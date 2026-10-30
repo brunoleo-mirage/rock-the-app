@@ -7,13 +7,11 @@
 <meta name="theme-color" content="#FEFAD9">
 <link rel="icon" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/AmaticSC-Bold.woff" as="font" type="font/woff" crossorigin>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rock the App">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet" crossorigin>
 <script>(function(){try{var p=localStorage.getItem('rta_theme');var d=p==='dark';document.documentElement.dataset.theme=d?'dark':'light';}catch(e){document.documentElement.dataset.theme='light'}})();</script>
 <style>
 /* Layout: cabeçalho amarelo manteiga, conteúdo em lista de cartões, navegação fixa embaixo. Paleta suave derivada do KV do festival. */
@@ -21,7 +19,7 @@
   --bg:#FEFAD9; --paper:#FFFDF8; --butter:#FFD653; --rose:#EBA9CC; --sky:#884AFE; --sage:#A9D3A0;
   --lav:#884AFE; --peach:#F3C7A6; --ink:#3A3340; --ink2:#6E6578; --line:#E6DAC2;
   --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#92FE71;--nm2:#EB4B94;--nm3:#EB4B94;--nm4:#92FE71;--nm5:#92FE71;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#FEFAD9;--nm9:#FEFAD9;--nm10:#FEFAD9;--nm11:#EB4B94;--nm12:#92FE71;--nm13:#92FE71;--nm14:#EB4B94;--nm15:#92FE71;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;
-  --f-display:'Revide','Amatic SC','Comic Sans MS',cursive; --f-body:'Revide','Amatic SC','Comic Sans MS',cursive;
+  --f-display:'Amatic SC','Comic Sans MS',cursive; --f-body:'Amatic SC','Comic Sans MS',cursive;
   color-scheme: light;
 }
 *{box-sizing:border-box}
@@ -182,9 +180,8 @@ nav button[aria-selected="true"]{background:var(--hdr)}
 .xbtn{float:right;width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);font-weight:800}
 
 /* ================= Tema RTM: cores e caixas do festival ================= */
-@font-face{font-family:'Revide';src:url('fonts/Revide-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'Revide';src:url('fonts/Revide-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
-@font-face{font-family:'Revide';src:url('fonts/Revide-Black.woff2') format('woff2');font-weight:900;font-display:swap}
+@font-face{font-family:'Amatic SC';src:url('fonts/AmaticSC-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Amatic SC';src:url('fonts/AmaticSC-Bold.woff') format('woff');font-weight:700 900;font-style:normal;font-display:swap}
 :root{
  --bg:#FEFAD9;--paper:#FEFAD9;--ink:#1A1420;--ink2:#5A4B63;--line:#E3D6A8;
  --butter:#FFD653;--rose:#EB4B94;--sky:#884AFE;--sage:#92FE71;--lav:#884AFE;--peach:#FE5A5E;--blue:#884AFE;--coral:#FE5A5E;
