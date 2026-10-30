@@ -993,18 +993,6 @@ function openPin(n,center){
   paintPin();
   if(S.pin&&center){const el=document.querySelector(`#mapbox .pin[data-pin="${n}"]`),w=$('#mapwrap');if(el&&w){w.scrollTo({left:el.offsetLeft-w.clientWidth/2,top:el.offsetTop-w.clientHeight/2,behavior:'smooth'});w.scrollIntoView({block:'start',behavior:'smooth'});}}
 }
-const WX=[
- {t:'Sexta, 30 de outubro',min:16,max:22,rain:'Chuva provável o dia todo',lvl:'Alta',alert:'AccuWeather tem alerta amarelo de chuva intensa e tempestade para a sexta.',sun:'18:04',ic:'storm',
-  src:[['Modelo numérico','17–22°, 75% de chuva'],['Meteored','18–22°, chuva moderada (~30 mm)'],['AccuWeather','16–22°, 86% de chuva'],['Clima do Brasil','18–23°, 90% de chuva']],
-  tips:['Capa de chuva (guarda-chuva atrapalha na multidão).','Tênis que pode molhar e meia extra na bolsa.','Celular em saquinho ou capinha.']},
- {t:'Sábado, 31 de outubro',min:17,max:24,rain:'Pancadas isoladas, trovoada possível',lvl:'Média',alert:'Fontes divergem muito: de 15% a 90% de chance de chuva. AccuWeather mantém alerta amarelo de chuva intensa.',sun:'18:05',ic:'mix',
-  src:[['Modelo numérico','18–24°, 15% de chuva'],['Meteored','19–27°, chuva fraca (~5 mm)'],['Climatempo','17–22°, chuva e trovoadas (~9 mm)'],['AccuWeather','17–23°, 60% de chuva e trovoada']],
-  tips:['Leve capa de chuva mesmo que a manhã abra.','Casaquinho leve para a noite: a madrugada fica por volta de 17°.','Gramado molhado: calçado fechado ajuda.']},
- {t:'Domingo, 1º de novembro',min:17,max:24,rain:'Sol e chuva alternados',lvl:'Média',alert:'',sun:'18:05',ic:'mix',
-  src:[['Modelo numérico','18–23°, 30% de chuva'],['Meteored','19–26°, chuva fraca (~5 mm)'],['Climatempo','17–23°, sol e chuva'],['Clima do Brasil','17–22°, 90% de chuva']],
-  tips:['Capa de chuva na bolsa.','Protetor solar para as primeiras horas da tarde, se o sol abrir.','Casaquinho leve para a noite.']}
-];
-
 /* personagens originais, no espírito dos cartazes: formas chapadas, contorno grosso e cores da paleta */
 const K='#1A1420',CR='#FEFAD9',RO='#EB4B94',CO='#FE5A5E',YE='#FFD653',GR='#92FE71',VI='#884AFE',VD='#6034BD';
 const eye=(x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${CR}" stroke="${K}" stroke-width="2.5"/><circle cx="${x+1}" cy="${y+1}" r="${r/2.6}" fill="${K}"/>`;
@@ -1061,8 +1049,8 @@ function liveDay(i){
 function rWx(){
   const live=!!S.wx;
   let html='';
-  const stamp=live?(S.wxErr?`Sem conexão agora. Mostrando a previsão de ${fmtD(S.wx.t)} às ${fmtT(S.wx.t)}.`:`Atualizada ${fmtD(S.wx.t)===fmtD(Date.now())?'hoje':'em '+fmtD(S.wx.t)} às ${fmtT(S.wx.t)}. Atualiza sozinha a cada 10 minutos.`):(S.wxBusy?'Buscando a previsão...':'Sem conexão e sem previsão salva. Mostrando a previsão de 29/10, que pode estar desatualizada.');
-  html+=`<p class="note" style="margin:0 0 8px">Itaipava, Petrópolis (Parque Paulo Rattes). ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
+  const stamp=live?(S.wxErr?`Sem conexão agora. Mostrando a previsão de ${fmtD(S.wx.t)} às ${fmtT(S.wx.t)}.`:`Atualizada ${fmtD(S.wx.t)===fmtD(Date.now())?'hoje':'em '+fmtD(S.wx.t)} às ${fmtT(S.wx.t)}. Atualiza sozinha a cada 10 minutos.`):(S.wxBusy?'Buscando a previsão...':'Sem conexão e sem previsão salva.');
+  html+=`<p class="note" style="margin:0 0 8px">Itaipava, Petrópolis (Parque Paulo Rattes). Fonte: Open-Meteo. ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
   if(live){
     const nowKey=NOW.date+'T'+String(Math.floor((NOW.mins%1440)/60)).padStart(2,'0')+':00';
     const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return w?pickChar(w):null});
@@ -1070,19 +1058,17 @@ function rWx(){
       if(dayOver(i))return;
       const w=liveDay(i); if(!w)return;
       const [desc,ic]=wmo(w.code), lvl=w.p>=60?'alta':w.p>=30?'média':'baixa';
-      const w0=WX[i];
       html+=`<section class="wcard"><div class="whead"><div><h3>${D.full}</h3><div class="big">${Math.round(w.min)}° a ${Math.round(w.max)}°</div></div>${charHtml(KEYS[i],varIdx(KEYS,i))}</div>
       <span class="pill" style="background:${w.p>=60?'#884AFE':'#FFD653'};color:${w.p>=60?'#FEFAD9':'#1A1420'}">Chance de chuva: ${lvl} (${w.p}%)</span>
       <p><b>${desc}.</b> ${w.mm>=0.1?String(w.mm.toFixed(1)).replace('.',',')+' mm no dia. ':'Sem chuva relevante. '}Pôr do sol às ${w.sunset}.</p>
-      ${w.storm?'<div class="alert">Previsão de trovoada em algum horário. Em caso de raios, saia de áreas abertas e de baixo de árvores.</div>':''}
+      ${w.storm?'<div class="alert">Previsão de trovoada em algum horário (modelo Open-Meteo). Em caso de raios, saia de áreas abertas e de baixo de árvores.</div>':''}
       ${w.best&&w.best.b-w.best.a>=1?`<div class="dry">Janela mais seca: ${String(w.hrs[w.best.a].h).padStart(2,'0')}h até ${String((w.hrs[w.best.b].h+1)%24).padStart(2,'0')}h</div>`:''}
       <div class="hrs" role="list" aria-label="Previsão hora a hora">${w.hrs.map(x=>`<div class="hc ${x.key===nowKey?'now':''}" role="listitem"><div class="h">${String(x.h).padStart(2,'0')}h</div><div class="bar"><i style="height:${Math.max(3,Math.round(x.P*0.34))}px"></i></div><div>${x.P}%</div><div class="tp">${Math.round(x.T)}°</div><div class="mm">${x.R>=0.1?String(x.R.toFixed(1)).replace('.',','):'0'} mm</div></div>`).join('')}</div>
       <p class="note" style="margin-top:2px">Barras: chance de chuva por hora.</p></section>`;
     });
   } else {
-    const SK=WX.map(w=>w.ic==='storm'?'storm':w.ic==='rain'?'rain':w.ic==='sun'?'sun':'mix');WX.forEach((w,i)=>{if(dayOver(i))return;html+=`<section class="wcard"><div class="whead"><div><h3>${w.t}</h3><div class="big">${w.min}° a ${w.max}°</div></div>${charHtml(SK[i],varIdx(SK,i))}</div><span class="pill" style="background:${w.lvl==='Alta'?'#884AFE':'#FFD653'};color:${w.lvl==='Alta'?'#FEFAD9':'#1A1420'}">Chance de chuva: ${w.lvl.toLowerCase()}</span><p><b>${w.rain}.</b> Pôr do sol às ${w.sun}.</p>${w.alert?`<div class="alert">${w.alert}</div>`:''}</section>`;});
+    html+='<div class="empty"><b>Sem previsão salva</b>Conecte-se à internet e toque em "Atualizar agora" para ver a previsão.</div>';
   }
-  html+=`<details class="oth"><summary>Outras fontes (previsão de 29/10)</summary>${WX.map(w=>`<h3 style="font-family:var(--f-display);font-size:16px;margin:10px 0 0">${w.t}</h3><table class="src"><tbody>${w.src.map(r=>`<tr><th scope="row">${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</tbody></table>`).join('')}</details>`;
   main.innerHTML=html;
 }
 
@@ -1095,7 +1081,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.79';
+const APP_VER='1.0.80';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
