@@ -1333,6 +1333,6 @@ paintTheme(); paintInstall(); render(); loadWx(); setInterval(loadWx,600000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!S.wx||Date.now()-S.wx.t>300000))loadWx();});
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.host))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 </script>
-<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "af42b17a667449f58e3dbefdd96e9dc1"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Cloudflare Web Analytics (não conta quem abriu o app com ?eu=1; ?eu=0 volta a contar) --><script>try{var q=new URLSearchParams(location.search).get('eu');if(q==='1')localStorage.setItem('rta_noan','1');if(q==='0')localStorage.removeItem('rta_noan');if(!localStorage.getItem('rta_noan')){var s=document.createElement('script');s.defer=true;s.src='https://static.cloudflareinsights.com/beacon.min.js';s.setAttribute('data-cf-beacon','{"token": "af42b17a667449f58e3dbefdd96e9dc1"}');document.head.appendChild(s);}}catch(e){}</script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
