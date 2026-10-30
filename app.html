@@ -1086,9 +1086,10 @@ function liveDay(i){
   const D=S.wx.d, di=D.daily.time.indexOf(DAYS[i].date); if(di<0)return null;
   const H=D.hourly, date=DAYS[i].date, nd=nextDate(date), hrs=[];
   for(let k=0;k<17;k++){const h=(12+k)%24, key=(k<12?date:nd)+'T'+String(h).padStart(2,'0')+':00', ix=H.time.indexOf(key); if(ix>=0)hrs.push({h,key,T:H.temperature_2m[ix],P:H.precipitation_probability[ix],R:H.precipitation[ix],C:H.weather_code[ix]});}
+  const nowIx=date===NOW.date?H.time.indexOf(hourKeyNow()):-1; /* só o dia de hoje tem 'agora'; os outros dias seguem a previsão geral */
   // janela mais seca (chuva <= 25%)
   let best=null,run=null;hrs.forEach((x,ix)=>{if(x.P<=25){if(!run)run={a:ix,b:ix};else run.b=ix;if(!best||(run.b-run.a)>(best.b-best.a))best={a:run.a,b:run.b};}else run=null;});
-  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95),tNow:(date===NOW.date&&(ix=>ix>=0?H.temperature_2m[ix]:null)(H.time.indexOf(hourKeyNow())))||null,cNow:(date===NOW.date&&(ix=>ix>=0?H.weather_code[ix]:null)(H.time.indexOf(hourKeyNow())))??null,pNow:(date===NOW.date&&(ix=>ix>=0?H.precipitation_probability[ix]:null)(H.time.indexOf(hourKeyNow())))??null};
+  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95),tNow:nowIx>=0?H.temperature_2m[nowIx]:null,cNow:nowIx>=0?H.weather_code[nowIx]:null,pNow:nowIx>=0?H.precipitation_probability[nowIx]:null};
 }
 function rWx(){
   const live=!!S.wx;
@@ -1126,7 +1127,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.89';
+const APP_VER='1.0.90';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
