@@ -937,9 +937,9 @@ function rRot(){
   });
   if(planIds().length){
     const nc=[...S.sel].filter(i=>conflictsOf(byId[i]).length).length;
-    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
+    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
   } else {
-    html+='<div class="row rbar"><button class="btns" id="import-rot">Importar</button></div>';
+    html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
   main.innerHTML=html;
 }
