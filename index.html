@@ -42,7 +42,7 @@ header h1{font-family:var(--f-display);font-size:22px;line-height:1.1;margin:0;f
 header p{margin:0;font-size:13px;color:var(--ink2)}
 #about-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);font-weight:800}
 main{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px 24px;-webkit-overflow-scrolling:touch}
-nav{display:grid;grid-template-columns:repeat(4,1fr);background:var(--paper);border-top:2px solid var(--ink);padding-bottom:env(safe-area-inset-bottom)}
+nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(64px,auto);background:var(--paper);border-top:2px solid var(--ink);padding-bottom:env(safe-area-inset-bottom)}
 nav button{border:0;background:none;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--ink2);position:relative;min-height:56px}
 nav button svg{width:24px;height:24px}
 nav button[aria-selected="true"]{color:var(--ink);background:var(--butter)}
@@ -511,6 +511,8 @@ h2.sec{font-size:25px}
 #sheet .shbtns .btns,#sheet .shbtns .btnp{display:block;text-align:center;text-decoration:none;color:var(--ink);width:100%}
 #sheet .shbtns .btnp{color:var(--dk)}
 #sheet .implist{margin:8px 0;padding-left:18px;max-height:34vh;overflow:auto;font-size:15px}
+nav button{min-width:0}
+nav #share-app{padding-left:6px;padding-right:6px}
 </style>
 </head>
 <body>
@@ -529,6 +531,7 @@ h2.sec{font-size:25px}
     <button role="tab" data-tab="rot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg>Meu roteiro<span class="badge" id="cnt" hidden>0</span></button>
     <button role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mapa</button>
     <button role="tab" data-tab="wx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17a4.5 4.5 0 1 1 1.2-8.8A5.5 5.5 0 0 1 18.5 10a3.5 3.5 0 0 1-.5 7z"/><path d="M9 20l1-2M13 20l1-2"/></svg>Tempo</button>
+    <button id="share-app" aria-label="Compartilhar o app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/></svg>Compartilhar</button>
   </nav>
 </div>
 <div id="scrim"></div>
@@ -851,7 +854,7 @@ function route(){
 function closeSheetThen(fn){ if(sheetOpen){hideSheet();afterClose=fn;history.back();} else fn(); }
 function credit(){return '<footer class="credit"><span class="dev">developed by</span><img class="mg" src="https://biblioteca-de-prompts-mirage.pages.dev/logo-mirage.jpg" alt="Mirage" width="52" height="84" loading="lazy"><img class="mw" src="https://biblioteca-de-prompts-mirage.pages.dev/mirage-word.png" alt="" width="90" height="30" loading="lazy"><span class="byg">by Ginger</span></footer>';}
 function render(){
-  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  document.querySelectorAll('nav button[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
   const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);
   ({prog:rProg,rot:rRot,map:rMap,wx:rWx})[S.tab]();
 }
@@ -1095,7 +1098,7 @@ function aboutSheet(){
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
-  <li><b>Compartilhar.</b> O botão "Compartilhar o app" no fim das telas manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF ou por link, e "Importar roteiro" traz o roteiro de outra pessoa para o seu.</li>
+  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF, e "Importar roteiro" lê o PDF que outra pessoa mandou e traz o roteiro dela para o seu.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo oficial.</b> Este é um aplicativo oficial do Rock The Mountain.</li>
   </ul>`;
@@ -1187,7 +1190,7 @@ const sheetHtml=(title,body)=>{$('#sheet').innerHTML='<button class="xbtn" data-
 const rotCode=()=>[...S.sel].filter(i=>byId[i]).concat([...S.maybe].filter(i=>byId[i]).map(i=>'m'+i)).join('.');
 const rotLink=()=>APP_URL+'/?r='+rotCode();
 function rotText(){
-  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'\n\nJá usa o app? Abra este link para importar meu roteiro:\n'+rotLink();
+  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'';
 }
 function parseCode(txt){
   const s=String(txt||''), m=s.match(/[?&]r=([0-9m.\-]+)/)||s.match(/^\s*([0-9m][0-9m.\-]{2,})\s*$/);
@@ -1218,17 +1221,28 @@ function shareRotSheet(){
    '<button class="btnp" id="sh-pdf">Compartilhar PDF</button><button class="btns" id="dl-pdf">Baixar PDF</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Enviar texto e link</button>':'')+
    `<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Enviar no WhatsApp</a>`+
-   '<button class="btns" id="sh-rot-copy">Copiar link para importar</button></div><p class="note">Quem receber o link e já tiver o app pode importar o seu roteiro em um toque.</p>');
+   '</div><p class="note">Quem receber o PDF e já tiver o app pode importar o seu roteiro em "Importar roteiro".</p>');
 }
 function importSheet(){
-  sheetHtml('Importar roteiro','<p class="note">Cole o link ou a mensagem que seu amigo enviou.</p><textarea id="imp-ta" placeholder="https://rock-the-app.pages.dev/?r=..."></textarea><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro nesse texto.</p><div class="acts2"><button class="btnp" id="imp-go">Continuar</button><button class="btns" data-close>Cancelar</button></div>');
+  sheetHtml('Importar roteiro','<p class="note">Escolha o PDF do roteiro que seu amigo enviou. Ele precisa ter sido gerado pelo Rock the App.</p><input type="file" id="imp-file" accept="application/pdf,.pdf" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App nesse arquivo.</p><div class="acts2"><button class="btnp" id="imp-pick">Escolher PDF</button><button class="btns" data-close>Cancelar</button></div>');
 }
+function importPdf(file){
+  const err=$('#imp-err'); if(err)err.hidden=true;
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const u=new Uint8Array(r.result);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));
+    const m=s.match(/RTA:([0-9m.\-]+)/),p=m&&parseCode('?r='+m[1]);
+    if(p)importPreview(p);else if(err)err.hidden=false;}catch(e){if(err)err.hidden=false;}};
+  r.onerror=()=>{if(err)err.hidden=false;};
+  r.readAsArrayBuffer(file);
+}
+document.addEventListener('change',e=>{if(e.target.id==='imp-file')importPdf(e.target.files&&e.target.files[0]);});
 let IMP=null;
 function importPreview(p){
   IMP=p;
   const L=[...p.sel.map(i=>[i,0]),...p.maybe.map(i=>[i,1])].map(([i,m])=>[byId[i],m]).sort((a,b)=>a[0].d-b[0].d||a[0].s-b[0].s);
   const has=planIds().length>0;
-  sheetHtml('Roteiro recebido',`<p class="note">${L.length} atraç${L.length>1?'ões':'ão'} no roteiro de um amigo.</p><ul class="implist">`+L.map(([x,m])=>`<li><b>${esc(x.name)}</b> · ${DAYS[x.d].short} ${DAYS[x.d].n}, ${hhmm(x.s)} · ${esc(stageLong(x.stage))}${m?' (talvez)':''}</li>`).join('')+'</ul><div class="acts2">'+
+  sheetHtml('Roteiro recebido',`<p class="note">${L.length} atraç${L.length>1?'ões':'ão'} no PDF.</p><ul class="implist">`+L.map(([x,m])=>`<li><b>${esc(x.name)}</b> · ${DAYS[x.d].short} ${DAYS[x.d].n}, ${hhmm(x.s)} · ${esc(stageLong(x.stage))}${m?' (talvez)':''}</li>`).join('')+'</ul><div class="acts2">'+
    `<button class="btnp" id="imp-add">${has?'Adicionar ao meu roteiro':'Importar'}</button>`+(has?'<button class="btns" id="imp-rep">Substituir meu roteiro</button>':'')+'<button class="btns" data-close>Cancelar</button></div>');
 }
 function applyImport(replace){
@@ -1278,11 +1292,12 @@ function pdfRotBlob(){
   objs[2]=`<< /Type /Pages /Kids [${pages.map((_,i)=>(5+2*i)+' 0 R').join(' ')}] /Count ${n} >>`;
   objs[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
   objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  objs[5+2*n]=`<< /Title (Meu roteiro - Rock the Mountain 2026) /Subject (RTA:${rotCode()}) /Creator (Rock the App) >>`;
   pages.forEach((p,i)=>{const s=p.join('\n');objs[5+2*i]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6+2*i} 0 R >>`;objs[6+2*i]=`<< /Length ${s.length} >>\nstream\n${s}\nendstream`;});
   let out='%PDF-1.4\n';const off=[];
   for(let i=1;i<objs.length;i++){off[i]=out.length;out+=`${i} 0 obj\n${objs[i]}\nendobj\n`;}
   const xr=out.length;
-  out+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`+off.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  out+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`+off.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length} /Root 1 0 R /Info ${5+2*n} 0 R >>\nstartxref\n${xr}\n%%EOF`;
   const u8=new Uint8Array(out.length);for(let i=0;i<out.length;i++)u8[i]=out.charCodeAt(i)&255;
   return new Blob([u8],{type:'application/pdf'});
 }
@@ -1302,14 +1317,12 @@ function shareClick(t){
   if(t.id==='sh-pdf')return pdfShare(),true;
   if(t.id==='dl-pdf')return (()=>{try{pdfDownload(pdfRotBlob())}catch(e){}})(),true;
   if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
-  if(t.id==='sh-rot-copy')return copyTo(rotLink(),t,'Link copiado'),true;
   if(t.id==='import-rot')return importSheet(),true;
-  if(t.id==='imp-go'){const p=parseCode(($('#imp-ta')||{}).value);if(!p){const e=$('#imp-err');if(e)e.hidden=false;return true;}importPreview(p);return true;}
+  if(t.id==='imp-pick'){const f=$('#imp-file');if(f)f.click();return true;}
   if(t.id==='imp-add')return applyImport(false),true;
   if(t.id==='imp-rep')return applyImport(true),true;
   return false;
 }
-try{new MutationObserver(()=>{if(!main.querySelector('.sharebar')){const bar='<div class="sharebar"><button class="btns" id="share-app">Compartilhar o app</button></div>',cr=main.querySelector('.credit');if(cr)cr.insertAdjacentHTML('beforebegin',bar);else main.insertAdjacentHTML('beforeend',bar);}}).observe(main,{childList:true});}catch(e){}
 (function(){try{const q=new URLSearchParams(location.search).get('r');if(!q)return;const p=parseCode('?r='+q);history.replaceState(null,'',location.pathname+location.hash);if(p)setTimeout(()=>importPreview(p),500);}catch(e){}})();
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
