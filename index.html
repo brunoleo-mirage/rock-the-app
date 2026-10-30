@@ -830,6 +830,7 @@ function nowBR(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_
   if(h<12){mins+=1440;const dt=new Date(date+'T12:00:00Z');dt.setUTCDate(dt.getUTCDate()-1);date=dt.toISOString().slice(0,10);}
   return {date,mins};}
 let NOW=nowBR();
+const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.e); /* acabou: sai da lista e do roteiro */
 const dayOver=d=>NOW.date>DAYS[d].date; /* o dia do festival vira ao meio-dia; passou do dia, ele fecha */
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
 const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
@@ -878,14 +879,14 @@ function card(sh,opts={}){
 }
 function rProg(){
   const q=norm(S.q.trim());
-  let list=SHOWS.filter(x=>x.d===S.day&&(S.stages.length===0||S.stages.includes(x.stage))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
+  let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
   list.sort((a,b)=>a.s-b.s||stageById[a.stage].i-stageById[b.stage].i);
   let html=dayChips();
   html+=`<input class="search" id="q" type="search" placeholder="Buscar artista ou palco" value="${esc(S.q)}" aria-label="Buscar">`;
   const ordered=S.stages.map(id=>stageById[id]).concat(STAGES.filter(s=>!S.stages.includes(s.id)));
-  html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id)?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
+  html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id&&!showOver(x))?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
   html+=`<p class="note" style="margin:0 0 4px">${DAYS[S.day].full} · ${list.length} ${list.length===1?'atração':'atrações'}${S.sel.size?' · '+[...S.sel].filter(i=>byId[i].d===S.day).length+' marcada(s)':''}</p>`;
-  if(!list.length) html+='<div class="empty"><b>Nada por aqui</b>Troque o palco ou limpe a busca.</div>';
+  if(!list.length) html+=SHOWS.filter(x=>x.d===S.day).every(showOver)?'<div class="empty"><b>As atrações deste dia já acabaram</b>Escolha outro dia acima.</div>':'<div class="empty"><b>Nada por aqui</b>Troque o palco ou limpe a busca.</div>';
   let lastH=null;
   list.forEach(sh=>{const h=Math.floor(sh.s/60)%24; if(h!==lastH){html+=`<div class="hour">${String(h).padStart(2,'0')}h</div>`;lastH=h;} html+=card(sh);});
   main.innerHTML=html;
@@ -1119,7 +1120,8 @@ let _rs=Math.floor(Date.now()/ROT_MS);
 function tick(){
   const r=Math.floor(Date.now()/ROT_MS); if(r!==_rs){_rs=r; if(S.tab==='wx')render();}
   const prev=NOW; NOW=nowBR();
-  if(prev.date!==NOW.date){const a=purgePast(),b=fixDay();if(a||b||S.tab==='wx'){render();return;}}
+  const pg=purgePast();if(pg){const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);}
+  if(prev.date!==NOW.date){const b=fixDay();if(pg||b||S.tab==='wx'){render();return;}}
   if(prev.mins!==NOW.mins&&(S.tab==='prog'||S.tab==='rot')&&!$('#sheet').classList.contains('open')&&!(document.activeElement&&document.activeElement.tagName==='INPUT')){
     const st=main.scrollTop;render();main.scrollTop=st;}
 }
@@ -1333,7 +1335,7 @@ function shareClick(t){
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 (function(){const h=location.hash.slice(1).split('-')[0];if(TABS.includes(h))S.tab=h;})();
 window.addEventListener('hashchange',route);
-function purgePast(){let ch=false;[S.sel,S.maybe].forEach(set=>[...set].forEach(id=>{if(byId[id]&&dayOver(byId[id].d)){set.delete(id);ch=true;}}));if(ch)save();return ch;}
+function purgePast(){let ch=false;[S.sel,S.maybe].forEach(set=>[...set].forEach(id=>{if(byId[id]&&showOver(byId[id])){set.delete(id);ch=true;}}));if(ch)save();return ch;}
 function fixDay(){if(dayOver(S.day)){const i=DAYS.findIndex((x,d)=>!dayOver(d));S.day=i<0?0:i;return true;}return false;}
 purgePast();fixDay();
 paintTheme(); paintInstall(); render(); loadWx(); setInterval(loadWx,600000);
