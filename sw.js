@@ -1,7 +1,7 @@
-const V='rta-v71';
+const V='rta-v72';
 const CORE=['./','index.html','map.jpg','sticker.png','mirage-logo.png','manifest.webmanifest','favicon.png','icons/icon-192.png','icons/icon-512.png','chars/storm.webp','chars/storm-2.webp','chars/storm-3.webp','chars/rain.webp','chars/rain-2.webp','chars/mix.webp','chars/mix-2.webp','chars/mix-3.webp','chars/sun.webp','chars/sun-2.webp','chars/sun-3.webp','chars/cold.webp','chars/cold-2.webp','chars/cold-3.webp','chars/fog.webp','chars/fog-2.webp','chars/fog-3.webp','chars/hot.webp','chars/hot-2.webp','chars/hot-3.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=='rta-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{
   const r=e.request; if(r.method!=='GET')return; const u=new URL(r.url);
   if(u.hostname==='api.open-meteo.com')return;
@@ -12,6 +12,6 @@ self.addEventListener('fetch',e=>{
       return m||net;}));
     return;}
   if(/gstatic\.com$|googleapis\.com$/.test(u.hostname)){
-    e.respondWith(caches.match(r).then(m=>m||fetch(r).then(res=>{const cp=res.clone();caches.open(V).then(c=>c.put(r,cp));return res;}).catch(()=>m)));
+    e.respondWith(caches.open('rta-fonts').then(c=>c.match(r).then(m=>m||fetch(r).then(res=>{if(res&&(res.ok||res.type==='opaque'&&u.hostname.endsWith('gstatic.com')))c.put(r,res.clone());return res;}).catch(()=>m))));
   }
 });
