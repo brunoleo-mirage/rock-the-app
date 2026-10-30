@@ -517,6 +517,7 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .rbar button{min-height:34px;padding:4px 10px;font-size:14px;line-height:1.1}
 .chip-btn.over,.chip-btn.over:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed;box-shadow:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="dark"]){color-scheme:light}}
+#sheet .ver{text-align:center;font-size:13px;color:var(--ink2);margin:14px 0 4px}
 </style>
 </head>
 <body>
@@ -1094,6 +1095,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
+const APP_VER='1.0.79';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1107,7 +1109,7 @@ function aboutSheet(){
   <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF, e "Importar roteiro" lê o PDF que outra pessoa mandou e traz o roteiro dela para o seu.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
-  </ul>`;
+  </ul><p class="ver">Versão ${APP_VER}</p>`;
   openSheet();
 }
 function copyText(){
