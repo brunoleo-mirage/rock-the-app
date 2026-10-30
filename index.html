@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rock the App</title>
 <meta name="theme-color" content="#FEFAD9">
-<meta name="color-scheme" id="cs" content="only light">
+<meta name="color-scheme" id="cs" content="light dark">
 <meta name="darkreader-lock">
 <link rel="icon" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rock the App">
-<script>(function(){try{var p=localStorage.getItem('rta_theme');var d=p==='dark';document.documentElement.dataset.theme=d?'dark':'light';var c=document.getElementById('cs');if(c)c.content=d?'dark':'only light';}catch(e){document.documentElement.dataset.theme='light'}})();</script>
+<script>(function(){try{var p=localStorage.getItem('rta_theme');var d=p==='dark';document.documentElement.dataset.theme=d?'dark':'light';var c=document.getElementById('cs');if(c)c.content=d?'dark':'light dark';}catch(e){document.documentElement.dataset.theme='light'}})();</script>
 <style>
 /* Layout: cabeçalho amarelo manteiga, conteúdo em lista de cartões, navegação fixa embaixo. Paleta suave derivada do KV do festival. */
 :root{
@@ -22,7 +22,7 @@
   --lav:#884AFE; --peach:#F3C7A6; --ink:#3A3340; --ink2:#6E6578; --line:#E6DAC2;
   --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#92FE71;--nm2:#EB4B94;--nm3:#EB4B94;--nm4:#92FE71;--nm5:#92FE71;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#FEFAD9;--nm9:#FEFAD9;--nm10:#FEFAD9;--nm11:#EB4B94;--nm12:#92FE71;--nm13:#92FE71;--nm14:#EB4B94;--nm15:#92FE71;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;
   --f-display:'Amatic SC','Comic Sans MS',cursive; --f-body:'Amatic SC','Comic Sans MS',cursive;
-  color-scheme: only light;
+  color-scheme: light;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -134,7 +134,7 @@ h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
 details.oth{background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:10px 12px;margin-bottom:12px}
 details.oth summary{font-weight:800;min-height:36px;display:flex;align-items:center;cursor:pointer}
 .refresh{margin:0 0 12px}
-:root[data-theme="dark"]{--bg:#1D1A23;--paper:#2A2631;--ink:#EEE8F3;--ink2:#B4ABC0;--line:#413B4B;--hdr:#2D2836;--on:#3A3426;color-scheme:only dark}
+:root[data-theme="dark"]{--bg:#1D1A23;--paper:#2A2631;--ink:#EEE8F3;--ink2:#B4ABC0;--line:#413B4B;--hdr:#2D2836;--on:#3A3426;color-scheme:dark}
 :root[data-theme="dark"] #mapbox:not(.orig) img{filter:saturate(.5) brightness(.8) contrast(.95)}
 :root[data-theme="dark"] .search::placeholder{color:#8F869B}
 .search,select{color:var(--ink)}
@@ -516,6 +516,7 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .rbar{margin:6px 0 12px;flex-wrap:wrap;gap:6px 8px}
 .rbar button{min-height:34px;padding:4px 10px;font-size:14px;line-height:1.1}
 .chip-btn.over,.chip-btn.over:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed;box-shadow:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="dark"]){color-scheme:light}}
 </style>
 </head>
 <body>
@@ -1131,7 +1132,7 @@ setInterval(tick,15000);
 const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>';
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
 function isDark(){return document.documentElement.dataset.theme==='dark';}
-function paintTheme(){const b=$('#theme-btn');if(b){b.innerHTML=isDark()?SUN:MOON;b.setAttribute('aria-label',isDark()?'Mudar para o modo claro':'Mudar para o modo escuro');}const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141214':'#FEFAD9';const cs=document.getElementById('cs');if(cs)cs.content=isDark()?'dark':'only light';}
+function paintTheme(){const b=$('#theme-btn');if(b){b.innerHTML=isDark()?SUN:MOON;b.setAttribute('aria-label',isDark()?'Mudar para o modo claro':'Mudar para o modo escuro');}const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141214':'#FEFAD9';const cs=document.getElementById('cs');if(cs)cs.content=isDark()?'dark':'light dark';}
 function toggleTheme(){const d=!isDark();document.documentElement.dataset.theme=d?'dark':'light';try{localStorage.setItem('rta_theme',d?'dark':'light')}catch(e){}paintTheme();}
 
 
