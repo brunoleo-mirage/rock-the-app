@@ -518,6 +518,8 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .chip-btn.over,.chip-btn.over:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed;box-shadow:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="dark"]){color-scheme:light}}
 #sheet .ver{text-align:center;font-size:13px;color:var(--ink2);margin:14px 0 4px}
+.nowt{display:inline-block;margin-top:6px;padding:0 12px;border:2.5px solid var(--ink);border-radius:999px;background:var(--butter);color:var(--dk);font-size:22px;line-height:28px}
+.nowt b{font-weight:700}
 </style>
 </head>
 <body>
@@ -1019,13 +1021,14 @@ function charImg(f,key){ if(!f)return RAIN_SVG; const base=f.split('-')[0]; retu
 function charHtml(key,i){ const n=CV[key]; if(!n)return RAIN_SVG; const v=((i||0)%n)+1; return `<img class="char" src="chars/${key}${v>1?'-'+v:''}.webp" width="104" height="104" alt="${CHAR_ALT[key]||'Clima'}" loading="lazy">`; }
 const charFor=(ic,storm)=>CHARS[storm?'storm':(ic==='rain'||ic==='storm')?(ic==='storm'?'storm':'rain'):ic==='sun'?'sun':'mix'];
 /* 7 cenários: trovoada > chuva > neblina > calor > frio > sol > nublado */
-function pickChar(w){
+function pickChar(w,t){  /* t = temperatura de agora (só no dia de hoje) */
   const fogH=(w.hrs||[]).filter(x=>x.C===45||x.C===48).length;
   if(w.storm)return 'storm';
   if(w.mm>=2||(w.code>=51&&w.code<=82)||(w.hrs||[]).filter(x=>x.P>=70&&x.R>=0.3).length>=4)return 'rain';
   if(w.code===45||w.code===48||fogH>=3)return 'fog';
-  if(w.max>=31)return 'hot';
-  if(w.min<=14||w.max<=19)return 'cold';
+  const hasT=t!=null&&!isNaN(t);
+  if(hasT?t>=29:w.max>=31)return 'hot';
+  if(hasT?t<=16:(w.min<=14||w.max<=19))return 'cold';
   return w.code<=1?'sun':'mix';
 }
 const CHAR_LABEL={storm:'Trovoada',rain:'Chuva',fog:'Neblina',hot:'Calor',cold:'Frio',sun:'Sol',mix:'Nublado'};
@@ -1050,6 +1053,7 @@ async function loadWx(){
 function wmo(c){ if(c===0)return['Céu limpo','sun']; if(c<=2)return['Poucas nuvens','mix']; if(c===3)return['Nublado','cloud']; if(c===45||c===48)return['Neblina','cloud']; if(c>=51&&c<=57)return['Garoa','rain']; if(c>=61&&c<=67)return['Chuva','rain']; if(c>=80&&c<=82)return['Pancadas de chuva','rain']; if(c>=95)return['Trovoadas','storm']; return['Variável','cloud']; }
 const fmtT=ts=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}).format(ts);
 const fmtD=ts=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit'}).format(ts);
+const hourKeyNow=()=>(NOW.mins>=1440?nextDate(NOW.date):NOW.date)+'T'+String(Math.floor((NOW.mins%1440)/60)).padStart(2,'0')+':00';
 const nextDate=d=>{const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+1);return x.toISOString().slice(0,10)};
 function liveDay(i){
   const D=S.wx.d, di=D.daily.time.indexOf(DAYS[i].date); if(di<0)return null;
@@ -1057,7 +1061,7 @@ function liveDay(i){
   for(let k=0;k<17;k++){const h=(12+k)%24, key=(k<12?date:nd)+'T'+String(h).padStart(2,'0')+':00', ix=H.time.indexOf(key); if(ix>=0)hrs.push({h,key,T:H.temperature_2m[ix],P:H.precipitation_probability[ix],R:H.precipitation[ix],C:H.weather_code[ix]});}
   // janela mais seca (chuva <= 25%)
   let best=null,run=null;hrs.forEach((x,ix)=>{if(x.P<=25){if(!run)run={a:ix,b:ix};else run.b=ix;if(!best||(run.b-run.a)>(best.b-best.a))best={a:run.a,b:run.b};}else run=null;});
-  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95)};
+  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95),tNow:(date===NOW.date&&(ix=>ix>=0?H.temperature_2m[ix]:null)(H.time.indexOf(hourKeyNow())))||null};
 }
 function rWx(){
   const live=!!S.wx;
@@ -1065,13 +1069,13 @@ function rWx(){
   const stamp=live?(S.wxErr?`Sem conexão agora. Mostrando a previsão de ${fmtD(S.wx.t)} às ${fmtT(S.wx.t)}.`:`Atualizada ${fmtD(S.wx.t)===fmtD(Date.now())?'hoje':'em '+fmtD(S.wx.t)} às ${fmtT(S.wx.t)}. Atualiza sozinha a cada 10 minutos.`):(S.wxBusy?'Buscando a previsão...':'Sem conexão e sem previsão salva.');
   html+=`<p class="note" style="margin:0 0 8px">Itaipava, Petrópolis (Parque Paulo Rattes). Fonte: Open-Meteo. ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
   if(live){
-    const nowKey=NOW.date+'T'+String(Math.floor((NOW.mins%1440)/60)).padStart(2,'0')+':00';
-    const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w)}), CH=assignChars(KEYS);
+    const nowKey=hourKeyNow();
+    const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w,w.tNow)}), CH=assignChars(KEYS);
     DAYS.forEach((D,i)=>{
       if(dayOver(i))return;
       const w=liveDay(i); if(!w)return;
       const [desc,ic]=wmo(w.code), lvl=w.p>=60?'alta':w.p>=30?'média':'baixa';
-      html+=`<section class="wcard"><div class="whead"><div><h3>${D.full}</h3><div class="big">${Math.round(w.min)}° a ${Math.round(w.max)}°</div></div>${charImg(CH[i],KEYS[i])}</div>
+      html+=`<section class="wcard"><div class="whead"><div><h3>${D.full}</h3><div class="big">${Math.round(w.min)}° a ${Math.round(w.max)}°</div>${w.tNow!=null?`<div class="nowt">Agora <b>${Math.round(w.tNow)}°</b></div>`:''}</div>${charImg(CH[i],KEYS[i])}</div>
       <span class="pill" style="background:${w.p>=60?'#884AFE':'#FFD653'};color:${w.p>=60?'#FEFAD9':'#1A1420'}">Chance de chuva: ${lvl} (${w.p}%)</span>
       <p><b>${desc}.</b> ${w.mm>=0.1?String(w.mm.toFixed(1)).replace('.',',')+' mm no dia. ':'Sem chuva relevante. '}Pôr do sol às ${w.sunset}.</p>
       ${w.storm?'<div class="alert">Previsão de trovoada em algum horário (modelo Open-Meteo). Em caso de raios, saia de áreas abertas e de baixo de árvores.</div>':''}
@@ -1094,7 +1098,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.82';
+const APP_VER='1.0.83';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1119,9 +1123,11 @@ function copyText(){
 
 
 let _rs=Math.floor(Date.now()/ROT_MS);
+let _ov=DAYS.map((d,i)=>dayOver(i)).join();
 function tick(){
   const r=Math.floor(Date.now()/ROT_MS); if(r!==_rs){_rs=r; if(S.tab==='wx')render();}
   const prev=NOW; NOW=nowBR();
+  const ov=DAYS.map((d,i)=>dayOver(i)).join(); if(ov!==_ov){_ov=ov;fixDay();purgePast();render();return;}
   const pg=purgePast();if(pg){const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);}
   if(prev.date!==NOW.date){const b=fixDay();if(pg||b||S.tab==='wx'){render();return;}}
   if(prev.mins!==NOW.mins&&(S.tab==='prog'||S.tab==='rot')&&!$('#sheet').classList.contains('open')&&!(document.activeElement&&document.activeElement.tagName==='INPUT')){
