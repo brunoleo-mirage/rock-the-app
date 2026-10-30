@@ -36,7 +36,7 @@ header .t{flex:1;min-width:0}
 header .dev{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;padding:2px 2px 0}
 header .dev span{font-size:5.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--ink2);white-space:nowrap}
 header .dev img{width:64px;height:auto;display:block}
-#about-btn{width:40px;height:40px;flex:none}
+#about-btn{width:40px;height:40px;flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0}
 header h1{font-family:var(--f-display);font-size:22px;line-height:1.1;margin:0;font-weight:700}
 header p{margin:0;font-size:13px;color:var(--ink2)}
 #about-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);font-weight:800}
@@ -494,7 +494,7 @@ h2.sec{font-size:25px}
 .card .time small{font-size:16px}
 .onair b{font-size:11.5px}
 
-.maybetag.mk{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1;border-radius:50%;font-family:'Amatic SC',cursive;font-weight:700}
+.maybetag.mk{width:24px;height:24px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:15px;line-height:1;border-radius:50%;font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-weight:800}
 .maybetag.heart{background:#FF5A5F;color:#fff;border:2px solid #1A1420;font-size:15px;font-family:system-ui,sans-serif}
 
 .card .stbtn{display:inline-flex;align-items:center;gap:6px;white-space:normal!important;flex-wrap:nowrap;line-height:1.1;padding:3px 9px;text-align:left;height:auto}
@@ -523,7 +523,7 @@ nav #share-app{padding-left:6px;padding-right:6px}
     <div class="t"><h1 class="sr">Rock the App</h1></div>
     <a class="dev" href="https://www.instagram.com/officeginger" target="_blank" rel="noopener" aria-label="Desenvolvido por Mirage by Ginger Agency (abre o Instagram)"><span>developed by</span><img src="mirage-logo.png" alt="Mirage by Ginger Agency" width="64" height="37"></a>
     <button id="theme-btn" aria-label="Alternar modo escuro"></button>
-    <button id="about-btn" aria-label="Sobre o app e como instalar">?</button>
+    <button id="about-btn" aria-label="Sobre o app e como instalar"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 9.2a3.5 3.5 0 1 1 5.4 2.9c-1.2.8-2 1.5-2 3"/><circle cx="12" cy="19" r="0.9" fill="currentColor" stroke="none"/></svg></button>
   </header>
   <div id="install" hidden><span>Use como aplicativo, até sem sinal</span><button id="install-btn" class="btnp">Instalar app</button></div>
   <main id="main" tabindex="-1"></main>
