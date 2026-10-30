@@ -1037,23 +1037,25 @@ function charImg(f,key){ if(!f)return RAIN_SVG; const base=f.split('-')[0]; retu
 function charHtml(key,i){ const n=CV[key]; if(!n)return RAIN_SVG; const v=((i||0)%n)+1; return `<img class="char" src="chars/${key}${v>1?'-'+v:''}.webp" width="104" height="104" alt="${CHAR_ALT[key]||'Clima'}" loading="lazy">`; }
 const charFor=(ic,storm)=>CHARS[storm?'storm':(ic==='rain'||ic==='storm')?(ic==='storm'?'storm':'rain'):ic==='sun'?'sun':'mix'];
 /* 7 cenários: trovoada > chuva > neblina > calor > frio > sol > nublado */
-function pickChar(w,t,cn){  /* t, cn = temperatura e código do tempo de agora (só no dia de hoje) */
+function pickChar(w,t,cn,pn){  /* t, cn = temperatura e código do tempo de agora (só no dia de hoje) */
   if(cn!=null){ /* hoje: o bonequinho reage ao que está acontecendo agora */
     if(cn>=95)return 'storm';
     if((cn>=51&&cn<=67)||(cn>=80&&cn<=82))return 'rain';
     if(cn===45||cn===48)return 'fog';
     const hot=t!=null&&t>=29, cold=t!=null&&t<=16;
     if(hot)return 'hot'; if(cold)return 'cold';
-    return cn<=1?'sun':'mix';
+    return (cn<=1&&(pn==null||pn<50))?'sun':'mix';
   }
   const fogH=(w.hrs||[]).filter(x=>x.C===45||x.C===48).length;
   if(w.code>=95||(w.hrs||[]).filter(x=>x.C>=95).length>=2)return 'storm'; /* previsão geral do dia: trovoada de verdade, não uma hora isolada (o alerta vermelho continua aparecendo) */
-  if(w.mm>=2||(w.code>=51&&w.code<=82)||(w.hrs||[]).filter(x=>x.P>=70&&x.R>=0.3).length>=4)return 'rain';
+  const hs=w.hrs||[], meanP=hs.length?hs.reduce((a,x)=>a+x.P,0)/hs.length:0;
+  /* chuva: pela quantidade, pelo código do dia, por muitas horas prováveis ou pela chance geral alta (nunca mostrar sol num dia com chance alta) */
+  if(w.mm>=2||(w.code>=51&&w.code<=82)||hs.filter(x=>x.P>=70&&x.R>=0.3).length>=4||hs.filter(x=>x.P>=70).length>=6||meanP>=60||(w.p!=null&&w.p>=90))return 'rain';
   if(w.code===45||w.code===48||fogH>=3)return 'fog';
   const hasT=t!=null&&!isNaN(t);
   if(hasT?t>=29:w.max>=31)return 'hot';
   if(hasT?t<=16:(w.min<=14||w.max<=19))return 'cold';
-  return w.code<=1?'sun':'mix';
+  return (w.code<=1&&meanP<40&&(w.p==null||w.p<50))?'sun':'mix';
 }
 const CHAR_LABEL={storm:'Trovoada',rain:'Chuva',fog:'Neblina',hot:'Calor',cold:'Frio',sun:'Sol',mix:'Nublado'};
 const ICONS={
@@ -1086,7 +1088,7 @@ function liveDay(i){
   for(let k=0;k<17;k++){const h=(12+k)%24, key=(k<12?date:nd)+'T'+String(h).padStart(2,'0')+':00', ix=H.time.indexOf(key); if(ix>=0)hrs.push({h,key,T:H.temperature_2m[ix],P:H.precipitation_probability[ix],R:H.precipitation[ix],C:H.weather_code[ix]});}
   // janela mais seca (chuva <= 25%)
   let best=null,run=null;hrs.forEach((x,ix)=>{if(x.P<=25){if(!run)run={a:ix,b:ix};else run.b=ix;if(!best||(run.b-run.a)>(best.b-best.a))best={a:run.a,b:run.b};}else run=null;});
-  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95),tNow:(date===NOW.date&&(ix=>ix>=0?H.temperature_2m[ix]:null)(H.time.indexOf(hourKeyNow())))||null,cNow:(date===NOW.date&&(ix=>ix>=0?H.weather_code[ix]:null)(H.time.indexOf(hourKeyNow())))??null};
+  return {min:D.daily.temperature_2m_min[di],max:D.daily.temperature_2m_max[di],p:D.daily.precipitation_probability_max[di],mm:D.daily.precipitation_sum[di],code:D.daily.weather_code[di],sunset:D.daily.sunset[di].slice(11),hrs,best,storm:hrs.some(x=>x.C>=95),tNow:(date===NOW.date&&(ix=>ix>=0?H.temperature_2m[ix]:null)(H.time.indexOf(hourKeyNow())))||null,cNow:(date===NOW.date&&(ix=>ix>=0?H.weather_code[ix]:null)(H.time.indexOf(hourKeyNow())))??null,pNow:(date===NOW.date&&(ix=>ix>=0?H.precipitation_probability[ix]:null)(H.time.indexOf(hourKeyNow())))??null};
 }
 function rWx(){
   const live=!!S.wx;
@@ -1095,7 +1097,7 @@ function rWx(){
   html+=`<p class="note" style="margin:0 0 8px">Itaipava, Petrópolis (Parque Paulo Rattes). Fonte: Open-Meteo. ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
   if(live){
     const nowKey=hourKeyNow();
-    const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w,w.tNow,w.cNow)}), CH=assignChars(KEYS);
+    const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w,w.tNow,w.cNow,w.pNow)}), CH=assignChars(KEYS);
     if(DAYS.every((d,i)=>dayOver(i)))html+='<div class="empty"><b>O festival deste fim de semana já acabou</b>Obrigado por usar o Rock the App!</div>';
     DAYS.forEach((D,i)=>{
       if(dayOver(i))return;
@@ -1124,7 +1126,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.88';
+const APP_VER='1.0.89';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
