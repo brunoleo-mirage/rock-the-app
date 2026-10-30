@@ -515,6 +515,7 @@ nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
 .rbar{margin:6px 0 12px;flex-wrap:wrap;gap:6px 8px}
 .rbar button{min-height:34px;padding:4px 10px;font-size:14px;line-height:1.1}
+.chip-btn.over,.chip-btn.over:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed;box-shadow:none}
 </style>
 </head>
 <body>
@@ -829,7 +830,8 @@ function nowBR(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_
   if(h<12){mins+=1440;const dt=new Date(date+'T12:00:00Z');dt.setUTCDate(dt.getUTCDate()-1);date=dt.toISOString().slice(0,10);}
   return {date,mins};}
 let NOW=nowBR();
-let dayIdx=Math.max(0,DAYS.findIndex(x=>x.date===NOW.date));
+const dayOver=d=>NOW.date>DAYS[d].date; /* o dia do festival vira ao meio-dia; passou do dia, ele fecha */
+let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
 const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
@@ -861,7 +863,7 @@ function render(){
   ({prog:rProg,rot:rRot,map:rMap,wx:rWx})[S.tab]();
 }
 function dayRain(i){ return ''; }
-function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn" data-day="${i}" aria-pressed="${S.day===i}"><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>';}
+function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
   const warn=on&&cf.length?`<div class="warn">⚠ Bate com ${cf.map(o=>esc(o.name)+' ('+range(o)+')').join(', ')}</div>`:'';
@@ -1062,6 +1064,7 @@ function rWx(){
     const nowKey=NOW.date+'T'+String(Math.floor((NOW.mins%1440)/60)).padStart(2,'0')+':00';
     const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return w?pickChar(w):null});
     DAYS.forEach((D,i)=>{
+      if(dayOver(i))return;
       const w=liveDay(i); if(!w)return;
       const [desc,ic]=wmo(w.code), lvl=w.p>=60?'alta':w.p>=30?'média':'baixa';
       const w0=WX[i];
@@ -1074,7 +1077,7 @@ function rWx(){
       <p class="note" style="margin-top:2px">Barras: chance de chuva por hora.</p></section>`;
     });
   } else {
-    const SK=WX.map(w=>w.ic==='storm'?'storm':w.ic==='rain'?'rain':w.ic==='sun'?'sun':'mix');WX.forEach((w,i)=>{html+=`<section class="wcard"><div class="whead"><div><h3>${w.t}</h3><div class="big">${w.min}° a ${w.max}°</div></div>${charHtml(SK[i],varIdx(SK,i))}</div><span class="pill" style="background:${w.lvl==='Alta'?'#884AFE':'#FFD653'};color:${w.lvl==='Alta'?'#FEFAD9':'#1A1420'}">Chance de chuva: ${w.lvl.toLowerCase()}</span><p><b>${w.rain}.</b> Pôr do sol às ${w.sun}.</p>${w.alert?`<div class="alert">${w.alert}</div>`:''}</section>`;});
+    const SK=WX.map(w=>w.ic==='storm'?'storm':w.ic==='rain'?'rain':w.ic==='sun'?'sun':'mix');WX.forEach((w,i)=>{if(dayOver(i))return;html+=`<section class="wcard"><div class="whead"><div><h3>${w.t}</h3><div class="big">${w.min}° a ${w.max}°</div></div>${charHtml(SK[i],varIdx(SK,i))}</div><span class="pill" style="background:${w.lvl==='Alta'?'#884AFE':'#FFD653'};color:${w.lvl==='Alta'?'#FEFAD9':'#1A1420'}">Chance de chuva: ${w.lvl.toLowerCase()}</span><p><b>${w.rain}.</b> Pôr do sol às ${w.sun}.</p>${w.alert?`<div class="alert">${w.alert}</div>`:''}</section>`;});
   }
   html+=`<details class="oth"><summary>Outras fontes (previsão de 29/10)</summary>${WX.map(w=>`<h3 style="font-family:var(--f-display);font-size:16px;margin:10px 0 0">${w.t}</h3><table class="src"><tbody>${w.src.map(r=>`<tr><th scope="row">${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</tbody></table>`).join('')}</details>`;
   main.innerHTML=html;
@@ -1116,6 +1119,7 @@ let _rs=Math.floor(Date.now()/ROT_MS);
 function tick(){
   const r=Math.floor(Date.now()/ROT_MS); if(r!==_rs){_rs=r; if(S.tab==='wx')render();}
   const prev=NOW; NOW=nowBR();
+  if(prev.date!==NOW.date){const a=purgePast(),b=fixDay();if(a||b||S.tab==='wx'){render();return;}}
   if(prev.mins!==NOW.mins&&(S.tab==='prog'||S.tab==='rot')&&!$('#sheet').classList.contains('open')&&!(document.activeElement&&document.activeElement.tagName==='INPUT')){
     const st=main.scrollTop;render();main.scrollTop=st;}
 }
@@ -1329,6 +1333,9 @@ function shareClick(t){
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 (function(){const h=location.hash.slice(1).split('-')[0];if(TABS.includes(h))S.tab=h;})();
 window.addEventListener('hashchange',route);
+function purgePast(){let ch=false;[S.sel,S.maybe].forEach(set=>[...set].forEach(id=>{if(byId[id]&&dayOver(byId[id].d)){set.delete(id);ch=true;}}));if(ch)save();return ch;}
+function fixDay(){if(dayOver(S.day)){const i=DAYS.findIndex((x,d)=>!dayOver(d));S.day=i<0?0:i;return true;}return false;}
+purgePast();fixDay();
 paintTheme(); paintInstall(); render(); loadWx(); setInterval(loadWx,600000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!S.wx||Date.now()-S.wx.t>300000))loadWx();});
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.host))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
