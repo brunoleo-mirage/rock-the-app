@@ -533,6 +533,9 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .nowt b{font-weight:700}
 :root[data-theme="dark"] .hc.now,:root[data-theme="dark"] .hc.now *{color:#1A1420!important}
 .card .stbtn{min-height:32px}
+.nmrow{flex-wrap:wrap}
+.nmbrk{flex-basis:100%;height:0}
+.onair{margin-top:4px!important;transform:none!important}
 </style>
 </head>
 <body>
@@ -888,7 +891,7 @@ function card(sh,opts={}){
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
-    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="onair" title="Tocando agora${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>Tocando agora</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
+    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="Tocando agora${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>Tocando agora</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
       ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true">Desmarcar</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true">Desmarcar</button>`)
       : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
@@ -1112,7 +1115,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.85';
+const APP_VER='1.0.86';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
