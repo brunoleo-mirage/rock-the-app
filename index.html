@@ -1047,7 +1047,7 @@ function pickChar(w,t,cn){  /* t, cn = temperatura e código do tempo de agora (
     return cn<=1?'sun':'mix';
   }
   const fogH=(w.hrs||[]).filter(x=>x.C===45||x.C===48).length;
-  if(w.storm)return 'storm';
+  if(w.code>=95||(w.hrs||[]).filter(x=>x.C>=95).length>=2)return 'storm'; /* previsão geral do dia: trovoada de verdade, não uma hora isolada (o alerta vermelho continua aparecendo) */
   if(w.mm>=2||(w.code>=51&&w.code<=82)||(w.hrs||[]).filter(x=>x.P>=70&&x.R>=0.3).length>=4)return 'rain';
   if(w.code===45||w.code===48||fogH>=3)return 'fog';
   const hasT=t!=null&&!isNaN(t);
@@ -1124,7 +1124,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.87';
+const APP_VER='1.0.88';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
