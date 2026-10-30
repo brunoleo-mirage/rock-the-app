@@ -513,6 +513,8 @@ h2.sec{font-size:25px}
 #sheet .implist{margin:8px 0;padding-left:18px;max-height:34vh;overflow:auto;font-size:15px}
 nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
+.rbar{margin:6px 0 12px;flex-wrap:nowrap;gap:8px}
+.rbar button{min-height:34px;padding:4px 12px;font-size:15px;line-height:1.1}
 </style>
 </head>
 <body>
@@ -935,10 +937,10 @@ function rRot(){
   });
   if(planIds().length){
     const nc=[...S.sel].filter(i=>conflictsOf(byId[i]).length).length;
-    html=livePanel()+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
-    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btnp" id="share-rot">Compartilhar roteiro</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="import-rot">Importar roteiro</button><button class="btns" id="clear">Limpar tudo</button></div>';
+    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
+    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>';
   } else {
-    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btnp" id="import-rot">Importar roteiro de um amigo</button></div>';
+    html+='<div class="row rbar"><button class="btns" id="import-rot">Importar</button></div>';
   }
   main.innerHTML=html;
 }
