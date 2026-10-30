@@ -505,6 +505,12 @@ h2.sec{font-size:25px}
 .card .stbtn u{display:none}
 .card .stbtn{font-size:15px;width:fit-content;max-width:100%;align-self:flex-start}
 .card .stbtn .stn{white-space:normal}
+
+.sharebar{display:flex;justify-content:center;margin:22px 0 8px}
+#sheet .shbtns{display:grid;gap:10px;margin-top:12px}
+#sheet .shbtns .btns,#sheet .shbtns .btnp{display:block;text-align:center;text-decoration:none;color:var(--ink);width:100%}
+#sheet .shbtns .btnp{color:var(--dk)}
+#sheet .implist{margin:8px 0;padding-left:18px;max-height:34vh;overflow:auto;font-size:15px}
 </style>
 </head>
 <body>
@@ -927,7 +933,9 @@ function rRot(){
   if(planIds().length){
     const nc=[...S.sel].filter(i=>conflictsOf(byId[i]).length).length;
     html=livePanel()+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
-    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btnp" id="copy">Copiar roteiro</button><button class="btns" id="clear">Limpar tudo</button></div>';
+    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btnp" id="share-rot">Compartilhar roteiro</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="import-rot">Importar roteiro</button><button class="btns" id="clear">Limpar tudo</button></div>';
+  } else {
+    html+='<div class="row" style="margin-top:16px;flex-wrap:wrap"><button class="btnp" id="import-rot">Importar roteiro de um amigo</button></div>';
   }
   main.innerHTML=html;
 }
@@ -1087,12 +1095,14 @@ function aboutSheet(){
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
+  <li><b>Compartilhar.</b> O botão "Compartilhar o app" no fim das telas manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF ou por link, e "Importar roteiro" traz o roteiro de outra pessoa para o seu.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
+  <li><b>Aplicativo oficial.</b> Este é um aplicativo oficial do Rock The Mountain.</li>
   </ul>`;
   openSheet();
 }
 function copyText(){
-  const t='*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\nhttps://rock-the-app.pages.dev';
+  const t=rotText();
   const fallback=()=>{$('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Copie o roteiro</h2><p class="note">Seu aparelho não deixou copiar sozinho. Selecione o texto abaixo.</p><textarea id="ta" readonly>${esc(t)}</textarea>`;openSheet();setTimeout(()=>{const a=$('#ta');a&&a.select();},50);};
   try{navigator.clipboard.writeText(t).then(()=>{$('#sheet').innerHTML='<h2>Roteiro copiado</h2><p>Agora é só colar no WhatsApp.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();},fallback);}catch(e){fallback();}
 }
@@ -1163,10 +1173,145 @@ document.addEventListener('click',e=>{
   if(t.dataset.cat){S.cat=t.dataset.cat;return render();}
   if(t.dataset.z){S.zoom=Math.min(4,Math.max(1,S.zoom+(+t.dataset.z)*0.5));const w=$('#mapwrap');const sl=w.scrollLeft/w.scrollWidth,st=w.scrollTop/w.scrollHeight;$('#mapbox').style.width=S.zoom*100+'%';w.scrollLeft=sl*w.scrollWidth;w.scrollTop=st*w.scrollHeight;relayout();return;}
   if(t.id==='wxr'){return loadWx();}
+  if(shareClick(t))return;
   if(t.id==='copy')return copyText();
   if(t.id==='clear'){S.sel.clear();S.maybe.clear();save();return render();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='mq'){S.mq=e.target.value;const l=$('#legend');if(l)l.innerHTML=legendHtml();return;}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;rProg();const n=$('#q');n.focus();n.setSelectionRange(pos,pos);}});
+
+/* ===================== COMPARTILHAR / PDF / IMPORTAR ===================== */
+const APP_URL='https://rock-the-app.pages.dev';
+const SHARE_TXT='Organize seu Rock The Mountain: roteiro de shows, mapa e previsão do tempo. Funciona até sem internet.';
+const enc=encodeURIComponent;
+const sheetHtml=(title,body)=>{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>'+title+'</h2>'+body;openSheet();};
+const rotCode=()=>[...S.sel].filter(i=>byId[i]).concat([...S.maybe].filter(i=>byId[i]).map(i=>'m'+i)).join('.');
+const rotLink=()=>APP_URL+'/?r='+rotCode();
+function rotText(){
+  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'\n\nJá usa o app? Abra este link para importar meu roteiro:\n'+rotLink();
+}
+function parseCode(txt){
+  const s=String(txt||''), m=s.match(/[?&]r=([0-9m.\-]+)/)||s.match(/^\s*([0-9m][0-9m.\-]{2,})\s*$/);
+  if(!m)return null;
+  const sel=[],maybe=[];
+  m[1].split('.').forEach(p=>{const mb=p[0]==='m',id=mb?p.slice(1):p;if(byId[id]&&!sel.includes(id)&&!maybe.includes(id))(mb?maybe:sel).push(id);});
+  return (sel.length||maybe.length)?{sel,maybe}:null;
+}
+function copyTo(text,btn,done){
+  const ok=()=>{if(btn){const o=btn.textContent;btn.textContent=done||'Copiado';setTimeout(()=>{btn.textContent=o},1800);}};
+  const fb=()=>{sheetHtml('Copie manualmente','<p class="note">Seu aparelho não deixou copiar sozinho. Selecione o texto abaixo.</p><textarea id="ta" readonly>'+esc(text)+'</textarea>');setTimeout(()=>{const a=$('#ta');if(a){a.focus();a.select();}},50);};
+  try{navigator.clipboard.writeText(text).then(ok,fb);}catch(e){fb();}
+}
+const A_ATTR='class="btns" target="_blank" rel="noopener"';
+function shareAppSheet(){
+  const u=APP_URL,t=SHARE_TXT+' '+u;
+  sheetHtml('Compartilhar o app','<p class="note">Mande o link para quem vai ao festival com você.</p><div class="shbtns">'+
+   (navigator.share?'<button class="btnp" id="sh-app-native">Compartilhar…</button>':'')+
+   `<a ${A_ATTR} href="https://wa.me/?text=${enc(t)}">WhatsApp</a>`+
+   `<a ${A_ATTR} href="https://t.me/share/url?url=${enc(u)}&text=${enc(SHARE_TXT)}">Telegram</a>`+
+   `<a ${A_ATTR} href="https://www.facebook.com/sharer/sharer.php?u=${enc(u)}">Facebook</a>`+
+   `<a ${A_ATTR} href="https://twitter.com/intent/tweet?text=${enc(SHARE_TXT)}&url=${enc(u)}">X (Twitter)</a>`+
+   '<button class="btns" id="sh-app-copy">Copiar link</button></div><p class="note">Instagram: use "Compartilhar…" ou copie o link e cole no adesivo de link do story.</p>');
+}
+function shareRotSheet(){
+  if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque alguns shows antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
+  sheetHtml('Compartilhar roteiro','<div class="shbtns">'+
+   '<button class="btnp" id="sh-pdf">Compartilhar PDF</button><button class="btns" id="dl-pdf">Baixar PDF</button>'+
+   (navigator.share?'<button class="btns" id="sh-rot-native">Enviar texto e link</button>':'')+
+   `<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Enviar no WhatsApp</a>`+
+   '<button class="btns" id="sh-rot-copy">Copiar link para importar</button></div><p class="note">Quem receber o link e já tiver o app pode importar o seu roteiro em um toque.</p>');
+}
+function importSheet(){
+  sheetHtml('Importar roteiro','<p class="note">Cole o link ou a mensagem que seu amigo enviou.</p><textarea id="imp-ta" placeholder="https://rock-the-app.pages.dev/?r=..."></textarea><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro nesse texto.</p><div class="acts2"><button class="btnp" id="imp-go">Continuar</button><button class="btns" data-close>Cancelar</button></div>');
+}
+let IMP=null;
+function importPreview(p){
+  IMP=p;
+  const L=[...p.sel.map(i=>[i,0]),...p.maybe.map(i=>[i,1])].map(([i,m])=>[byId[i],m]).sort((a,b)=>a[0].d-b[0].d||a[0].s-b[0].s);
+  const has=planIds().length>0;
+  sheetHtml('Roteiro recebido',`<p class="note">${L.length} atraç${L.length>1?'ões':'ão'} no roteiro de um amigo.</p><ul class="implist">`+L.map(([x,m])=>`<li><b>${esc(x.name)}</b> · ${DAYS[x.d].short} ${DAYS[x.d].n}, ${hhmm(x.s)} · ${esc(stageLong(x.stage))}${m?' (talvez)':''}</li>`).join('')+'</ul><div class="acts2">'+
+   `<button class="btnp" id="imp-add">${has?'Adicionar ao meu roteiro':'Importar'}</button>`+(has?'<button class="btns" id="imp-rep">Substituir meu roteiro</button>':'')+'<button class="btns" data-close>Cancelar</button></div>');
+}
+function applyImport(replace){
+  if(!IMP)return; if(replace){S.sel.clear();S.maybe.clear();}
+  IMP.sel.forEach(i=>{S.maybe.delete(i);S.sel.add(i);});
+  IMP.maybe.forEach(i=>{if(!S.sel.has(i))S.maybe.add(i);});
+  IMP=null;save();
+  closeSheetThen(()=>{if(S.tab!=='rot')setTab('rot');else render();});
+}
+/* PDF simples (Helvetica, sem dependências, funciona offline) */
+function pdfRotBlob(){
+  const W=595,H=842,M=40,INK='0.102 0.078 0.125',pages=[];let cur,y;
+  const san=s=>String(s).replace(/[–—]/g,'-').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[•·]/g,'-').replace(/[^\x20-\x7E\xA0-\xFF]/g,'?');
+  const pe=s=>san(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  const hx=h=>{h=String(h).trim().replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16)||0;return [(n>>16)&255,(n>>8)&255,n&255].map(v=>(v/255).toFixed(3)).join(' ');};
+  const txt=(s,x,yy,size,bold,col)=>cur.push(`BT /F${bold?2:1} ${size} Tf ${col||INK} rg ${x} ${yy} Td (${pe(s)}) Tj ET`);
+  const rect=(x,yy,w,h,col)=>cur.push(`${col} rg ${x} ${yy} ${w} ${h} re f`);
+  const newPage=()=>{cur=[];pages.push(cur);['#EB4B94','#FE5A5E','#FFD653','#92FE71','#884AFE'].forEach((c,i)=>rect(i*W/5,H-12,W/5+1,12,hx(c)));y=H-56;};
+  const cs=getComputedStyle(document.documentElement);
+  newPage();
+  txt('Meu roteiro',M,y,28,true);y-=20;
+  txt('Rock the Mountain 2026 - Itaipava, Petrópolis',M,y,12,false,'0.35 0.30 0.40');y-=30;
+  let any=false;
+  DAYS.forEach((D,d)=>{
+    const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
+    if(!items.length)return; any=true;
+    if(y<120)newPage();
+    txt(D.full,M,y,17,true);y-=7;rect(M,y,W-2*M,2,hx('#1A1420'));y-=24;
+    items.forEach(x=>{
+      if(y<70){newPage();txt(D.full+' (cont.)',M,y,13,true);y-=26;}
+      const st=stageById[x.stage],col=hx(cs.getPropertyValue(st.c)||'#EB4B94');
+      rect(M,y-9,8,30,col);
+      txt(range(x),M+16,y+2,13,true);
+      let nm=x.name;if(nm.length>46)nm=nm.slice(0,45)+'...';
+      txt(nm,M+128,y+2,13,true);
+      txt((x.oficina?'Oficina - ':'')+stageLong(x.stage),M+128,y-10,10,false,'0.35 0.30 0.40');
+      const tag=S.maybe.has(x.id)?'TALVEZ':(conflictsOf(x).length?'CONFLITO':'');
+      if(tag)txt(tag,W-M-62,y+2,9,true,tag==='TALVEZ'?'0.35 0.30 0.40':'0.75 0.20 0.20');
+      y-=40;
+    });
+    y-=8;
+  });
+  const n=pages.length;
+  pages.forEach((p,i)=>{cur=p;txt('Feito no Rock the App - rock-the-app.pages.dev',M,26,9,false,'0.35 0.30 0.40');txt((i+1)+'/'+n,W-M-18,26,9,false,'0.35 0.30 0.40');});
+  const objs=[];
+  objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
+  objs[2]=`<< /Type /Pages /Kids [${pages.map((_,i)=>(5+2*i)+' 0 R').join(' ')}] /Count ${n} >>`;
+  objs[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  pages.forEach((p,i)=>{const s=p.join('\n');objs[5+2*i]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6+2*i} 0 R >>`;objs[6+2*i]=`<< /Length ${s.length} >>\nstream\n${s}\nendstream`;});
+  let out='%PDF-1.4\n';const off=[];
+  for(let i=1;i<objs.length;i++){off[i]=out.length;out+=`${i} 0 obj\n${objs[i]}\nendobj\n`;}
+  const xr=out.length;
+  out+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`+off.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const u8=new Uint8Array(out.length);for(let i=0;i<out.length;i++)u8[i]=out.charCodeAt(i)&255;
+  return new Blob([u8],{type:'application/pdf'});
+}
+function pdfDownload(b){
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='meu-roteiro-rock-the-mountain.pdf';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+}
+function pdfShare(){
+  try{const b=pdfRotBlob(),f=new File([b],'meu-roteiro-rock-the-mountain.pdf',{type:'application/pdf'});
+    if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
+    else pdfDownload(b);}catch(e){}
+}
+function shareClick(t){
+  if(t.id==='share-app')return shareAppSheet(),true;
+  if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
+  if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
+  if(t.id==='share-rot')return shareRotSheet(),true;
+  if(t.id==='sh-pdf')return pdfShare(),true;
+  if(t.id==='dl-pdf')return (()=>{try{pdfDownload(pdfRotBlob())}catch(e){}})(),true;
+  if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
+  if(t.id==='sh-rot-copy')return copyTo(rotLink(),t,'Link copiado'),true;
+  if(t.id==='import-rot')return importSheet(),true;
+  if(t.id==='imp-go'){const p=parseCode(($('#imp-ta')||{}).value);if(!p){const e=$('#imp-err');if(e)e.hidden=false;return true;}importPreview(p);return true;}
+  if(t.id==='imp-add')return applyImport(false),true;
+  if(t.id==='imp-rep')return applyImport(true),true;
+  return false;
+}
+try{new MutationObserver(()=>{if(!main.querySelector('.sharebar')){const bar='<div class="sharebar"><button class="btns" id="share-app">Compartilhar o app</button></div>',cr=main.querySelector('.credit');if(cr)cr.insertAdjacentHTML('beforebegin',bar);else main.insertAdjacentHTML('beforeend',bar);}}).observe(main,{childList:true});}catch(e){}
+(function(){try{const q=new URLSearchParams(location.search).get('r');if(!q)return;const p=parseCode('?r='+q);history.replaceState(null,'',location.pathname+location.hash);if(p)setTimeout(()=>importPreview(p),500);}catch(e){}})();
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 (function(){const h=location.hash.slice(1).split('-')[0];if(TABS.includes(h))S.tab=h;})();
 window.addEventListener('hashchange',route);
