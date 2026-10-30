@@ -997,7 +997,7 @@ function openPin(n,center){
 const K='#1A1420',CR='#FEFAD9',RO='#EB4B94',CO='#FE5A5E',YE='#FFD653',GR='#92FE71',VI='#884AFE',VD='#6034BD';
 const eye=(x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${CR}" stroke="${K}" stroke-width="2.5"/><circle cx="${x+1}" cy="${y+1}" r="${r/2.6}" fill="${K}"/>`;
 const drop=(x,y)=>`<path d="M${x} ${y}c-3 5-5 8-5 11a5 5 0 0 0 10 0c0-3-2-6-5-11z" fill="${CR}" stroke="${K}" stroke-width="2"/>`;
-const CV={storm:3,rain:2,mix:3,sun:3,cold:3,fog:3,hot:3}; /* variações por cenário: chars/<cenário>[-2|-3].webp */
+const CV={storm:3,rain:3,mix:3,sun:3,cold:3,fog:3,hot:3}; /* variações por cenário: chars/<cenário>[-2|-3].webp */
 const ROT_MS=2*3600*1000; /* a cada 2h o personagem do dia alterna */
 function varIdx(keys,i){let k=0;for(let j=0;j<i;j++)if(keys[j]===keys[i])k++;return k+Math.floor(Date.now()/ROT_MS);} /* dias com a mesma previsão nunca repetem o personagem */
 const CHAR_ALT={"storm": "Personagem com guarda-chuva virado sob trovoada", "mix": "Personagem em dia nublado com sol entre nuvens", "sun": "Personagem sob o sol forte", "cold": "Personagem agasalhado no frio", "fog": "Personagem na neblina da serra", "hot": "Personagem no calor", "rain": "Personagem na chuva"};
@@ -1005,7 +1005,7 @@ const RAIN_SVG=`<svg class="char" viewBox="0 0 160 160" role="img" aria-label="P
 const CHARS={};
 /* escolhe um personagem por dia, sem repetir entre os dias. Dias de chuva podem usar também o da chuva com guarda-chuva (storm) se faltar variação. */
 const charPool=k=>Array.from({length:CV[k]||0},(_,i)=>k+(i?'-'+(i+1):''));
-const CHAR_EXT={rain:['storm']};
+const CHAR_EXT={};
 function assignChars(keys){
   const used=new Set(),rot=Math.floor(Date.now()/ROT_MS);
   return keys.map(k=>{
@@ -1094,7 +1094,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.81';
+const APP_VER='1.0.82';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
