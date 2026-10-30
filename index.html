@@ -1118,10 +1118,10 @@ function toggleTheme(){const d=!isDark();document.documentElement.dataset.theme=
 /* ===================== INSTALAR APP ===================== */
 let deferredInstall=null;
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
-const wasInstalled=()=>{try{return localStorage.getItem('rta_installed')==='1'}catch(e){return false}};
+const wasInstalled=()=>false; try{localStorage.removeItem('rta_installed')}catch(e){}
 const canInstallHere=()=>location.protocol==='https:'&&!/claude/.test(location.host)||location.protocol==='file:';
 function paintInstall(){const el=$('#install');if(el)el.hidden=!canInstallHere()||isStandalone()||wasInstalled();}
-function markInstalled(){try{localStorage.setItem('rta_installed','1')}catch(e){}deferredInstall=null;paintInstall();}
+function markInstalled(){deferredInstall=null;paintInstall();}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;paintInstall();});
 window.addEventListener('appinstalled',markInstalled);
 try{matchMedia('(display-mode: standalone)').addEventListener('change',paintInstall);}catch(e){}
