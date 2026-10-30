@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rock the App</title>
 <meta name="theme-color" content="#FEFAD9">
+<meta name="description" content="Monte seu roteiro de shows, veja o mapa e a previsão do tempo do Rock The Mountain 2026. Funciona até sem internet. App não oficial.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Rock the App">
+<meta property="og:title" content="Rock the App: roteiro, mapa e tempo do Rock The Mountain">
+<meta property="og:description" content="Monte seu roteiro de shows, veja o mapa e a previsão do tempo. Funciona até sem internet.">
+<meta property="og:url" content="https://rock-the-app.pages.dev/">
+<meta property="og:image" content="https://rock-the-app.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" id="cs" content="light dark">
 <meta name="darkreader-lock">
 <link rel="icon" href="favicon.png">
@@ -520,6 +531,8 @@ nav #share-app{padding-left:6px;padding-right:6px}
 #sheet .ver{text-align:center;font-size:13px;color:var(--ink2);margin:14px 0 4px}
 .nowt{display:inline-block;margin-top:6px;padding:0 12px;border:2.5px solid var(--ink);border-radius:999px;background:var(--butter);color:var(--dk);font-size:22px;line-height:28px}
 .nowt b{font-weight:700}
+:root[data-theme="dark"] .hc.now,:root[data-theme="dark"] .hc.now *{color:#1A1420!important}
+.card .stbtn{min-height:32px}
 </style>
 </head>
 <body>
@@ -1071,6 +1084,7 @@ function rWx(){
   if(live){
     const nowKey=hourKeyNow();
     const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w,w.tNow)}), CH=assignChars(KEYS);
+    if(DAYS.every((d,i)=>dayOver(i)))html+='<div class="empty"><b>O festival deste fim de semana já acabou</b>Obrigado por usar o Rock the App!</div>';
     DAYS.forEach((D,i)=>{
       if(dayOver(i))return;
       const w=liveDay(i); if(!w)return;
@@ -1098,18 +1112,18 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.83';
+const APP_VER='1.0.85';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
-  <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Em cada dia aparece a chuva prevista, em mm.</li>
-  <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar, manter os dois ou cancelar. Atrações que duram o dia todo não entram nessa checagem.</li>
-  <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar roteiro" copia o texto para você colar no WhatsApp.</li>
+  <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Shows que já acabaram saem da lista, e o dia fica indisponível depois do último show.</li>
+  <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar, manter os dois ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
+  <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
   <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto.</li>
-  <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela.</li>
+  <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
-  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF, e "Importar roteiro" lê o PDF que outra pessoa mandou e traz o roteiro dela para o seu.</li>
+  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF, e "Importar de um amigo" lê o PDF que outra pessoa mandou e traz o roteiro dela para o seu.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
   </ul><p class="ver">Versão ${APP_VER}</p>`;
