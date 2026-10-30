@@ -831,7 +831,7 @@ function nowBR(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_
   return {date,mins};}
 let NOW=nowBR();
 const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.e); /* acabou: sai da lista e do roteiro */
-const dayOver=d=>NOW.date>DAYS[d].date; /* o dia do festival vira ao meio-dia; passou do dia, ele fecha */
+const dayOver=d=>SHOWS.filter(x=>x.d===d).every(showOver); /* o dia só fecha depois que o último show termina */ 
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
 const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
