@@ -536,6 +536,11 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .nmrow{flex-wrap:wrap}
 .nmbrk{flex-basis:100%;height:0}
 .onair{margin-top:4px!important;transform:none!important}
+.gbox{margin:12px 0;border:4px solid #FE5A5E;border-radius:26px;overflow:hidden;background:#FE5A5E}
+.gwarn{margin:0;padding:5px 14px 6px;background:#FE5A5E;color:#1A1420;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:19px;line-height:24px;font-weight:700;text-transform:uppercase}
+.gbody{padding:8px 6px 8px;border-radius:20px;background:color-mix(in srgb,#FE5A5E 18%,var(--bg))}
+.gbody .card{margin-top:0;margin-bottom:8px}
+.gbody .card:last-child{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -949,18 +954,25 @@ function rRot(){
     const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
     if(!items.length)return;
     html+=`<h2 class="sec">${D.full}</h2>`;
+    /* grupos de shows "Quero ir" que batem entre si: o aviso vai logo acima do primeiro do grupo */
+    const going=items.filter(x=>S.sel.has(x.id)&&!x.bg), par={}; going.forEach(x=>par[x.id]=x.id);
+    const fnd=x=>{while(par[x]!==x)x=par[x]=par[par[x]];return x;};
+    going.forEach(a=>going.forEach(b=>{if(a.id<b.id&&overlap(a,b))par[fnd(a.id)]=fnd(b.id);}));
+    const grp={}; going.forEach(x=>{const r=fnd(x.id);(grp[r]=grp[r]||[]).push(x);});
+    const openAt={}, closeAt={}; Object.values(grp).forEach(g=>{if(g.length>1){const a=items.indexOf(g[0]),z=items.indexOf(g[g.length-1]);openAt[a]=g.length;closeAt[z]=1;}});
     items.forEach((sh,i)=>{
+      if(openAt[i])html+=`<div class="gbox"><div class="gwarn">⚠ ${openAt[i]} shows com horário sobreposto</div><div class="gbody">`;
       html+=card(sh,{nomap:false,unmark:true});
+      if(closeAt[i])html+='</div></div>';
       const nx=items[i+1];
       if(nx&&!sh.bg&&!nx.bg&&!overlap(sh,nx)&&!S.maybe.has(sh.id)&&!S.maybe.has(nx.id)){
         const g=nx.s-sh.e; const same=sh.stage===nx.stage;
-        html+=`<div class="gap ${g<10&&!same?'tight':''}">${g<10&&!same?'Troca apertada: ':'Intervalo de '}${g} min${g<10&&!same?' para ir de '+esc(stageById[sh.stage].n)+' a '+esc(stageById[nx.stage].n):''}</div>`;
+        if(g<10&&!same)html+=`<div class="gap tight">Troca apertada: ${g} min para ir de ${esc(stageById[sh.stage].n)} a ${esc(stageById[nx.stage].n)}</div>`;
       }
     });
   });
   if(planIds().length){
-    const nc=[...S.sel].filter(i=>conflictsOf(byId[i]).length).length;
-    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto</div>`:'')+html;
+    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1128,7 +1140,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.92';
+const APP_VER='1.0.93';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
