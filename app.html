@@ -541,6 +541,10 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .gbody{padding:8px 6px 8px;border-radius:20px;background:color-mix(in srgb,#FE5A5E 18%,var(--bg))}
 .gbody .card{margin-top:0;margin-bottom:8px}
 .gbody .card:last-child{margin-bottom:0}
+.nowt{white-space:nowrap;margin:2px 0 6px}
+.wcard .pill{white-space:nowrap}
+.whead h3{white-space:nowrap}
+@media (max-width:340px){.whead .char{width:78px;height:78px}.whead h3{font-size:21px}}
 </style>
 </head>
 <body>
@@ -1109,8 +1113,8 @@ function liveDay(i){
 function rWx(){
   const live=!!S.wx;
   let html='';
-  const stamp=live?(S.wxErr?`Sem conexão agora. Mostrando a previsão de ${fmtD(S.wx.t)} às ${fmtT(S.wx.t)}.`:`Atualizada ${fmtD(S.wx.t)===fmtD(Date.now())?'hoje':'em '+fmtD(S.wx.t)} às ${fmtT(S.wx.t)}. Atualiza sozinha a cada 10 minutos.`):(S.wxBusy?'Buscando a previsão...':'Sem conexão e sem previsão salva.');
-  html+=`<p class="note" style="margin:0 0 8px">Itaipava, Petrópolis (Parque Paulo Rattes). Fonte: Open-Meteo. ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
+  const stamp=live?(S.wxErr?`Sem conexão agora. Mostrando a previsão de ${fmtD(S.wx.t)} às ${fmtT(S.wx.t)}.`:`Atualizada ${fmtD(S.wx.t)===fmtD(Date.now())?'hoje':'em '+fmtD(S.wx.t)} às ${fmtT(S.wx.t)}`):(S.wxBusy?'Buscando a previsão...':'Sem conexão e sem previsão salva.');
+  html+=`<p class="note" style="margin:0 0 8px">Itaipava · Open-Meteo · ${stamp}</p><button class="btns refresh" id="wxr">${S.wxBusy?'Atualizando...':'Atualizar agora'}</button>`;
   if(live){
     const nowKey=hourKeyNow();
     const KEYS=DAYS.map((D,i)=>{const w=liveDay(i);return dayOver(i)||!w?null:pickChar(w,w.tNow,w.cNow,w.pNow,w.rNow)}), CH=assignChars(KEYS);
@@ -1119,7 +1123,8 @@ function rWx(){
       if(dayOver(i))return;
       const w=liveDay(i); if(!w)return;
       const [desc,ic]=wmo(w.code), lvl=w.p>=60?'alta':w.p>=30?'média':'baixa';
-      html+=`<section class="wcard"><div class="whead"><div><h3>${D.full}</h3><div class="big">${Math.round(w.min)}° a ${Math.round(w.max)}°</div>${w.tNow!=null?`<div class="nowt">Agora <b>${Math.round(w.tNow)}°</b>${w.cNow!=null?' · '+nowLabel(w.cNow,w.rNow):''}</div>`:''}</div>${charImg(CH[i],KEYS[i])}</div>
+      html+=`<section class="wcard"><div class="whead"><div><h3>${D.full}</h3><div class="big">${Math.round(w.min)}° a ${Math.round(w.max)}°</div></div>${charImg(CH[i],KEYS[i])}</div>
+      ${w.tNow!=null?`<div class="nowt">Agora <b>${Math.round(w.tNow)}°</b>${w.cNow!=null?' · '+nowLabel(w.cNow,w.rNow):''}</div>`:''}
       <span class="pill" style="background:${w.p>=60?'#884AFE':'#FFD653'};color:${w.p>=60?'#FEFAD9':'#1A1420'}">Chance de chuva: ${lvl} (${w.p}%)</span>
       <p><b>${desc}.</b> ${w.mm>=0.1?String(w.mm.toFixed(1)).replace('.',',')+' mm no dia. ':'Sem chuva relevante. '}Pôr do sol às ${w.sunset}.</p>
       ${w.storm?'<div class="alert">Previsão de trovoada em algum horário. Em caso de raios, saia de áreas abertas e de baixo de árvores.</div>':''}
@@ -1142,7 +1147,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.98';
+const APP_VER='1.0.99';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
