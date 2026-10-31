@@ -960,7 +960,7 @@ function rRot(){
   });
   if(planIds().length){
     const nc=[...S.sel].filter(i=>conflictsOf(byId[i]).length).length;
-    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto. Toque em "Marcado" para tirar um deles.</div>`:'')+html;
+    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+(nc?`<div class="alert" style="margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⚠ ${nc} show${nc>1?'s':''} com horário sobreposto</div>`:'')+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1128,7 +1128,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.91';
+const APP_VER='1.0.92';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">

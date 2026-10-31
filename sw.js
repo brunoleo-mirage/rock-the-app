@@ -1,4 +1,4 @@
-const V='rta-v91';
+const V='rta-v92';
 const CORE=['./','index.html','map.jpg','sticker.png','mirage-logo.png','manifest.webmanifest','favicon.png','icons/icon-192.png','icons/icon-512.png','fonts/AmaticSC-Regular.woff','fonts/AmaticSC-Bold.woff','chars/storm.webp','chars/storm-2.webp','chars/storm-3.webp','chars/rain.webp','chars/rain-2.webp','chars/rain-3.webp','chars/mix.webp','chars/mix-2.webp','chars/mix-3.webp','chars/sun.webp','chars/sun-2.webp','chars/sun-3.webp','chars/cold.webp','chars/cold-2.webp','chars/cold-3.webp','chars/fog.webp','chars/fog-2.webp','chars/fog-3.webp','chars/hot.webp','chars/hot-2.webp','chars/hot-3.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=='rta-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
