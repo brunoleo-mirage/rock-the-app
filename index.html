@@ -479,12 +479,12 @@ h2.sec{font-size:25px}
 
 /* 'Talvez' fica claro só na tela Meu roteiro; no resto, os cartões seguem vivos */
 .card.maybe-rot{background:color-mix(in srgb,var(--c) 20%,#FEFAD9)}
-.card.maybe-rot h3{color:var(--c)!important}
+.card.maybe-rot h3{color:#1A1420!important;-webkit-text-stroke:0!important;text-shadow:none!important;paint-order:normal}
 .card.maybe-rot,.card.maybe-rot .time,.card.maybe-rot .time small,.card.maybe-rot .note,.card.maybe-rot .tag{color:#1A1420}
 .card.maybe-rot .st,.card.maybe-rot .stbtn{background:#FEFAD9;color:#1A1420}
 .card.maybe-rot .go{background:#FEFAD9;color:#1A1420;border-color:#1A1420}
 :root[data-theme="dark"] .card.maybe-rot{background:color-mix(in srgb,var(--c) 26%,#1C191E)}
-:root[data-theme="dark"] .card.maybe-rot h3{color:var(--nm)!important}
+:root[data-theme="dark"] .card.maybe-rot h3{color:#FEFAD9!important}
 :root[data-theme="dark"] .card.maybe-rot,:root[data-theme="dark"] .card.maybe-rot .time,:root[data-theme="dark"] .card.maybe-rot .time small,:root[data-theme="dark"] .card.maybe-rot .note,:root[data-theme="dark"] .card.maybe-rot .tag{color:#FEFAD9}
 
 /* coluna dos botões com largura fixa para não invadir o nome/palco */
@@ -1140,7 +1140,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.93';
+const APP_VER='1.0.94';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
