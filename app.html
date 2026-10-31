@@ -944,7 +944,7 @@ function livePanel(){
   const dt=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'long',day:'2-digit',month:'2-digit'}).format(new Date());
   const lbl=dt.charAt(0).toUpperCase()+dt.slice(1).replace(', ',' ');
   const base=NOW.mins;
-  return `<section class="livebox" aria-label="Ao vivo"><div class="lhead"><span class="ldot"></span><h2>Ao vivo</h2></div><p class="lclock">${esc(lbl)} · ${hhmm(base)} · horário de Brasília</p>
+  return `<section class="livebox" aria-label="Ao vivo"><div class="lhead"><span class="ldot"></span><h2>Ao vivo</h2></div><p class="lclock">${esc(lbl)} · ${hhmm(base)}</p>
   <h4>Agora</h4>${cur.length?cur.map(x=>liveMini(x,'now')).join(''):'<div class="lnone">Nada seu tocando agora.'+(nxt?' Dá tempo de comer e hidratar.':'')+'</div>'}
   <h4>Próximo</h4>${nxt?liveMini(nxt,'next'):'<div class="lnone">Nenhum show a seguir no seu roteiro.</div>'}</section>`;
 }
@@ -1142,7 +1142,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.97';
+const APP_VER='1.0.98';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
