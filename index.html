@@ -903,6 +903,7 @@ function card(sh,opts={}){
   </article>`;
 }
 function rProg(){
+  const _pc=main.querySelector('.chips[aria-label="Palco"]'), _sl=_pc?_pc.scrollLeft:0; /* mantém a posição da fila de palcos ao tocar num deles */
   const q=norm(S.q.trim());
   let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
   list.sort((a,b)=>a.s-b.s||stageById[a.stage].i-stageById[b.stage].i);
@@ -915,7 +916,7 @@ function rProg(){
   let lastH=null;
   list.forEach(sh=>{const h=Math.floor(sh.s/60)%24; if(h!==lastH){html+=`<div class="hour">${String(h).padStart(2,'0')}h</div>`;lastH=h;} html+=card(sh);});
   main.innerHTML=html;
-  const cr=main.querySelector('.chips');if(cr)cr.scrollLeft=0;
+  const cr=main.querySelector('.chips[aria-label="Palco"]');if(cr)cr.scrollLeft=_sl;
 }
 const STAGE_LONG={floresta:'Palco Floresta',estrela:'Palco Estrela',aurora:'Palco Aurora',movdome:'Mov.Dome',fervo:'Pista Fervo',secreto:'Secreto',magic:'Magic Drags',casa:'Casa do Rock',coreto:'Coreto',samba:'Roda de Samba',reggae:'Reggae Yard',speakeasy:'Speakeasy',skate:'Skatepark',quadras:'Quadras',kids:'Área Kids'};
 const stageLong=id=>STAGE_LONG[id]||('Palco '+stageById[id].n);
@@ -1141,7 +1142,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.95';
+const APP_VER='1.0.96';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
