@@ -576,6 +576,7 @@ body.mapfs .mapctl{display:none}
 html,body{touch-action:pan-x pan-y}
 #mapwrap{touch-action:pan-x pan-y;overscroll-behavior:contain}
 .card .warnlist{padding:4px 8px 5px}
+.lmini .warnlist{padding:4px 8px 5px}
 .warnlist .wh{font-weight:700;font-size:14px;line-height:1.1;margin-bottom:2px}
 .warnlist ul{list-style:none;margin:0;padding:0}
 .warnlist li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 8px;align-items:baseline;padding:3px 0;border-top:1.5px dashed rgba(26,20,32,.35);font-size:14px;line-height:1.05}
@@ -978,7 +979,7 @@ function liveMini(sh,kind){
   const when=kind==='now'
     ? `até ${hhmm(sh.e)}${sh.noEnd?'':' · faltam '+fmtIn(sh.e-NOW.mins)}`
     : (abs-now>=1440?`começa ${DAYS[sh.d].short.toLowerCase()} ${DAYS[sh.d].n}, ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`:`começa ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`);
-  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}">Mapa ${pin} ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn">⚡ Choca com ${cf.map(o=>esc(o.name)).join(', ')}</div>`:''}</article>`;
+  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}">Mapa ${pin} ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${range(o)}</span></li>`).join('')}</ul></div>`:''}</article>`;
 }
 function livePanel(){
   const now=absMin(NOW.date,NOW.mins);
@@ -1213,7 +1214,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.112';
+const APP_VER='1.0.113';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
