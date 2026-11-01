@@ -546,6 +546,15 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .wcard .pill{white-space:nowrap}
 .whead h3{white-space:nowrap}
 @media (max-width:340px){.whead .char{width:78px;height:78px}.whead h3{font-size:21px}}
+
+.fsbtn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;margin-left:auto}
+.fsbar{display:none}
+body.mapfs #mapwrap{position:fixed;inset:0;z-index:60;max-height:none;width:100vw;height:100vh;height:100dvh;border:0;border-radius:0;box-shadow:none}
+body.mapfs .fsbar{display:flex;position:fixed;z-index:61;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;justify-content:space-between;align-items:center;pointer-events:none}
+body.mapfs .fsbar>*{pointer-events:auto}
+body.mapfs #nav,body.mapfs .mapbar{visibility:hidden}
+body.mapfs #mapwrap{display:flex}
+body.mapfs #mapbox{margin:auto;flex:none}
 </style>
 </head>
 <body>
@@ -882,6 +891,7 @@ function setTab(t){ if(t===S.tab)return; S.tab=t; try{location.hash=t;}catch(e){
 function route(){
   const h=location.hash.slice(1), base=h.split('-')[0], sh=h.endsWith('-info');
   const tab=TABS.includes(base)?base:'prog';
+  if(!h.endsWith('-fs')&&S.mapFs)leaveFsState();
   if(!sh&&sheetOpen)hideSheet();
   if(tab!==S.tab){S.tab=tab;render();main.scrollTop=0;}
   if(!sh&&afterClose){const f=afterClose;afterClose=null;f();}
@@ -889,6 +899,7 @@ function route(){
 function closeSheetThen(fn){ if(sheetOpen){hideSheet();afterClose=fn;history.back();} else fn(); }
 function credit(){return '<footer class="credit"><span class="dev">developed by</span><img class="mg" src="https://biblioteca-de-prompts-mirage.pages.dev/logo-mirage.jpg" alt="Mirage" width="52" height="84" loading="lazy"><img class="mw" src="https://biblioteca-de-prompts-mirage.pages.dev/mirage-word.png" alt="" width="90" height="30" loading="lazy"><span class="byg">by Ginger</span></footer>';}
 function render(){
+  if(S.mapFs&&S.tab!=='map')leaveFsState();
   document.querySelectorAll('nav button[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
   const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);
   ({prog:rProg,rot:rRot,map:rMap,wx:rWx})[S.tab]();
@@ -994,8 +1005,9 @@ function rMap(){
   const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}</span>`}).join('');
   const pins=PINS.map(p=>`<button class="pin ${p.cat} ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
   const lg=legendHtml();
-  main.innerHTML=`<div class="mapbar"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div></div>${cats}
+  main.innerHTML=`<div class="mapbar"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div>${cats}
   <div id="mapwrap"><div id="mapbox" class="${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${pins}</div></div>
+  <div class="fsbar"><button class="btnp" id="map-fs-x">Fechar</button><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div></div>
   <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Arraste o mapa para andar por ele.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
   relayout();
 }
@@ -1148,14 +1160,14 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.103';
+const APP_VER='1.0.104';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
   <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Shows que já acabaram saem da lista, e o dia fica indisponível depois do último show.</li>
   <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar pelo novo, marcar mesmo assim ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
   <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
-  <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto.</li>
+  <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto. "Tela cheia" abre o mapa sobre a tela inteira, com os mesmos números e zoom; o botão Fechar ou o voltar do celular saem dela.</li>
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
@@ -1239,7 +1251,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.stageprog){S.stages=[t.dataset.stageprog];return closeSheetThen(()=>{if(S.tab!=='prog')setTab('prog');else render();});}
   if(t.dataset.pin){return openPin(+t.dataset.pin,!!t.dataset.center);}
   if(t.dataset.cat){S.cat=t.dataset.cat;return render();}
-  if(t.dataset.z){S.zoom=Math.min(4,Math.max(1,S.zoom+(+t.dataset.z)*0.5));const w=$('#mapwrap');const sl=w.scrollLeft/w.scrollWidth,st=w.scrollTop/w.scrollHeight;$('#mapbox').style.width=S.zoom*100+'%';w.scrollLeft=sl*w.scrollWidth;w.scrollTop=st*w.scrollHeight;relayout();return;}
+  if(t.dataset.z){S.zoom=Math.min(S.mapFs?6:4,Math.max(1,S.zoom+(+t.dataset.z)*0.5));const w=$('#mapwrap');const sl=w.scrollLeft/w.scrollWidth,st=w.scrollTop/w.scrollHeight;$('#mapbox').style.width=S.zoom*100+'%';w.scrollLeft=sl*w.scrollWidth;w.scrollTop=st*w.scrollHeight;relayout();return;}
   if(t.id==='wxr'){return loadWx();}
   if(shareClick(t))return;
   if(t.id==='copy')return copyText();
@@ -1374,7 +1386,12 @@ function pdfShare(){
     if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
     else pdfDownload(b);}catch(e){}
 }
+function leaveFsState(){S.mapFs=false;document.body.classList.remove('mapfs');if(S.zoomBeforeFs){S.zoom=S.zoomBeforeFs;S.zoomBeforeFs=0;const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';}}
+function enterMapFs(){S.mapFs=true;S.zoomBeforeFs=S.zoom;S.zoom=Math.min(6,Math.max(S.zoom,Math.ceil((innerHeight*(1848/850)/innerWidth)*2)/2));const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';document.body.classList.add('mapfs');try{location.hash='map-fs';}catch(e){}}
+function exitMapFs(){if(!S.mapFs)return;leaveFsState();if(location.hash.endsWith('-fs')){try{history.back();}catch(e){}}}
 function shareClick(t){
+  if(t.id==='map-fs')return enterMapFs(),true;
+  if(t.id==='map-fs-x')return exitMapFs(),true;
   if(t.id==='share-app')return shareAppSheet(),true;
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
@@ -1390,7 +1407,7 @@ function shareClick(t){
 }
 (function(){try{const q=new URLSearchParams(location.search).get('r');if(!q)return;const p=parseCode('?r='+q);history.replaceState(null,'',location.pathname+location.hash);if(p)setTimeout(()=>importPreview(p),500);}catch(e){}})();
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.mapFs)exitMapFs();else closeSheet();}});
 (function(){const h=location.hash.slice(1).split('-')[0];if(TABS.includes(h))S.tab=h;})();
 window.addEventListener('hashchange',route);
 function purgePast(){let ch=false;[S.sel,S.maybe].forEach(set=>[...set].forEach(id=>{if(byId[id]&&showOver(byId[id])){set.delete(id);ch=true;}}));if(ch)save();return ch;}
