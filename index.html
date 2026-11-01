@@ -907,13 +907,14 @@ const isLive=sh=>NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.s&&NOW.mins<sh.e;
 const $=s=>document.querySelector(s), main=$('#main');
 const TABS=['prog','rot','map','wx'];
 let sheetOpen=false, afterClose=null;
-function setTab(t){ if(t===S.tab)return; S.tab=t; try{location.hash=t;}catch(e){} render(); main.scrollTop=0; }
+const TABSCROLL={}; /* guarda onde a pessoa parou em cada aba */
+function setTab(t){ if(t===S.tab)return; TABSCROLL[S.tab]=main.scrollTop; S.tab=t; try{location.hash=t;}catch(e){} render(); main.scrollTop=TABSCROLL[t]||0; }
 function route(){
   const h=location.hash.slice(1), base=h.split('-')[0], sh=h.endsWith('-info');
   const tab=TABS.includes(base)?base:'prog';
   if(!h.endsWith('-fs')&&S.mapFs)leaveFsState();
   if(!sh&&sheetOpen)hideSheet();
-  if(tab!==S.tab){S.tab=tab;render();main.scrollTop=0;}
+  if(tab!==S.tab){TABSCROLL[S.tab]=main.scrollTop;S.tab=tab;render();main.scrollTop=TABSCROLL[tab]||0;}
   if(!sh&&afterClose){const f=afterClose;afterClose=null;f();}
 }
 function closeSheetThen(fn){ if(sheetOpen){hideSheet();afterClose=fn;history.back();} else fn(); }
@@ -1205,7 +1206,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.109';
+const APP_VER='1.0.110';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1275,7 +1276,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest('.plabel')&&!e.target.closest('.irl'))return;
   if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.';}return;}
   const t=e.target.closest('button,a,.irl'); if(!t)return;
-  if(t.dataset.tab){closeSheet();if(t.dataset.tab==='prog'&&S.tab!=='prog')S.stages=[];if(t.dataset.tab==='map'&&S.tab!=='map')S.pin=null;return setTab(t.dataset.tab);}
+  if(t.dataset.tab){closeSheet();if(t.dataset.tab==='map'&&S.tab!=='map')S.pin=null;return setTab(t.dataset.tab);}
   if(t.id==='install-btn')return doInstall();
   if(t.id==='theme-btn')return toggleTheme();
   if(t.id==='about-btn')return aboutSheet();
