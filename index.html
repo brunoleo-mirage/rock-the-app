@@ -568,8 +568,10 @@ body.mapfs.lista-aberta .fslist{display:block;position:fixed;z-index:62;left:0;r
 #mapframe{position:relative}
 .mapctl{position:absolute;z-index:5;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
 .mapctl>*{pointer-events:auto}
-.mapctl .zoom button{width:40px;height:40px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
-.mapctl .fsbtn{margin:0;min-height:40px;height:40px;padding:0 12px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+.mapctl .zoom{gap:5px}
+.mapctl .zoom button{width:34px;height:34px;border-radius:10px;border-width:2px;font-size:19px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+.mapctl .fsbtn{margin:0;min-height:34px;height:34px;padding:0 10px;gap:5px;border-radius:10px;font-size:15px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+.mapctl .fsbtn svg{width:15px;height:15px}
 body.mapfs .mapctl{display:none}
 </style>
 </head>
@@ -1199,7 +1201,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.107';
+const APP_VER='1.0.108';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
