@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Rock the App</title>
 <meta name="theme-color" content="#FEFAD9">
 <meta name="description" content="Monte seu roteiro de shows, veja o mapa e a previsão do tempo do Rock The Mountain 2026. Funciona até sem internet. App não oficial.">
@@ -573,6 +573,8 @@ body.mapfs.lista-aberta .fslist{display:block;position:fixed;z-index:62;left:0;r
 .mapctl .fsbtn{margin:0;min-height:34px;height:34px;padding:0 10px;gap:5px;border-radius:10px;font-size:15px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
 .mapctl .fsbtn svg{width:15px;height:15px}
 body.mapfs .mapctl{display:none}
+html,body{touch-action:pan-x pan-y}
+#mapwrap{touch-action:pan-x pan-y;overscroll-behavior:contain}
 </style>
 </head>
 <body>
@@ -1019,16 +1021,18 @@ function legendHtml(qq){
   return L.length?L.map(p=>`<button class="lg" data-pin="${p.n}" data-center="1"><i class="pin ${p.cat}" style="position:static;transform:none">${p.n}</i><span>${esc(p.name)}</span></button>`).join(''):'<p class="note">Nenhum lugar encontrado.</p>';
 }
 function rMap(){
+  const _cc=main.querySelector('.chips[aria-label="Categoria"]'), _cs=_cc?_cc.scrollLeft:0; /* mantém a posição da fila de categorias */
   const cats='<div class="chips" role="group" aria-label="Categoria">'+CATS.map(([k,n])=>`<button class="chip-btn" data-cat="${k}" aria-pressed="${S.cat===k}">${n}</button>`).join('')+'</div>';
   const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}</span>`}).join('');
   const pins=PINS.map(p=>`<button class="pin ${p.cat} ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
   const lg=legendHtml();
   main.innerHTML=`${cats}
   <div id="mapframe"><div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${pins}</div></div>
-  <div class="mapctl"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
-  <div class="fsbar"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><div class="fsl"><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
+  <div class="mapctl"><span></span><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
+  <div class="fsbar"><div class="fsl"><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
   <div id="fslist" class="fslist" role="dialog" aria-label="Legenda do mapa"><input class="search" id="fsq" type="search" placeholder="Buscar lugar" aria-label="Buscar lugar"><div class="legend" id="fslegend">${legendHtml('')}</div></div>
-  <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Arraste o mapa para andar por ele.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
+  <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Use dois dedos para dar zoom e arraste para andar pelo mapa.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
+  const _nc=main.querySelector('.chips[aria-label="Categoria"]'); if(_nc)_nc.scrollLeft=_cs;
   relayout();
 }
 
@@ -1201,14 +1205,14 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.108';
+const APP_VER='1.0.109';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
   <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Shows que já acabaram saem da lista, e o dia fica indisponível depois do último show.</li>
   <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar pelo novo, marcar mesmo assim ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
   <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
-  <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto. "Tela cheia" abre o mapa sobre a tela inteira, com os mesmos números e zoom; nela, "Nomes" escreve o nome ao lado dos números e "Lista" mostra todos os pontos com busca. O botão Fechar ou o voltar do celular saem dela.</li>
+  <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto. "Tela cheia" abre o mapa sobre a tela inteira, com os mesmos números e o zoom com dois dedos; nela, "Nomes" escreve o nome ao lado dos números e "Lista" mostra todos os pontos com busca. O botão Fechar ou o voltar do celular saem dela.</li>
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
@@ -1428,6 +1432,24 @@ function pdfShare(){
     else pdfDownload(b);}catch(e){}
 }
 function leaveFsState(){S.mapFs=false;document.body.classList.remove('mapfs','lista-aberta');if(S.zoomBeforeFs){S.zoom=S.zoomBeforeFs;S.zoomBeforeFs=0;const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';}}
+
+/* zoom com dois dedos só no mapa (a página inteira não dá zoom) */
+(function(){
+  let p=null;
+  const wrap=()=>document.querySelector('#mapwrap'), box=()=>document.querySelector('#mapbox');
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  function setZoom(z,cx,cy){
+    const w=wrap(),b=box(); if(!w||!b)return; z=Math.min(S.mapFs?6:4,Math.max(1,z));
+    const fx=(w.scrollLeft+cx)/b.clientWidth, fy=(w.scrollTop+cy)/b.clientHeight;
+    S.zoom=z; b.style.width=z*100+'%';
+    w.scrollLeft=fx*b.clientWidth-cx; w.scrollTop=fy*b.clientHeight-cy; relayout();
+  }
+  document.addEventListener('touchstart',e=>{const w=e.target.closest&&e.target.closest('#mapwrap');if(!w||e.touches.length!==2)return;p={d:dist(e.touches),z:S.zoom};e.preventDefault();},{passive:false});
+  document.addEventListener('touchmove',e=>{if(!p)return;if(e.touches.length!==2){p=null;return;}e.preventDefault();const r=wrap().getBoundingClientRect();setZoom(p.z*dist(e.touches)/p.d,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top);},{passive:false});
+  document.addEventListener('touchend',e=>{if(e.touches.length<2)p=null;});
+  document.addEventListener('wheel',e=>{if(!e.ctrlKey||!(e.target.closest&&e.target.closest('#mapwrap')))return;e.preventDefault();const r=wrap().getBoundingClientRect();setZoom(S.zoom*Math.exp(-e.deltaY*0.01),e.clientX-r.left,e.clientY-r.top);},{passive:false});
+  ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+})();
 function enterMapFs(){S.mapFs=true;S.zoomBeforeFs=S.zoom;S.zoom=Math.min(6,Math.max(S.zoom,Math.ceil((innerHeight*(1848/850)/innerWidth)*2)/2));const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';document.body.classList.add('mapfs');try{location.hash='map-fs';}catch(e){}relayout();}
 function exitMapFs(){if(!S.mapFs)return;leaveFsState();if(location.hash.endsWith('-fs')){try{history.back();}catch(e){}}}
 function shareClick(t){
