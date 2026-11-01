@@ -564,6 +564,13 @@ body.mapfs #mapbox.names .pname{display:block}
 .fslist{display:none}
 body.mapfs.lista-aberta .fslist{display:block;position:fixed;z-index:62;left:0;right:0;bottom:0;max-height:58vh;max-height:58dvh;overflow:auto;padding:12px 12px max(14px,env(safe-area-inset-bottom));background:var(--paper);border-top:3px solid var(--ink);border-radius:22px 22px 0 0;box-shadow:0 -6px 18px rgba(0,0,0,.25)}
 .fslist .search{margin-bottom:10px}
+
+#mapframe{position:relative}
+.mapctl{position:absolute;z-index:5;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.mapctl>*{pointer-events:auto}
+.mapctl .zoom button{width:40px;height:40px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+.mapctl .fsbtn{margin:0;min-height:40px;height:40px;padding:0 12px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+body.mapfs .mapctl{display:none}
 </style>
 </head>
 <body>
@@ -1014,8 +1021,9 @@ function rMap(){
   const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}</span>`}).join('');
   const pins=PINS.map(p=>`<button class="pin ${p.cat} ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
   const lg=legendHtml();
-  main.innerHTML=`<div class="mapbar"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div>${cats}
-  <div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${pins}</div></div>
+  main.innerHTML=`${cats}
+  <div id="mapframe"><div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${pins}</div></div>
+  <div class="mapctl"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
   <div class="fsbar"><div class="zoom"><button data-z="-1" aria-label="Diminuir zoom">−</button><button data-z="1" aria-label="Aumentar zoom">+</button></div><div class="fsl"><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
   <div id="fslist" class="fslist" role="dialog" aria-label="Legenda do mapa"><input class="search" id="fsq" type="search" placeholder="Buscar lugar" aria-label="Buscar lugar"><div class="legend" id="fslegend">${legendHtml('')}</div></div>
   <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Arraste o mapa para andar por ele.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
@@ -1191,7 +1199,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.106';
+const APP_VER='1.0.107';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
