@@ -1145,15 +1145,15 @@ function openSheet(){$('#scrim').classList.add('open');$('#sheet').classList.add
 function closeSheet(){ if(!sheetOpen)return; hideSheet(); if(location.hash.endsWith('-info'))history.back(); }
 function conflictSheet(sh,cf){
   $('#sheet').innerHTML=`<h2>Esse horário já está ocupado</h2><p><b>${esc(sh.name)}</b> (${esc(stageById[sh.stage].n)}, ${range(sh)}) bate com:</p><ul>${cf.map(o=>`<li><b>${esc(o.name)}</b> (${esc(stageById[o.stage].n)}, ${range(o)})</li>`).join('')}</ul>
-  <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
+  <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.102';
+const APP_VER='1.0.103';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
   <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Shows que já acabaram saem da lista, e o dia fica indisponível depois do último show.</li>
-  <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar, manter os dois ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
+  <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar pelo novo, marcar mesmo assim ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
   <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
   <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto.</li>
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
