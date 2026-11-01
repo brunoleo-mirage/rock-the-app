@@ -581,6 +581,7 @@ html,body{touch-action:pan-x pan-y}
 .warnlist li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 8px;align-items:baseline;padding:3px 0;border-top:1.5px dashed rgba(26,20,32,.35);font-size:14px;line-height:1.05}
 .warnlist .wn{min-width:0;flex:1 1 auto;overflow-wrap:break-word}
 .warnlist .wt{flex:none;white-space:nowrap;font-size:13px;opacity:.85;margin-left:auto}
+.chips[aria-label="Palco"]{position:sticky;top:-18px;z-index:20;background:var(--bg);padding-top:8px;padding-bottom:10px;margin-top:-8px;box-shadow:0 8px 8px -8px rgba(26,20,32,.35)}
 </style>
 </head>
 <body>
@@ -1212,7 +1213,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.111';
+const APP_VER='1.0.112';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
