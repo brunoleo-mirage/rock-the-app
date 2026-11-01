@@ -20,6 +20,7 @@
 <meta name="darkreader-lock">
 <link rel="icon" href="favicon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="sticker.webp" as="image" type="image/webp" fetchpriority="high">
 <link rel="preload" href="fonts/AmaticSC-Bold.woff" as="font" type="font/woff" crossorigin>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -550,9 +551,9 @@ nav #share-app{padding-left:6px;padding-right:6px}
 <body>
 <div id="app">
   <header>
-    <img class="sticker" src="sticker.png" alt="Rock the App">
+    <img class="sticker" src="sticker.webp" width="480" height="195" fetchpriority="high" decoding="async" alt="Rock the App">
     <div class="t"><h1 class="sr">Rock the App</h1></div>
-    <a class="dev" href="https://www.instagram.com/officeginger" target="_blank" rel="noopener" aria-label="Desenvolvido por Mirage by Ginger Agency (abre o Instagram)"><span>developed by</span><img src="mirage-logo.png" alt="Mirage by Ginger Agency" width="64" height="37"></a>
+    <a class="dev" href="https://www.instagram.com/officeginger" target="_blank" rel="noopener" aria-label="Desenvolvido por Mirage by Ginger Agency (abre o Instagram)"><span>developed by</span><img src="mirage-logo.webp" alt="Mirage by Ginger Agency" width="64" height="37"></a>
     <button id="theme-btn" aria-label="Alternar modo escuro"></button>
     <button id="about-btn" aria-label="Sobre o app e como instalar"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 9.2a3.5 3.5 0 1 1 5.4 2.9c-1.2.8-2 1.5-2 3"/><circle cx="12" cy="19" r="0.9" fill="currentColor" stroke="none"/></svg></button>
   </header>
@@ -1147,7 +1148,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar os dois</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.101';
+const APP_VER='1.0.102';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
