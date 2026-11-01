@@ -575,6 +575,12 @@ body.mapfs.lista-aberta .fslist{display:block;position:fixed;z-index:62;left:0;r
 body.mapfs .mapctl{display:none}
 html,body{touch-action:pan-x pan-y}
 #mapwrap{touch-action:pan-x pan-y;overscroll-behavior:contain}
+.card .warnlist{padding:4px 8px 5px}
+.warnlist .wh{font-weight:700;font-size:14px;line-height:1.1;margin-bottom:2px}
+.warnlist ul{list-style:none;margin:0;padding:0}
+.warnlist li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 8px;align-items:baseline;padding:3px 0;border-top:1.5px dashed rgba(26,20,32,.35);font-size:14px;line-height:1.05}
+.warnlist .wn{min-width:0;flex:1 1 auto;overflow-wrap:break-word}
+.warnlist .wt{flex:none;white-space:nowrap;font-size:13px;opacity:.85;margin-left:auto}
 </style>
 </head>
 <body>
@@ -929,7 +935,7 @@ function dayRain(i){ return ''; }
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
-  const warn=on&&cf.length?`<div class="warn">⚠ Bate com ${cf.map(o=>esc(o.name)+' ('+range(o)+')').join(', ')}</div>`:'';
+  const warn=on&&cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${range(o)}</span></li>`).join('')}</ul></div>`:'';
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
@@ -1206,7 +1212,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.110';
+const APP_VER='1.0.111';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
