@@ -1252,7 +1252,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.121';
+const APP_VER='1.0.122';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1413,7 +1413,7 @@ function shareAppSheet(){
 }
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque alguns shows antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
-  sheetHtml('Compartilhar roteiro','<p class="note">Escolha o modelo. Você envia uma imagem pronta para postar nos stories e no feed. Ela já leva um QR para seus amigos colocarem o roteiro no app deles.</p><div class="mods" id="mods" role="group" aria-label="Modelos"></div><div class="shbtns">'+
+  sheetHtml('Compartilhar roteiro','<p class="note">Escolha o modelo. Você envia uma imagem pronta para postar. Ela já leva um QR para seus amigos colocarem o roteiro no app deles.</p><div class="mods" id="mods" role="group" aria-label="Modelos"></div><div class="shbtns">'+
    '<button class="btnp" id="sh-img">Compartilhar imagem do roteiro</button><button class="btns" id="dl-img">Baixar imagem do roteiro</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
    '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
