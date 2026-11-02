@@ -99,7 +99,7 @@ h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
 .mapbar{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
 .zoom{display:flex;gap:6px}
 .zoom button{width:44px;height:44px;border-radius:12px;border:2px solid var(--ink);background:var(--paper);font-size:22px;font-weight:800;line-height:1}
-#mapwrap{border:2px solid var(--ink);border-radius:16px;overflow:auto;max-height:min(62vh,560px);background:#FEFAD9;-webkit-overflow-scrolling:touch}
+#mapwrap{border:2px solid var(--ink);border-radius:16px;overflow:auto;max-height:min(44vh,320px);background:#FEFAD9;-webkit-overflow-scrolling:touch}
 #mapbox{position:relative;width:100%}
 #mapbox img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;filter:saturate(.55) brightness(1.06) contrast(.92)}
 #mapbox.orig img{filter:none}
@@ -919,11 +919,12 @@ try{if(localStorage.getItem('rta_wk')!=='2'){localStorage.removeItem('rta_sel');
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
 try{const v=JSON.parse(localStorage.getItem('rta_maybe')||'[]');v.forEach(id=>byId[id]&&!S.sel.has(id)&&S.maybe.add(id));}catch(e){}
-const save=()=>{try{localStorage.setItem('rta_sel',JSON.stringify([...S.sel]));localStorage.setItem('rta_maybe',JSON.stringify([...S.maybe]))}catch(e){}};
+const save=()=>{try{localStorage.setItem('rta_sel',JSON.stringify([...S.sel]));localStorage.setItem('rta_maybe',JSON.stringify([...S.maybe]))}catch(e){}try{pushSyncSoon();}catch(e){}};
 const planIds=()=>[...S.sel,...S.maybe];
 const overlap=(a,b)=>a.s<b.e&&b.s<a.e;
 function conflictsOf(sh){ if(sh.bg)return[]; return [...S.sel].map(i=>byId[i]).filter(o=>o&&o.id!==sh.id&&o.d===sh.d&&!o.bg&&overlap(sh,o)); }
 function fmtIn(m){m=Math.max(0,Math.round(m));const d=Math.floor(m/1440),h=Math.floor(m%1440/60),mm=m%60;return d?`${d}d ${h}h`:h?`${h}h${String(mm).padStart(2,'0')}`:`${mm} min`;}
+const liveWord=sh=>(sh.oficina||sh.stage==='kids')?'Rolando agora':'Tocando agora';
 const isLive=sh=>NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.s&&NOW.mins<sh.e;
 
 /* ===================== RENDER ===================== */
@@ -956,7 +957,7 @@ function card(sh,opts={}){
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
-    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="Tocando agora${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>Tocando agora</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
+    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
       ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true">Desmarcar</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true">Desmarcar</button>`)
       : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
@@ -1057,7 +1058,7 @@ function rMap(){
   <div class="mapctl"><button class="btns favbtn" type="button" aria-pressed="${S.cat==='fav'}">♥ Favoritos</button><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
   <div class="fsbar"><div class="fsl"><button class="btns favbtn" type="button" aria-pressed="${S.cat==='fav'}">♥ Favoritos</button><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
   <div id="fslist" class="fslist" role="dialog" aria-label="Legenda do mapa"><input class="search" id="fsq" type="search" placeholder="Buscar lugar" aria-label="Buscar lugar"><div class="legend" id="fslegend">${legendHtml('')}</div></div>
-  <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Use dois dedos para dar zoom e arraste para andar pelo mapa.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
+  <p class="note" id="maphint">${S.showPins?'Toque num número para ver o nome.':'Toque no mapa para mostrar os números.'} Dois dedos dão zoom.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
   const _nc=main.querySelector('.chips[aria-label="Categoria"]'); if(_nc)_nc.scrollLeft=_cs;
   relayout();
 }
@@ -1252,7 +1253,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.124';
+const APP_VER='1.0.125';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1265,7 +1266,7 @@ function aboutSheet(){
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
   <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar como texto com link. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
-  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar 15 min antes" liga um aviso antes de cada show marcado. Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.</li>
+  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar 15 min antes" liga um aviso antes de cada show marcado. ${pushOk()?'Ele chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial. Para isso, o servidor guarda apenas o endereço de notificação do seu aparelho e os horários dos shows marcados, e apaga tudo se você desligar os lembretes.':'Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.'}</li>
   <li><b>Horários podem mudar.</b> A programação pode ser alterada pela organização do festival. Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
@@ -1281,12 +1282,32 @@ function copyText(){
 
 let _rs=Math.floor(Date.now()/ROT_MS);
 let _ov=DAYS.map((d,i)=>dayOver(i)).join();
+const PUSH_URL='https://rta-push.brunolregis.workers.dev';const VAPID_PUB='BJuBHVkKhVKw-3T0w2Ocmom1_8O8DeZ9UJTm9PltdF9r76CN8sp74113B8kwwFC2Iqi7K2k0VEn5XcRL6jQ-D-0';
+const pushOk=()=>!!PUSH_URL&&'serviceWorker' in navigator&&'PushManager' in window;
+const u8=b=>{const p='='.repeat((4-b.length%4)%4),s=atob((b+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(s,c=>c.charCodeAt(0));};
+const startUTC=sh=>Math.floor(absMin(DAYS[sh.d].date,sh.s)+180);
+function idbSetPlan(plan){return new Promise(res=>{try{const q=indexedDB.open('rta',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onerror=()=>res();q.onsuccess=()=>{try{const tx=q.result.transaction('k','readwrite');tx.objectStore('k').put(plan,'plan');tx.oncomplete=()=>res();tx.onerror=()=>res();}catch(e){res();}};}catch(e){res();}});}
+let _ps=0;
+function pushSyncSoon(){clearTimeout(_ps);_ps=setTimeout(pushSync,1500);}
+async function pushSync(){
+  if(!remindOn())return;
+  const plan=[...S.sel].map(i=>byId[i]).filter(Boolean).map(sh=>({id:sh.id,name:sh.name,stage:stageLong(sh.stage),hora:hhmm(sh.s),at:startUTC(sh)}));
+  await idbSetPlan(plan);
+  if(!pushOk())return;
+  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUB)});
+    await fetch(PUSH_URL+'/sub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sub:sub.toJSON(),times:plan.map(p=>p.at-15)})});
+  }catch(e){}
+}
+async function pushOff(){
+  try{if(!pushOk())return;const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch(PUSH_URL+'/unsub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})}).catch(()=>{});await sub.unsubscribe();}}catch(e){}
+}
 const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notification' in window&&Notification.permission==='granted';}catch(e){return false;}};
 async function toggleRemind(){
   if(remindOn()){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Para ver como ele chega, toque em testar e saia do app: o aviso aparece em 5 segundos.</p><div class="acts2"><button class="btnp" id="rem-test">Testar aviso</button><button class="btns" id="rem-off">Desligar lembretes</button><button class="btns" data-close>Fechar</button></div>';return openSheet();}
   if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
   let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
-  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
+  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();pushSync();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. '+(pushOk()?'Os avisos chegam mesmo com o app fechado.':'Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.')+'</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
   else{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Avisos bloqueados</h2><p>Libere as notificações deste site nas configurações do navegador e toque de novo.</p>';openSheet();}
 }
 const _rn=new Set();
@@ -1343,7 +1364,7 @@ document.addEventListener('click',e=>{
   const mt=e.target.closest('[data-meet]'); if(mt){e.preventDefault();return meetPin(+mt.dataset.meet);}
   if(e.target.closest('.favbtn'))return toggleFavFilter();
   if(e.target.closest('.plabel')&&!e.target.closest('.irl'))return;
-  if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.';}return;}
+  if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=(S.showPins?'Toque num número para ver o nome.':'Toque no mapa para mostrar os números.')+' Dois dedos dão zoom.';}return;}
   const t=e.target.closest('button,a,.irl'); if(!t)return;
   if(t.dataset.tab){closeSheet();if(t.dataset.tab==='map'&&S.tab!=='map')S.pin=null;return setTab(t.dataset.tab);}
   if(t.id==='install-btn')return doInstall();
@@ -1371,7 +1392,7 @@ document.addEventListener('click',e=>{
   if(shareClick(t))return;
   if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
   if(t.id==='remind')return toggleRemind();
-  if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}closeSheet();return render();}
+  if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}pushOff();closeSheet();return render();}
   if(t.id==='rem-test'){closeSheet();setTimeout(()=>{const o={body:'Palco Floresta · começa às 17:40. É assim que o lembrete aparece.',icon:'icon-192.png',tag:'rta-teste'};try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification('Show de teste em 15 min',o)).catch(()=>{try{new Notification('Show de teste em 15 min',o);}catch(e){}});else new Notification('Show de teste em 15 min',o);}catch(e){}},5000);return;}
   if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
   if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
