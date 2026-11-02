@@ -526,9 +526,11 @@ h2.sec{font-size:25px}
 nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
 #sheet .how a{color:inherit;font-weight:700;text-decoration:underline}
-.mods{display:flex;gap:12px;overflow-x:auto;padding:6px 4px 12px;margin:6px 0}
-.mod{flex:none;width:150px;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:center}
-.mod img{display:block;width:100%;height:auto;max-height:300px;object-fit:cover;object-position:top;border:3px solid var(--ink);border-radius:14px}
+.shprev{display:flex;justify-content:center;margin:2px 0 8px;min-height:10px}
+.shprev img{display:block;max-height:150px;width:auto;max-width:100%;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
+.mods{display:flex;gap:8px;padding:6px 4px 10px;margin:4px 0}
+.mod{flex:1 1 0;min-width:0;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:center}
+.mod img{display:block;width:100%;height:auto;border:3px solid var(--ink);border-radius:10px}
 .mod span{display:block;margin-top:4px;font-family:var(--f-display);font-size:20px}
 .mod[aria-pressed="true"] img{outline:5px solid #EB4B94;outline-offset:1px}
 .lg .fv{margin-left:auto;font-size:22px;line-height:1;padding:6px 4px 6px 10px;cursor:pointer}
@@ -1033,7 +1035,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes: ligados':'Avisar 15 min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes ligados':'Avisar 15 min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1250,7 +1252,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.120';
+const APP_VER='1.0.121';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1284,7 +1286,7 @@ async function toggleRemind(){
   if(remindOn()){try{localStorage.setItem('rta_remind','0');}catch(e){}return render();}
   if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
   let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
-  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Os avisos funcionam com o app aberto ou em segundo plano. Se o celular fechar o app, o aviso pode não chegar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
+  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
   else{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Avisos bloqueados</h2><p>Libere as notificações deste site nas configurações do navegador e toque de novo.</p>';openSheet();}
 }
 const _rn=new Set();
@@ -1411,11 +1413,13 @@ function shareAppSheet(){
 }
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque alguns shows antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
-  sheetHtml('Compartilhar roteiro','<div class="shbtns">'+
-   '<button class="btnp" id="sh-img">Compartilhar roteiro</button><button class="btns" id="dl-img">Baixar roteiro</button>'+
+  sheetHtml('Compartilhar roteiro','<p class="note">Escolha o modelo. Você envia uma imagem pronta para postar nos stories e no feed. Ela já leva um QR para seus amigos colocarem o roteiro no app deles.</p><div class="mods" id="mods" role="group" aria-label="Modelos"></div><div class="shbtns">'+
+   '<button class="btnp" id="sh-img">Compartilhar imagem do roteiro</button><button class="btns" id="dl-img">Baixar imagem do roteiro</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
    '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
-   '</div><p class="note">A imagem leva um QR: quem escanear coloca o seu roteiro no próprio app.</p>');
+   '</div>');
+  try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])MOD.th=s;}catch(e){}
+  (async()=>{let html='';for(const k of Object.keys(IMG_THEMES)){const b=await imgRotBlob(k);if(!$('#mods'))return;html+=`<button class="mod" data-mod="${k}" aria-pressed="${k===MOD.th}"><img src="${URL.createObjectURL(b)}" alt="Modelo ${IMG_THEMES[k].n}"></button>`;}$('#mods').innerHTML=html;})();
 }
 function importSheet(){
   sheetHtml('Importar roteiro','<p class="note">Cole aqui a mensagem que seu amigo enviou (ela termina com um link do Rock the App), ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
@@ -1535,15 +1539,7 @@ async function imgShare(dl,th){
     if(!dl&&navigator.canShare&&navigator.canShare({files:[f]}))return navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}catch(e){}
 }
-let MOD={act:'sh',th:'claro'};
-async function modSheet(act){
-  let th='claro';try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])th=s;}catch(e){}
-  MOD={act,th};
-  sheetHtml('Escolha o modelo','<div class="mods" id="mods" role="group" aria-label="Modelos"><p class="note">Preparando as prévias…</p></div><div class="acts2"><button class="btnp" id="mod-go">'+(act==='dl'?'Baixar roteiro':'Compartilhar roteiro')+'</button><button class="btns" data-close>Cancelar</button></div>');
-  const box=$('#mods');let html='';
-  for(const k of Object.keys(IMG_THEMES)){const b=await imgRotBlob(k);html+=`<button class="mod" data-mod="${k}" aria-pressed="${k===MOD.th}"><img src="${URL.createObjectURL(b)}" alt="Modelo ${IMG_THEMES[k].n}"></button>`;if(!$('#mods'))return;}
-  box.innerHTML=html;
-}
+let MOD={th:'claro'};
 async function importImg(file){
   const err=$('#imp-err'); if(err)err.hidden=true; if(!file)return;
   try{
@@ -1594,10 +1590,8 @@ function shareClick(t){
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
-  if(t.id==='sh-img')return modSheet('sh'),true;
-  if(t.id==='dl-img')return modSheet('dl'),true;
+  if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
   if(t.dataset.mod){MOD.th=t.dataset.mod;document.querySelectorAll('.mod').forEach(x=>x.setAttribute('aria-pressed',x===t));return true;}
-  if(t.id==='mod-go'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}closeSheet();return imgShare(MOD.act==='dl',MOD.th),true;}
   if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
   if(t.id==='import-rot')return importSheet(),true;
   if(t.id==='imp-pick'){const f=$('#imp-file');if(f)f.click();return true;}
