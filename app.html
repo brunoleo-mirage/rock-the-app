@@ -88,7 +88,7 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--rose)
 .go{border:2px solid var(--ink);background:var(--paper);border-radius:12px;padding:6px 10px;font-weight:800;font-size:14px;min-height:40px;white-space:nowrap}
 .go[aria-pressed="true"]{background:var(--sage)}
 .mini{border:0;background:none;text-decoration:underline;font-size:12.5px;font-weight:700;color:var(--ink2);padding:2px;min-height:28px}
-.empty{padding:28px 12px;text-align:center;color:var(--ink2)}
+.empty{padding:28px 8px;text-align:center;color:var(--ink2);white-space:nowrap;font-size:clamp(12px,4.8vw,22px)}
 .empty b{display:block;font-family:var(--f-display);font-size:19px;color:var(--ink);margin-bottom:4px}
 h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
 .gap{font-size:13px;color:var(--ink2);padding:2px 0 8px 14px;border-left:3px dotted var(--line);margin-left:6px}
@@ -1026,7 +1026,7 @@ function livePanel(){
 }
 function rRot(){
   let html='';
-  if(!planIds().length) html='<div class="empty"><b>Seu roteiro está vazio</b>Toque em "Quero ir" ou "Talvez" nos shows da Programação.</div>';
+  if(!planIds().length) html='<div class="empty"><b>Seu roteiro está vazio</b>Toque em "Quero ir" ou "Talvez" nas atrações da Programação.</div>';
   DAYS.forEach((D,d)=>{
     const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
     if(!items.length)return;
@@ -1266,7 +1266,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.130';
+const APP_VER='1.0.131';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
