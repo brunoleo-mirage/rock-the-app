@@ -526,6 +526,8 @@ h2.sec{font-size:25px}
 nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
 #sheet .how a{color:inherit;font-weight:700;text-decoration:underline}
+.leads{display:flex;flex-wrap:nowrap;gap:6px;margin:4px 0 10px}
+.leads .chip-btn{min-height:40px;padding:0 8px;flex:1 1 0;font-size:19px}
 .shprev{display:flex;justify-content:center;margin:2px 0 8px;min-height:10px}
 .shprev img{display:block;max-height:150px;width:auto;max-width:100%;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
 .mods{display:flex;gap:8px;padding:6px 4px 10px;margin:4px 0}
@@ -1036,7 +1038,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes ligados':'Avisar 15 min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes ligados':'Avisar '+leadMin()+' min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1253,7 +1255,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.125';
+const APP_VER='1.0.126';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1266,7 +1268,7 @@ function aboutSheet(){
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
   <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar como texto com link. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
-  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar 15 min antes" liga um aviso antes de cada show marcado. ${pushOk()?'Ele chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial. Para isso, o servidor guarda apenas o endereço de notificação do seu aparelho e os horários dos shows marcados, e apaga tudo se você desligar os lembretes.':'Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.'}</li>
+  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar antes" liga um aviso antes de cada show marcado, e você escolhe quanto tempo antes (5, 10, 15, 30 ou 60 min). ${pushOk()?'Ele chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial. Para isso, o servidor guarda apenas o endereço de notificação do seu aparelho e os horários dos shows marcados, e apaga tudo se você desligar os lembretes.':'Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.'}</li>
   <li><b>Horários podem mudar.</b> A programação pode ser alterada pela organização do festival. Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
@@ -1291,31 +1293,38 @@ let _ps=0;
 function pushSyncSoon(){clearTimeout(_ps);_ps=setTimeout(pushSync,1500);}
 async function pushSync(){
   if(!remindOn())return;
-  const plan=[...S.sel].map(i=>byId[i]).filter(Boolean).map(sh=>({id:sh.id,name:sh.name,stage:stageLong(sh.stage),hora:hhmm(sh.s),at:startUTC(sh)}));
+  const plan=[...S.sel].map(i=>byId[i]).filter(Boolean).map(sh=>({id:sh.id,name:sh.name,stage:stageLong(sh.stage),hora:hhmm(sh.s),at:startUTC(sh),lead:leadMin()}));
   await idbSetPlan(plan);
   if(!pushOk())return;
   try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID_PUB)});
-    await fetch(PUSH_URL+'/sub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sub:sub.toJSON(),times:plan.map(p=>p.at-15)})});
+    await fetch(PUSH_URL+'/sub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sub:sub.toJSON(),times:plan.map(p=>p.at-leadMin())})});
   }catch(e){}
 }
 async function pushOff(){
   try{if(!pushOk())return;const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub){await fetch(PUSH_URL+'/unsub',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})}).catch(()=>{});await sub.unsubscribe();}}catch(e){}
 }
 const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notification' in window&&Notification.permission==='granted';}catch(e){return false;}};
+const LEADS=[5,10,15,30,60];
+const leadMin=()=>{try{const v=+localStorage.getItem('rta_lead');return LEADS.includes(v)?v:15;}catch(e){return 15;}};
+function remindSheet(extra,btns){
+  $('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso <b id="lead-n">'+leadMin()+'</b> minutos antes de cada show marcado. '+extra+'</p><p class="note">Quanto tempo antes?</p><div class="leads" role="group" aria-label="Minutos antes">'+LEADS.map(n=>`<button class="chip-btn" data-lead="${n}" aria-pressed="${n===leadMin()}">${n} min</button>`).join('')+'</div><div class="acts2">'+btns+'</div>';
+  openSheet();
+}
 async function toggleRemind(){
-  if(remindOn()){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Para ver como ele chega, toque em testar e saia do app: o aviso aparece em 5 segundos.</p><div class="acts2"><button class="btnp" id="rem-test">Testar aviso</button><button class="btns" id="rem-off">Desligar lembretes</button><button class="btns" data-close>Fechar</button></div>';return openSheet();}
+  if(remindOn())return remindSheet('Para ver como ele chega, toque em testar e saia do app: o aviso aparece em 5 segundos.','<button class="btnp" id="rem-test">Testar aviso</button><button class="btns" id="rem-off">Desligar lembretes</button><button class="btns" data-close>Fechar</button>');
   if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
   let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
-  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();pushSync();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. '+(pushOk()?'Os avisos chegam mesmo com o app fechado.':'Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.')+'</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
+  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();pushSync();render();remindSheet(pushOk()?'Os avisos chegam mesmo com o app fechado.':'Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.','<button class="btns" data-close>Ok</button>');}
   else{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Avisos bloqueados</h2><p>Libere as notificações deste site nas configurações do navegador e toque de novo.</p>';openSheet();}
 }
+
 const _rn=new Set();
 function remindCheck(){
   if(!remindOn())return;
   const now=absMin(NOW.date,NOW.mins);
   S.sel.forEach(id=>{const sh=byId[id];if(!sh||_rn.has(id))return;const d=absMin(DAYS[sh.d].date,sh.s)-now;
-    if(d>0&&d<=15){_rn.add(id);const o={body:stageById[sh.stage].n+' · começa às '+hhmm(sh.s),icon:'icon-192.png',tag:'rta-'+id};
+    if(d>0&&d<=leadMin()){_rn.add(id);const o={body:stageById[sh.stage].n+' · começa às '+hhmm(sh.s),icon:'icon-192.png',tag:'rta-'+id};
       try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification(sh.name+' em '+d+' min',o)).catch(()=>{try{new Notification(sh.name+' em '+d+' min',o);}catch(e){}});else new Notification(sh.name+' em '+d+' min',o);}catch(e){}}});
 }
 function tick(){
@@ -1393,6 +1402,7 @@ document.addEventListener('click',e=>{
   if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
   if(t.id==='remind')return toggleRemind();
   if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}pushOff();closeSheet();return render();}
+  if(t.dataset.lead){try{localStorage.setItem('rta_lead',t.dataset.lead);}catch(e){}_rn.clear();document.querySelectorAll('[data-lead]').forEach(x=>x.setAttribute('aria-pressed',x===t));const n=$('#lead-n');if(n)n.textContent=t.dataset.lead;const b=$('#remind');if(b)b.textContent='Lembretes ligados';pushSync();return true;}
   if(t.id==='rem-test'){closeSheet();setTimeout(()=>{const o={body:'Palco Floresta · começa às 17:40. É assim que o lembrete aparece.',icon:'icon-192.png',tag:'rta-teste'};try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification('Show de teste em 15 min',o)).catch(()=>{try{new Notification('Show de teste em 15 min',o);}catch(e){}});else new Notification('Show de teste em 15 min',o);}catch(e){}},5000);return;}
   if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
   if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
