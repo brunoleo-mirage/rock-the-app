@@ -611,9 +611,9 @@ html,body{touch-action:pan-x pan-y}
 "use strict";
 /* ===================== DADOS ===================== */
 const DAYS=[
- {k:'sex',short:'Sex',n:'30/10',full:'Sexta, 30 de outubro',date:'2026-10-30'},
- {k:'sab',short:'Sáb',n:'31/10',full:'Sábado, 31 de outubro',date:'2026-10-31'},
- {k:'dom',short:'Dom',n:'01/11',full:'Domingo, 1º de novembro',date:'2026-11-01'}
+ {k:'sex',short:'Sex',n:'06/11',full:'Sexta, 6 de novembro',date:'2026-11-06'},
+ {k:'sab',short:'Sáb',n:'07/11',full:'Sábado, 7 de novembro',date:'2026-11-07'},
+ {k:'dom',short:'Dom',n:'08/11',full:'Domingo, 8 de novembro',date:'2026-11-08'}
 ];
 const STAGES=[
  {id:'floresta',n:'Palco Floresta',s:'Vivo',pins:[24],c:'--st1'},
@@ -901,6 +901,7 @@ const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mi
 const dayOver=d=>SHOWS.filter(x=>x.d===d).every(showOver); /* o dia só fecha depois que o último show termina */ 
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
 const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
+try{if(localStorage.getItem('rta_wk')!=='2'){localStorage.removeItem('rta_sel');localStorage.removeItem('rta_maybe');localStorage.setItem('rta_wk','2');}}catch(e){}
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
 try{const v=JSON.parse(localStorage.getItem('rta_maybe')||'[]');v.forEach(id=>byId[id]&&!S.sel.has(id)&&S.maybe.add(id));}catch(e){}
@@ -1214,7 +1215,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.115';
+const APP_VER='1.0.116';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
