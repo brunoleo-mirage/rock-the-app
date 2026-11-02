@@ -1266,7 +1266,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.128';
+const APP_VER='1.0.129';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1559,7 +1559,7 @@ async function imgRotBlob(th){
   try{await document.fonts.load('700 40px "Amatic SC"');}catch(e){}
   const cs=getComputedStyle(document.documentElement),FF='"Amatic SC","Arial Narrow",sans-serif',INK='#1A1420',CRM='#FEFAD9',LN=T.line,W=1080,PAD=48;
   const days=DAYS.map((D,d)=>({D,items:planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s)})).filter(x=>x.items.length);
-  const RH=156,HEAD=456,FOOT=420,DH=120;
+  const RH=172,HEAD=430,FOOT=420,DH=112;
   const H=Math.max(1350,HEAD+days.reduce((a,x)=>a+DH+x.items.length*RH+14,0)+FOOT);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
   const grd=c.createLinearGradient(0,0,0,H);grd.addColorStop(0,T.bg[0]);grd.addColorStop(1,T.bg[1]);c.fillStyle=grd;c.fillRect(0,0,W,H);
@@ -1571,32 +1571,37 @@ async function imgRotBlob(th){
   const box=(x,y,w,h,r,fill,dash,sh)=>{if(sh){rr(x+sh,y+sh,w,h,r);c.fillStyle=LN;c.fill();}rr(x,y,w,h,r);c.fillStyle=fill;c.fill();c.lineWidth=6;c.strokeStyle=LN;c.setLineDash(dash?[18,12]:[]);c.stroke();c.setLineDash([]);};
   const outl=(s,x,y,fill,sw,ln)=>{c.lineJoin='round';c.lineWidth=sw;c.strokeStyle=ln||INK;c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y);};
   c.textBaseline='alphabetic';c.textAlign='left';
-  if(T.char){const im=await _ld(T.char);if(im){const sc=Math.min(470/im.naturalWidth,380/im.naturalHeight),iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;c.drawImage(im,W-PAD-iw+20,56+(380-ih)/2,iw,ih);}}
-  c.font='700 190px '+FF;outl('MEU',PAD,230,T.title,16,T.titleLine);outl('ROTEIRO',PAD,372,T.title,16,T.titleLine);
-  c.font='700 52px '+FF;c.fillStyle=T.sub;
-  const d0=DAYS[0],d1=DAYS[DAYS.length-1];c.fillText(('ROCK THE MOUNTAIN · '+d0.n.slice(0,2)+' A '+d1.n.slice(0,2)+' DE NOVEMBRO').toUpperCase(),PAD+4,440);
+  if(T.char){const im=await _ld(T.char);if(im){const sc=Math.min(260/im.naturalWidth,262/im.naturalHeight),iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;c.drawImage(im,850-iw/2,433-ih/2,iw,ih);}}
+  {const lg=await _ld('logo-rtm.webp');if(lg){const lh=240,lw=lh*lg.naturalWidth/lg.naturalHeight,P=12,tc=document.createElement('canvas');tc.width=Math.ceil(lw+2*P+8);tc.height=Math.ceil(lh+2*P+8);const x=tc.getContext('2d');
+    x.drawImage(lg,P+4,P+4,lw,lh);x.globalCompositeOperation='source-in';x.fillStyle='#FFFFFF';x.fillRect(0,0,tc.width,tc.height);x.globalCompositeOperation='source-over';
+    const st=document.createElement('canvas');st.width=tc.width;st.height=tc.height;const y=st.getContext('2d');for(let a=0;a<24;a++){y.drawImage(tc,Math.cos(a/24*6.2832)*P*0.8,Math.sin(a/24*6.2832)*P*0.8);}y.drawImage(lg,P+4,P+4,lw,lh);
+    c.save();c.translate(545,172);c.rotate(-.07);c.shadowColor='rgba(0,0,0,.35)';c.shadowBlur=10;c.shadowOffsetY=5;c.drawImage(st,-st.width/2,-st.height/2);c.restore();}}
+  c.font='700 140px '+FF;outl('MEU',PAD,196,T.title,12,T.titleLine);outl('ROTEIRO',PAD,306,T.title,12,T.titleLine);
+  c.font='700 40px '+FF;c.fillStyle=T.sub;
+  const d0=DAYS[0],d1=DAYS[DAYS.length-1];c.fillText(('2º FINAL DE SEMANA · '+d0.n.slice(0,2)+' A '+d1.n.slice(0,2)+' DE NOVEMBRO').toUpperCase(),PAD+4,364);
   let y=HEAD+20;
   days.forEach(({D,items})=>{
     c.font='700 76px '+FF;const tw=c.measureText(D.full.toUpperCase()).width;
     box(PAD,y,tw+70,84,42,T.pill,false,6);c.fillStyle=T.pillTx;c.fillText(D.full.toUpperCase(),PAD+35,y+64);y+=DH;
     items.forEach(sh=>{
       const st=stageById[sh.stage],fill=(cs.getPropertyValue(st.c)||'#EB4B94').trim()||'#EB4B94',nmc=(cs.getPropertyValue(st.c.replace('--st','--nm'))||'#92FE71').trim()||'#92FE71',mb=S.maybe.has(sh.id);
-      box(PAD,y,W-2*PAD-8,RH-22,34,fill,mb,8);
-      c.fillStyle=LT.has(st.c)?CRM:INK;c.font='700 66px '+FF;c.fillText(hhmm(sh.s),PAD+34,y+66);
-      c.font='700 40px '+FF;c.fillText(sh.noEnd?'':'ATÉ '+hhmm(sh.e),PAD+36,y+108);
-      let fs=84;c.font='700 '+fs+'px '+FF;const nm=sh.name.toUpperCase();while(c.measureText(nm).width>600&&fs>40){fs-=3;c.font='700 '+fs+'px '+FF;}
-      outl(nm,300,y+70,nmc,Math.round(fs/6));
-      c.font='700 38px '+FF;const sn=(stageLong(sh.stage)+(mb?' · TALVEZ':'')).toUpperCase(),sw=c.measureText(sn).width;
-      rr(300,y+84,sw+34,40,20);c.fillStyle=CRM;c.fill();c.lineWidth=4;c.strokeStyle=INK;c.stroke();c.fillStyle=INK;c.fillText(sn,317,y+115);
+      box(PAD,y,W-2*PAD-8,134,34,fill,mb,8);
+      c.fillStyle=LT.has(st.c)?CRM:INK;c.font='700 54px '+FF;c.fillText(hhmm(sh.s),PAD+42,y+70);
+      c.font='700 32px '+FF;c.fillText(sh.noEnd?'':'ATÉ '+hhmm(sh.e),PAD+44,y+106);
+      let fs=64;c.font='700 '+fs+'px '+FF;const nm=sh.name.toUpperCase();while(c.measureText(nm).width>600&&fs>38){fs-=3;c.font='700 '+fs+'px '+FF;}
+      outl(nm,290,y+70,nmc,Math.round(fs/6));
+      if(mb){const nw=c.measureText(nm).width;c.font='700 30px '+FF;const tw=c.measureText('TALVEZ').width,bx=290+nw+20,bh=40,by=y+70-fs*0.34-bh/2;rr(bx,by,tw+30,bh,20);c.fillStyle='rgba(254,250,217,.9)';c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.setLineDash([8,6]);c.stroke();c.setLineDash([]);c.fillStyle=INK;c.fillText('TALVEZ',bx+15,by+30);}
+      c.font='700 30px '+FF;const sn=stageLong(sh.stage).toUpperCase(),sw=c.measureText(sn).width;
+      rr(290,y+84,sw+30,36,18);c.fillStyle=CRM;c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.stroke();c.fillStyle=INK;c.fillText(sn,305,y+111);
       y+=RH;});
     y+=14;});
   const fy=H-FOOT+20;box(PAD,fy,W-2*PAD-8,FOOT-92,36,T.foot,false,8);
   try{const q=QR.make(rotLink(),0);if(q){const m=Math.floor(220/(q.size+2));const qs=m*(q.size+2),qx=PAD+34,qy=fy+(FOOT-92-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
-  const logo=await _ld('sticker.webp');if(logo){const lw=210,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W-PAD-8-lw/2-26,fy+(FOOT-92)/2);c.rotate(.06);c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
-  c.fillStyle=T.footTx;c.font='700 64px '+FF;c.fillText('QUER ESTE ROTEIRO?',320,fy+82);c.fillText('ESCANEIE!',320,fy+142);
-  c.font='700 38px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO.',320,fy+190);c.fillText('GRÁTIS, SEM BAIXAR NADA.',320,fy+230);
-  c.fillStyle=T.footSub;c.font='700 42px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',320,fy+282);
-  c.font='700 30px '+FF;c.globalAlpha=.75;c.fillStyle=T.footTx;c.fillText('APP NÃO OFICIAL DO ROCK THE MOUNTAIN',320,fy+318);c.globalAlpha=1;
+  const logo=await _ld('sticker.webp');if(logo){const lw=270,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W-PAD-8-lw/2-22,fy+(FOOT-92)/2);c.rotate(.06);c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
+  c.fillStyle=T.footTx;c.font='700 54px '+FF;c.fillText('QUER ESTE ROTEIRO?',320,fy+80);c.fillText('ESCANEIE!',320,fy+132);
+  c.font='700 32px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO.',320,fy+180);c.fillText('GRÁTIS, SEM BAIXAR NADA.',320,fy+216);
+  c.fillStyle=T.footSub;c.font='700 36px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',320,fy+262);
+  c.font='700 26px '+FF;c.globalAlpha=.75;c.fillStyle=T.footTx;c.fillText('APP NÃO OFICIAL DO ROCK THE MOUNTAIN',320,fy+296);c.globalAlpha=1;
   return new Promise(r=>cv.toBlob(r,'image/png'));
 }
 async function imgShare(dl,th){
