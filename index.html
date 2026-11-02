@@ -525,6 +525,23 @@ h2.sec{font-size:25px}
 #sheet .implist{margin:8px 0;padding-left:18px;max-height:34vh;overflow:auto;font-size:15px}
 nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
+#sheet .how a{color:inherit;font-weight:700;text-decoration:underline}
+.meloc{position:absolute;transform:translate(-50%,-50%);z-index:6;width:30px;height:30px;border-radius:50%;background:#FFD653;color:#1A1420;border:3px solid #1A1420;box-shadow:0 0 0 3px #FE5A5E,0 2px 4px rgba(0,0,0,.4);display:grid;place-items:center;font:700 16px/1 var(--f-display);pointer-events:none}
+#mapbox.placing{cursor:crosshair;outline:3px dashed #FE5A5E;outline-offset:-3px}
+.mods{display:flex;gap:12px;overflow-x:auto;padding:6px 4px 12px;margin:6px 0}
+.mod{flex:none;width:150px;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:center}
+.mod img{display:block;width:100%;height:auto;max-height:300px;object-fit:cover;object-position:top;border:3px solid var(--ink);border-radius:14px}
+.mod span{display:block;margin-top:4px;font-family:var(--f-display);font-size:20px}
+.mod[aria-pressed="true"] img{outline:5px solid #EB4B94;outline-offset:1px}
+.melr{display:flex;flex-direction:column;gap:6px;margin:8px 0;font-weight:700}
+.melb{display:flex;gap:8px;flex-wrap:wrap}
+.melb button{min-height:36px;padding:0 12px}
+.lg .fv{margin-left:auto;font-size:22px;line-height:1;padding:6px 4px 6px 10px;cursor:pointer}
+.lg>span:nth-of-type(1){min-width:0}
+.mapctl .mebtn{margin:0;min-height:34px;height:34px;padding:0 10px;border-radius:10px;font-size:15px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
+.mebtn[aria-pressed="true"]{background:#FFD653!important;color:#1A1420}
+.hint2{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#FFD653;color:#1A1420;border:2.5px solid #1A1420;border-radius:var(--rx);box-shadow:3px 3px 0 #1A1420;padding:6px 8px 6px 12px;margin:0 0 10px;font-family:var(--f-display);font-size:20px;line-height:1.1}
+.hint2 button{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid #1A1420;background:#FEFAD9;color:#1A1420;font-size:20px;line-height:1;padding:0}
 .rbar{margin:6px 0 12px;flex-wrap:wrap;gap:6px 8px}
 .rbar button{min-height:34px;padding:4px 10px;font-size:14px;line-height:1.1}
 .chip-btn.over,.chip-btn.over:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed;box-shadow:none}
@@ -870,7 +887,7 @@ const PINS=[
 [43,889,271,'Posto de Saúde','sau'],[44,899,234,'Acolhimento','srv'],[45,899,220,'Roda Gigante','exp'],[46,832,204,'Reggae Yard','palco'],
 [47,814,146,'Skate Park Lagunitas Day Time','palco'],[48,866,116,'Posto de Saúde','sau']
 ].map(p=>({n:p[0],x:p[1],y:p[2],name:p[3],cat:p[4],note:p[5]||''}));
-const CATS=[['all','Tudo'],['palco','Palcos'],['exp','Comida e arte'],['beb','Bebedouros'],['ban','Banheiros'],['sau','Saúde'],['pcd','Acessibilidade'],['srv','Serviços'],['sai','Saídas']];
+const CATS=[['all','Tudo'],['palco','Palcos'],['exp','Comida e arte'],['beb','Bebedouros'],['ban','Banheiros'],['sau','Saúde'],['pcd','Acessibilidade'],['srv','Serviços'],['sai','Saídas'],['fav','Favoritos']];
 const MAPW=924, MAPH=425;
 const PIN_STAGE={6:'aurora',15:'casa',17:'coreto',19:'speakeasy',24:'floresta',25:'estrela',29:'samba',30:'kids',34:'magic',40:'secreto',42:'fervo',46:'reggae',47:'skate'};
 
@@ -900,7 +917,7 @@ let NOW=nowBR();
 const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.e); /* acabou: sai da lista e do roteiro */
 const dayOver=d=>SHOWS.filter(x=>x.d===d).every(showOver); /* o dia só fecha depois que o último show termina */ 
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
-const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
+const S={me:[],tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
 try{if(localStorage.getItem('rta_wk')!=='2'){localStorage.removeItem('rta_sel');localStorage.removeItem('rta_maybe');localStorage.setItem('rta_wk','2');}}catch(e){}
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
@@ -948,12 +965,14 @@ function card(sh,opts={}){
       : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
   </article>`;
 }
+const hintOff=()=>{try{return localStorage.getItem('rta_hint2')==='1';}catch(e){return false;}};
 function rProg(){
   const _pc=main.querySelector('.chips[aria-label="Palco"]'), _sl=_pc?_pc.scrollLeft:0; /* mantém a posição da fila de palcos ao tocar num deles */
   const q=norm(S.q.trim());
   let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
   list.sort((a,b)=>a.s-b.s||stageById[a.stage].i-stageById[b.stage].i);
   let html=dayChips();
+  if(!S.sel.size&&!S.maybe.size&&!hintOff())html+='<div class="hint2" role="note"><span>Se programe para o 2º fim de semana</span><button type="button" data-hint-x aria-label="Fechar aviso">×</button></div>';
   html+=`<input class="search" id="q" type="search" placeholder="Buscar artista ou palco" value="${esc(S.q)}" aria-label="Buscar">`;
   const ordered=S.stages.map(id=>stageById[id]).concat(STAGES.filter(s=>!S.stages.includes(s.id)));
   html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id&&!showOver(x))?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
@@ -1019,7 +1038,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+'<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="copy">Copiar texto</button><button class="btns" id="clear">Limpar tudo</button></div>'+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes: ligados':'Avisar 15 min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1027,22 +1046,23 @@ function rRot(){
 }
 function legendHtml(qq){
   const q=norm(((qq===undefined?S.mq:qq)||'').trim());
-  const L=PINS.filter(p=>(S.cat==='all'||p.cat===S.cat)&&(!q||norm(p.name).includes(q)||String(p.n)===q));
-  return L.length?L.map(p=>`<button class="lg" data-pin="${p.n}" data-center="1"><i class="pin ${p.cat}" style="position:static;transform:none">${p.n}</i><span>${esc(p.name)}</span></button>`).join(''):'<p class="note">Nenhum lugar encontrado.</p>';
+  const L=PINS.filter(p=>inCat(p)&&(!q||norm(p.name).includes(q)||String(p.n)===q));
+  return L.length?L.map(p=>`<button class="lg" data-pin="${p.n}" data-center="1"><i class="pin ${p.cat}" style="position:static;transform:none">${p.n}</i><span>${esc(p.name)}</span><span class="fv" role="button" tabindex="0" data-fav="${p.n}" aria-label="Guardar nos favoritos">${S.fav.has(p.n)?'♥':'♡'}</span></button>`).join(''):(S.cat==='fav'&&!q?'<p class="note">Toque no ♡ de um lugar para guardar aqui.</p>':'<p class="note">Nenhum lugar encontrado.</p>');
 }
 function rMap(){
   const _cc=main.querySelector('.chips[aria-label="Categoria"]'), _cs=_cc?_cc.scrollLeft:0; /* mantém a posição da fila de categorias */
   const cats='<div class="chips" role="group" aria-label="Categoria">'+CATS.map(([k,n])=>`<button class="chip-btn" data-cat="${k}" aria-pressed="${S.cat===k}">${n}</button>`).join('')+'</div>';
-  const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}</span>`}).join('');
-  const pins=PINS.map(p=>`<button class="pin ${p.cat} ${S.cat!=='all'&&p.cat!==S.cat?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
+  const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${!inCat(p)?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}${p.n===8?'':` <a class="irl" role="button" tabindex="0" data-fav="${p.n}" aria-label="Guardar nos favoritos">${S.fav.has(p.n)?'♥':'♡'}</a> <a class="irl" role="button" tabindex="0" data-meet="${p.n}">compartilhar</a>`}</span>`}).join('');
+  const pins=PINS.map(p=>`<button class="pin ${p.cat} ${!inCat(p)?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
   const lg=legendHtml();
   main.innerHTML=`${cats}
-  <div id="mapframe"><div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${pins}</div></div>
-  <div class="mapctl"><span></span><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
-  <div class="fsbar"><div class="fsl"><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
+  <div id="mapframe"><div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${S.me.map((m,i)=>`<span class="meloc" style="left:${(m.x*100).toFixed(2)}%;top:${(m.y*100).toFixed(2)}%">${S.me.length>1?'ABCDE'[i]:'★'}</span>`).join('')}${pins}</div></div>
+  <div class="mapctl"><button class="btns mebtn" type="button">Marcar lugar</button><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
+  <div class="fsbar"><div class="fsl"><button class="btns mebtn" type="button">Marcar lugar</button><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
   <div id="fslist" class="fslist" role="dialog" aria-label="Legenda do mapa"><input class="search" id="fsq" type="search" placeholder="Buscar lugar" aria-label="Buscar lugar"><div class="legend" id="fslegend">${legendHtml('')}</div></div>
   <p class="note" id="maphint">${S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.'} Nos palcos, o "ir" leva para a programação do palco. Use dois dedos para dar zoom e arraste para andar pelo mapa.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
   const _nc=main.querySelector('.chips[aria-label="Categoria"]'); if(_nc)_nc.scrollLeft=_cs;
+  paintMe();
   relayout();
 }
 
@@ -1086,6 +1106,30 @@ function layoutNames(){
 let lblT=null; const relayout=()=>{clearTimeout(lblT);lblT=setTimeout(()=>requestAnimationFrame(()=>{layoutLabels();layoutNames();}),60);};
 window.addEventListener('resize',relayout);
 try{document.fonts&&document.fonts.ready.then(relayout);}catch(e){}
+const inCat=p=>S.cat==='all'||(S.cat==='fav'?S.fav.has(p.n):p.cat===S.cat);
+const saveMe=()=>{try{S.me.length?localStorage.setItem('rta_me',JSON.stringify(S.me)):localStorage.removeItem('rta_me');}catch(e){}};
+function toggleFav(n){
+  S.fav.has(n)?S.fav.delete(n):S.fav.add(n);
+  try{localStorage.setItem('rta_fav',JSON.stringify([...S.fav]));}catch(e){}
+  document.querySelectorAll('[data-fav="'+n+'"]').forEach(el=>el.textContent=S.fav.has(n)?'♥':'♡');
+  document.querySelectorAll('#mapbox .pin,#mapbox .plabel').forEach(el=>{const p=PINS.find(x=>x.n===+el.dataset.pin);if(p)el.classList.toggle('dim',!inCat(p));});
+  if(S.cat==='fav'){const a=$('#legend'),b=$('#fslegend');if(a)a.innerHTML=legendHtml();if(b)b.innerHTML=legendHtml('');}
+}
+function paintMe(){
+  const b=S.place?'Toque no mapa ✕':(S.me.length?(S.me.length>1?'Lugares marcados':'Lugar marcado'):'Marcar lugar');
+  document.querySelectorAll('.mebtn').forEach(x=>{x.textContent=b;x.setAttribute('aria-pressed',!!S.place);});
+  const m=$('#mapbox'); if(m)m.classList.toggle('placing',!!S.place);
+  const h=$('#maphint'); if(h&&S.place)h.textContent='Toque no mapa para marcar um lugar (carro, barraca, encontro com amigos).';
+}
+function pinTxt(p){const sid=PIN_STAGE[p.n];return sid?stageById[sid].n:p.name;}
+function sendMeet(text,n){const m=text+'\nVeja no mapa do Rock the App:\n'+APP_URL+'/?pin='+n;
+  if(navigator.share)navigator.share({text:m}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank');}
+function nearStage(m){const L=PINS.filter(p=>p.cat==='palco');let b=null,bd=9;L.forEach(p=>{const d=Math.hypot(p.x/MAPW-m.x,p.y/MAPH-m.y);if(d<bd){bd=d;b=p;}});return b;}
+function meetPin(n){const p=PINS.find(x=>x.n===n);if(p)sendMeet(pinTxt(p),n);}
+function meetMe(i){const m=S.me[i];if(!m)return;const p=nearStage(m);if(p)sendMeet(pinTxt(p),p.n);}
+function meSheet(){
+  const L=S.me.map((m,i)=>{const p=nearStage(m),nm=S.me.length>1?'ABCDE'[i]+' · ':'';return `<div class="melr"><span>${nm}${p?esc(pinTxt(p)):'Mapa'}</span><span class="melb"><button class="btnp" data-mee="${i}">Compartilhar</button><button class="btns" data-med="${i}">Apagar</button></span></div>`;}).join('');
+  $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>${S.me.length>1?'Lugares marcados':'Lugar marcado'}</h2>${L}<div class="acts2">${S.me.length<5?'<button class="btns" id="me-add">Marcar outro lugar</button>':''}<button class="btns" data-close>Fechar</button></div>`;openSheet();}
 function paintPin(){
   document.querySelectorAll('#mapbox .plabel').forEach(l=>l.classList.toggle('show',+l.dataset.pin===S.pin&&!l.classList.contains('dim')));
   document.querySelectorAll('#mapbox .pin').forEach(b=>b.classList.toggle('act',+b.dataset.pin===S.pin));
@@ -1215,7 +1259,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.116';
+const APP_VER='1.0.117';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1223,10 +1267,13 @@ function aboutSheet(){
   <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar pelo novo, marcar mesmo assim ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
   <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
   <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto. "Tela cheia" abre o mapa sobre a tela inteira, com os mesmos números e o zoom com dois dedos; nela, "Nomes" escreve o nome ao lado dos números e "Lista" mostra todos os pontos com busca. O botão Fechar ou o voltar do celular saem dela.</li>
+  <li><b>Marcar lugar e Favoritos.</b> Em "Marcar lugar", toque no mapa para fixar onde você deixou o carro, a barraca ou combinou com amigos (não é a sua localização ao vivo; dá para marcar até 5 lugares, como A, B, C); "Compartilhar" manda por mensagem o palco mais perto. O ♡ nos lugares da legenda e no nome do ponto guarda seus favoritos no filtro "Favoritos". O mapa é ilustrativo, sem escala real.</li>
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
-  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar roteiro" envia o roteiro em PDF, e "Importar de um amigo" lê o PDF que outra pessoa mandou e traz o roteiro dela para o seu.</li>
+  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar como texto com link. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
+  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar 15 min antes" liga um aviso antes de cada show marcado. Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.</li>
+  <li><b>Horários podem mudar.</b> A programação pode ser alterada pela organização do festival. Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li>
   <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
   </ul><p class="ver">Versão ${APP_VER}</p>`;
@@ -1241,7 +1288,24 @@ function copyText(){
 
 let _rs=Math.floor(Date.now()/ROT_MS);
 let _ov=DAYS.map((d,i)=>dayOver(i)).join();
+const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notification' in window&&Notification.permission==='granted';}catch(e){return false;}};
+async function toggleRemind(){
+  if(remindOn()){try{localStorage.setItem('rta_remind','0');}catch(e){}return render();}
+  if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
+  let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
+  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Os avisos funcionam com o app aberto ou em segundo plano. Se o celular fechar o app, o aviso pode não chegar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
+  else{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Avisos bloqueados</h2><p>Libere as notificações deste site nas configurações do navegador e toque de novo.</p>';openSheet();}
+}
+const _rn=new Set();
+function remindCheck(){
+  if(!remindOn())return;
+  const now=absMin(NOW.date,NOW.mins);
+  S.sel.forEach(id=>{const sh=byId[id];if(!sh||_rn.has(id))return;const d=absMin(DAYS[sh.d].date,sh.s)-now;
+    if(d>0&&d<=15){_rn.add(id);const o={body:stageById[sh.stage].n+' · começa às '+hhmm(sh.s),icon:'icon-192.png',tag:'rta-'+id};
+      try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification(sh.name+' em '+d+' min',o)).catch(()=>{try{new Notification(sh.name+' em '+d+' min',o);}catch(e){}});else new Notification(sh.name+' em '+d+' min',o);}catch(e){}}});
+}
 function tick(){
+  remindCheck();
   const r=Math.floor(Date.now()/ROT_MS); if(r!==_rs){_rs=r; if(S.tab==='wx')render();}
   const prev=NOW; NOW=nowBR();
   const ov=DAYS.map((d,i)=>dayOver(i)).join(); if(ov!==_ov){_ov=ov;fixDay();purgePast();render();return;}
@@ -1282,6 +1346,10 @@ async function doInstall(){
 
 /* ===================== EVENTOS ===================== */
 document.addEventListener('click',e=>{
+  const fv=e.target.closest('[data-fav]'); if(fv){e.preventDefault();return toggleFav(+fv.dataset.fav);}
+  const mt=e.target.closest('[data-meet]'); if(mt){e.preventDefault();return meetPin(+mt.dataset.meet);}
+  if(e.target.closest('.mebtn')){if(S.place)S.place=false;else if(S.me.length)return meSheet();else S.place=true;return paintMe();}
+  if(S.place&&e.target.closest('#mapbox')&&!e.target.closest('.plabel')){const r=$('#mapbox').getBoundingClientRect();S.me.push({x:Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),y:Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))});S.place=false;saveMe();return render();}
   if(e.target.closest('.plabel')&&!e.target.closest('.irl'))return;
   if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=S.showPins?'Toque em um número para ver o nome. Toque no mapa de novo para esconder os números.':'Toque no mapa para mostrar os números.';}return;}
   const t=e.target.closest('button,a,.irl'); if(!t)return;
@@ -1305,16 +1373,23 @@ document.addEventListener('click',e=>{
   if(t.dataset.pinstage){const s=stageById[t.dataset.pinstage];S.cat='all';if(S.tab==='map')render();else setTab('map');const n=s.pins[0];setTimeout(()=>openPin(n,true),30);return;}
   if(t.dataset.stageprog){S.stages=[t.dataset.stageprog];return closeSheetThen(()=>{if(S.tab!=='prog')setTab('prog');else render();});}
   if(t.dataset.pin&&!t.classList.contains('pname')){document.body.classList.remove('lista-aberta');return openPin(+t.dataset.pin,!!t.dataset.center);}
-  if(t.dataset.cat){S.cat=t.dataset.cat;return render();}
+  if(t.dataset.cat){S.cat=t.dataset.cat;try{localStorage.setItem('rta_cat',S.cat);}catch(e){}return render();}
   if(t.dataset.z){S.zoom=Math.min(S.mapFs?6:4,Math.max(1,S.zoom+(+t.dataset.z)*0.5));const w=$('#mapwrap');const sl=w.scrollLeft/w.scrollWidth,st=w.scrollTop/w.scrollHeight;$('#mapbox').style.width=S.zoom*100+'%';w.scrollLeft=sl*w.scrollWidth;w.scrollTop=st*w.scrollHeight;relayout();return;}
   if(t.id==='wxr'){return loadWx();}
   if(shareClick(t))return;
+  if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
+  if(t.id==='remind')return toggleRemind();
+  if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
+  if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
+  if(t.id==='me-add'){closeSheet();S.place=true;return paintMe();}
+  if(t.dataset.med!==undefined){S.me.splice(+t.dataset.med,1);saveMe();closeSheet();return render();}
+  if(t.dataset.mee!==undefined){const i=+t.dataset.mee;closeSheet();return meetMe(i);}
   if(t.id==='copy')return copyText();
   if(t.id==='clear'){S.sel.clear();S.maybe.clear();save();return render();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='fsq'){const l=$('#fslegend');if(l)l.innerHTML=legendHtml(e.target.value);return;}if(e.target.id==='mq'){S.mq=e.target.value;const l=$('#legend');if(l)l.innerHTML=legendHtml();return;}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;rProg();const n=$('#q');n.focus();n.setSelectionRange(pos,pos);}});
 
-/* ===================== COMPARTILHAR / PDF / IMPORTAR ===================== */
+/* ===================== COMPARTILHAR / IMAGEM / IMPORTAR ===================== */
 const APP_URL='https://rock-the-app.pages.dev';
 const SHARE_TXT='Organize seu Rock The Mountain: roteiro de shows, mapa e previsão do tempo. Funciona até sem internet.';
 const enc=encodeURIComponent;
@@ -1322,7 +1397,7 @@ const sheetHtml=(title,body)=>{$('#sheet').innerHTML='<button class="xbtn" data-
 const rotCode=()=>[...S.sel].filter(i=>byId[i]).concat([...S.maybe].filter(i=>byId[i]).map(i=>'m'+i)).join('.');
 const rotLink=()=>APP_URL+'/?r='+rotCode();
 function rotText(){
-  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'';
+  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'\n\nPara colocar este roteiro no seu app, é só tocar aqui:\n'+rotLink();
 }
 function parseCode(txt){
   const s=String(txt||''), m=s.match(/[?&]r=([0-9m.\-]+)/)||s.match(/^\s*([0-9m][0-9m.\-]{2,})\s*$/);
@@ -1350,31 +1425,21 @@ function shareAppSheet(){
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque alguns shows antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
   sheetHtml('Compartilhar roteiro','<div class="shbtns">'+
-   '<button class="btnp" id="sh-pdf">Compartilhar PDF</button><button class="btns" id="dl-pdf">Baixar PDF</button>'+
-   (navigator.share?'<button class="btns" id="sh-rot-native">Enviar texto e link</button>':'')+
-   `<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Enviar no WhatsApp</a>`+
-   '</div><p class="note">Quem receber o PDF e já tiver o app pode importar o seu roteiro em "Importar roteiro".</p>');
+   '<button class="btnp" id="sh-img">Compartilhar roteiro</button><button class="btns" id="dl-img">Baixar roteiro</button>'+
+   (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
+   '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
+   '</div><p class="note">A imagem leva um QR: quem escanear coloca o seu roteiro no próprio app.</p>');
 }
 function importSheet(){
-  sheetHtml('Importar roteiro','<p class="note">Escolha o PDF do roteiro que seu amigo enviou. Ele precisa ter sido gerado pelo Rock the App.</p><input type="file" id="imp-file" accept="application/pdf,.pdf" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App nesse arquivo.</p><div class="acts2"><button class="btnp" id="imp-pick">Escolher PDF</button><button class="btns" data-close>Cancelar</button></div>');
+  sheetHtml('Importar roteiro','<p class="note">Cole a mensagem ou o link que seu amigo mandou, ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
 }
-function importPdf(file){
-  const err=$('#imp-err'); if(err)err.hidden=true;
-  if(!file)return;
-  const r=new FileReader();
-  r.onload=()=>{try{const u=new Uint8Array(r.result);let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray(i,i+8192));
-    const m=s.match(/RTA:([0-9m.\-]+)/),p=m&&parseCode('?r='+m[1]);
-    if(p)importPreview(p);else if(err)err.hidden=false;}catch(e){if(err)err.hidden=false;}};
-  r.onerror=()=>{if(err)err.hidden=false;};
-  r.readAsArrayBuffer(file);
-}
-document.addEventListener('change',e=>{if(e.target.id==='imp-file')importPdf(e.target.files&&e.target.files[0]);});
+document.addEventListener('change',e=>{if(e.target.id==='imp-file')importImg(e.target.files&&e.target.files[0]);});
 let IMP=null;
 function importPreview(p){
   IMP=p;
   const L=[...p.sel.map(i=>[i,0]),...p.maybe.map(i=>[i,1])].map(([i,m])=>[byId[i],m]).sort((a,b)=>a[0].d-b[0].d||a[0].s-b[0].s);
   const has=planIds().length>0;
-  sheetHtml('Roteiro recebido',`<p class="note">${L.length} atraç${L.length>1?'ões':'ão'} no PDF.</p><ul class="implist">`+L.map(([x,m])=>`<li><b>${esc(x.name)}</b> · ${DAYS[x.d].short} ${DAYS[x.d].n}, ${hhmm(x.s)} · ${esc(stageLong(x.stage))}${m?' (talvez)':''}</li>`).join('')+'</ul><div class="acts2">'+
+  sheetHtml('Roteiro recebido',`<p class="note">${L.length} atraç${L.length>1?'ões':'ão'} no roteiro.</p><ul class="implist">`+L.map(([x,m])=>`<li><b>${esc(x.name)}</b> · ${DAYS[x.d].short} ${DAYS[x.d].n}, ${hhmm(x.s)} · ${esc(stageLong(x.stage))}${m?' (talvez)':''}</li>`).join('')+'</ul><div class="acts2">'+
    `<button class="btnp" id="imp-add">${has?'Adicionar ao meu roteiro':'Importar'}</button>`+(has?'<button class="btns" id="imp-rep">Substituir meu roteiro</button>':'')+'<button class="btns" data-close>Cancelar</button></div>');
 }
 function applyImport(replace){
@@ -1384,62 +1449,122 @@ function applyImport(replace){
   IMP=null;save();
   closeSheetThen(()=>{if(S.tab!=='rot')setTab('rot');else render();});
 }
-/* PDF simples (Helvetica, sem dependências, funciona offline) */
-function pdfRotBlob(){
-  const W=595,H=842,M=40,INK='0.102 0.078 0.125',pages=[];let cur,y;
-  const san=s=>String(s).replace(/[–—]/g,'-').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[•·]/g,'-').replace(/[^\x20-\x7E\xA0-\xFF]/g,'?');
-  const pe=s=>san(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
-  const hx=h=>{h=String(h).trim().replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16)||0;return [(n>>16)&255,(n>>8)&255,n&255].map(v=>(v/255).toFixed(3)).join(' ');};
-  const txt=(s,x,yy,size,bold,col)=>cur.push(`BT /F${bold?2:1} ${size} Tf ${col||INK} rg ${x} ${yy} Td (${pe(s)}) Tj ET`);
-  const rect=(x,yy,w,h,col)=>cur.push(`${col} rg ${x} ${yy} ${w} ${h} re f`);
-  const newPage=()=>{cur=[];pages.push(cur);['#EB4B94','#FE5A5E','#FFD653','#92FE71','#884AFE'].forEach((c,i)=>rect(i*W/5,H-12,W/5+1,12,hx(c)));y=H-56;};
-  const cs=getComputedStyle(document.documentElement);
-  newPage();
-  txt('Meu roteiro',M,y,28,true);y-=20;
-  txt('Rock the Mountain 2026 - Itaipava, Petrópolis',M,y,12,false,'0.35 0.30 0.40');y-=30;
-  let any=false;
-  DAYS.forEach((D,d)=>{
-    const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
-    if(!items.length)return; any=true;
-    if(y<120)newPage();
-    txt(D.full,M,y,17,true);y-=7;rect(M,y,W-2*M,2,hx('#1A1420'));y-=24;
-    items.forEach(x=>{
-      if(y<70){newPage();txt(D.full+' (cont.)',M,y,13,true);y-=26;}
-      const st=stageById[x.stage],col=hx(cs.getPropertyValue(st.c)||'#EB4B94');
-      rect(M,y-9,8,30,col);
-      txt(range(x),M+16,y+2,13,true);
-      let nm=x.name;if(nm.length>46)nm=nm.slice(0,45)+'...';
-      txt(nm,M+128,y+2,13,true);
-      txt((x.oficina?'Oficina - ':'')+stageLong(x.stage),M+128,y-10,10,false,'0.35 0.30 0.40');
-      const tag=S.maybe.has(x.id)?'TALVEZ':(conflictsOf(x).length?'CONFLITO':'');
-      if(tag)txt(tag,W-M-62,y+2,9,true,tag==='TALVEZ'?'0.35 0.30 0.40':'0.75 0.20 0.20');
-      y-=40;
-    });
-    y-=8;
-  });
-  const n=pages.length;
-  pages.forEach((p,i)=>{cur=p;txt('Feito no Rock the App - rock-the-app.pages.dev',M,26,9,false,'0.35 0.30 0.40');txt((i+1)+'/'+n,W-M-18,26,9,false,'0.35 0.30 0.40');});
-  const objs=[];
-  objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
-  objs[2]=`<< /Type /Pages /Kids [${pages.map((_,i)=>(5+2*i)+' 0 R').join(' ')}] /Count ${n} >>`;
-  objs[3]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
-  objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
-  objs[5+2*n]=`<< /Title (Meu roteiro - Rock the Mountain 2026) /Subject (RTA:${rotCode()}) /Creator (Rock the App) >>`;
-  pages.forEach((p,i)=>{const s=p.join('\n');objs[5+2*i]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6+2*i} 0 R >>`;objs[6+2*i]=`<< /Length ${s.length} >>\nstream\n${s}\nendstream`;});
-  let out='%PDF-1.4\n';const off=[];
-  for(let i=1;i<objs.length;i++){off[i]=out.length;out+=`${i} 0 obj\n${objs[i]}\nendobj\n`;}
-  const xr=out.length;
-  out+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`+off.slice(1).map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length} /Root 1 0 R /Info ${5+2*n} 0 R >>\nstartxref\n${xr}\n%%EOF`;
-  const u8=new Uint8Array(out.length);for(let i=0;i<out.length;i++)u8[i]=out.charCodeAt(i)&255;
-  return new Blob([u8],{type:'application/pdf'});
+/* gerador de QR Code (modo byte, correção L/M) – sem dependências */
+const QR=(function(){
+  const ECC=[[ -1,7,10,15,20,26,18,20,24,30,18,20,24,26,30,22,24,28,30,28,28],[ -1,10,16,26,18,24,16,18,22,22,26,30,22,22,24,24,28,28,26,26,26]];
+  const NB=[[ -1,1,1,1,1,1,2,2,2,2,4,4,4,4,4,6,6,6,6,7,8],[ -1,1,1,1,2,2,4,4,4,5,5,5,8,9,9,10,10,11,13,14,16]];
+  const FMT=[1,0]; /* bits de formato: L=1, M=0 */
+  const rawMods=v=>{let r=(16*v+128)*v+64;if(v>=2){const a=Math.floor(v/7)+2;r-=(25*a-10)*a-55;if(v>=7)r-=36;}return r;};
+  const dataCW=(v,e)=>Math.floor(rawMods(v)/8)-ECC[e][v]*NB[e][v];
+  const gfMul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x;}return z;};
+  const rsDiv=n=>{const r=[];for(let i=0;i<n-1;i++)r.push(0);r.push(1);let root=1;for(let i=0;i<n;i++){for(let j=0;j<r.length;j++){r[j]=gfMul(r[j],root);if(j+1<r.length)r[j]^=r[j+1];}root=gfMul(root,2);}return r;};
+  const rsRem=(data,div)=>{const r=div.map(()=>0);data.forEach(b=>{const f=b^r.shift();r.push(0);div.forEach((c,i)=>r[i]^=gfMul(c,f));});return r;};
+  function make(text,eccIx){
+    const bytes=[...new TextEncoder().encode(text)];
+    let ver=1;for(;ver<=20;ver++){const cap=dataCW(ver,eccIx)*8;if(4+(ver<10?8:16)+bytes.length*8<=cap)break;}
+    if(ver>20)return null;
+    const bits=[];const put=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>>i)&1);};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCW(ver,eccIx)*8;put(0,Math.min(4,cap-bits.length));put(0,(8-bits.length%8)%8);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=(b<<1)|bits[i+j];data.push(b);}
+    const nb=NB[eccIx][ver],eb=ECC[eccIx][ver],raw=Math.floor(rawMods(ver)/8),ns=nb-raw%nb,sl=Math.floor(raw/nb),div=rsDiv(eb),blocks=[];
+    for(let i=0,k=0;i<nb;i++){const len=sl-eb+(i<ns?0:1);const d=data.slice(k,k+len);k+=len;const e=rsRem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e));}
+    const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-eb||j>=ns)all.push(b[i]);});
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false));}
+    const set=(x,y,d)=>{m[y][x]=d;fn[y][x]=true;};
+    for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+    [[3,3],[size-4,3],[3,size-4]].forEach(([cx,cy])=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),x=cx+dx,y=cy+dy;if(x>=0&&x<size&&y>=0&&y<size)set(x,y,d!==2&&d!==4);}});
+    if(ver>1){const na=Math.floor(ver/7)+2,step=ver===32?26:Math.ceil((ver*4+4)/(na*2-2))*2,al=[6];for(let p=size-7;al.length<na;p-=step)al.splice(1,0,p);
+      al.forEach((ax,i)=>al.forEach((ay,j)=>{if((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(ax+dx,ay+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}));}
+    const fmt=mask=>{const d=(FMT[eccIx]<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const bitsF=((d<<10)|r)^0x5412;const g=i=>((bitsF>>>i)&1)!==0;
+      for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+      for(let i=0;i<8;i++)set(size-1-i,8,g(i));for(let i=8;i<15;i++)set(8,size-15+i,g(i));set(8,size-8,true);};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const v=(ver<<12)|r;for(let i=0;i<18;i++){const b=((v>>>i)&1)!==0,a=size-11+i%3,c=Math.floor(i/3);set(a,c,b);set(c,a,b);}}
+    let i=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-vert:vert;if(!fn[y][x]&&i<all.length*8){m[y][x]=((all[i>>>3]>>>(7-(i&7)))&1)!==0;i++;}}}
+    const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++){let inv;switch(mk){case 0:inv=(x+y)%2===0;break;case 1:inv=y%2===0;break;case 2:inv=x%3===0;break;case 3:inv=(x+y)%3===0;break;case 4:inv=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;case 5:inv=x*y%2+x*y%3===0;break;case 6:inv=(x*y%2+x*y%3)%2===0;break;default:inv=((x+y)%2+x*y%3)%2===0;}if(!fn[y][x]&&inv)m[y][x]=!m[y][x];}};
+    apply(0);fmt(0);
+    return {size,get:(x,y)=>m[y][x]};
+  }
+  return {make};
+})();
+
+/* imagem do roteiro (para postar e compartilhar) */
+const _ld=src=>new Promise(r=>{const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=src;});
+const IMG_THEMES={
+  claro:{n:'Claro',bg:['#FEFAD9','#FFE9A8'],line:'#1A1420',txt:'#1A1420',sub:'#6034BD',pill:'#884AFE',pillTx:'#FEFAD9',foot:'#FEFAD9',footTx:'#1A1420',footSub:'#6034BD',title:'#92FE71',titleLine:'#1A1420',char:'chars/fest-dance.webp'},
+  escuro:{n:'Escuro',bg:['#17121C','#2A2036'],line:'#FEFAD9',txt:'#FEFAD9',sub:'#C9B3FF',pill:'#884AFE',pillTx:'#FEFAD9',foot:'#2A2036',footTx:'#FEFAD9',footSub:'#C9B3FF',title:'#92FE71',titleLine:'#1A1420',char:'chars/fest-guitar.webp'},
+  festival:{n:'Festival',bg:['#884AFE','#5B2FC4'],line:'#1A1420',txt:'#1A1420',sub:'#FFD653',pill:'#FFD653',pillTx:'#1A1420',foot:'#FEFAD9',footTx:'#1A1420',footSub:'#6034BD',title:'#FFD653',titleLine:'#1A1420',char:'chars/fest-duo.webp',dots:'rgba(254,250,217,.14)'},
+  sol:{n:'Pôr do sol',bg:['#FE5A5E','#FFD653'],line:'#1A1420',txt:'#1A1420',sub:'#1A1420',pill:'#1A1420',pillTx:'#FEFAD9',foot:'#FEFAD9',footTx:'#1A1420',footSub:'#6034BD',title:'#FEFAD9',titleLine:'#1A1420',char:'chars/fest-rock.webp',dots:'rgba(26,20,32,.08)'}
+};
+async function imgRotBlob(th){
+  const T=IMG_THEMES[th]||IMG_THEMES.claro;
+  try{await document.fonts.load('700 40px "Amatic SC"');}catch(e){}
+  const cs=getComputedStyle(document.documentElement),FF='"Amatic SC","Arial Narrow",sans-serif',INK='#1A1420',CRM='#FEFAD9',LN=T.line,W=1080,PAD=48;
+  const days=DAYS.map((D,d)=>({D,items:planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s)})).filter(x=>x.items.length);
+  const RH=156,HEAD=456,FOOT=420,DH=120;
+  const H=Math.max(1350,HEAD+days.reduce((a,x)=>a+DH+x.items.length*RH+14,0)+FOOT);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const grd=c.createLinearGradient(0,0,0,H);grd.addColorStop(0,T.bg[0]);grd.addColorStop(1,T.bg[1]);c.fillStyle=grd;c.fillRect(0,0,W,H);
+  if(T.dots){c.fillStyle=T.dots;for(let yy=60;yy<H;yy+=70)for(let xx=(yy/70%2)*35+20;xx<W;xx+=70){c.beginPath();c.arc(xx,yy,9,0,7);c.fill();}}
+  const cols=['#EB4B94','#FE5A5E','#FFD653','#92FE71','#884AFE'];
+  cols.forEach((k,i)=>{c.fillStyle=k;c.fillRect(i*W/5,0,W/5+1,34);c.fillRect(i*W/5,H-34,W/5+1,34);});
+  c.fillStyle=LN;c.fillRect(0,34,W,6);c.fillRect(0,H-40,W,6);
+  const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
+  const box=(x,y,w,h,r,fill,dash,sh)=>{if(sh){rr(x+sh,y+sh,w,h,r);c.fillStyle=LN;c.fill();}rr(x,y,w,h,r);c.fillStyle=fill;c.fill();c.lineWidth=6;c.strokeStyle=LN;c.setLineDash(dash?[18,12]:[]);c.stroke();c.setLineDash([]);};
+  const outl=(s,x,y,fill,sw,ln)=>{c.lineJoin='round';c.lineWidth=sw;c.strokeStyle=ln||INK;c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y);};
+  c.textBaseline='alphabetic';c.textAlign='left';
+  if(T.char){const im=await _ld(T.char);if(im){const sc=Math.min(470/im.naturalWidth,380/im.naturalHeight),iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;c.drawImage(im,W-PAD-iw+20,56+(380-ih)/2,iw,ih);}}
+  c.font='700 190px '+FF;outl('MEU',PAD,230,T.title,16,T.titleLine);outl('ROTEIRO',PAD,372,T.title,16,T.titleLine);
+  c.font='700 52px '+FF;c.fillStyle=T.sub;
+  const d0=DAYS[0],d1=DAYS[DAYS.length-1];c.fillText(('ROCK THE MOUNTAIN · '+d0.n.slice(0,2)+' A '+d1.n.slice(0,2)+' DE NOVEMBRO').toUpperCase(),PAD+4,440);
+  let y=HEAD+20;
+  days.forEach(({D,items})=>{
+    c.font='700 76px '+FF;const tw=c.measureText(D.full.toUpperCase()).width;
+    box(PAD,y,tw+70,84,42,T.pill,false,6);c.fillStyle=T.pillTx;c.fillText(D.full.toUpperCase(),PAD+35,y+64);y+=DH;
+    items.forEach(sh=>{
+      const st=stageById[sh.stage],fill=(cs.getPropertyValue(st.c)||'#EB4B94').trim()||'#EB4B94',nmc=(cs.getPropertyValue(st.c.replace('--st','--nm'))||'#92FE71').trim()||'#92FE71',mb=S.maybe.has(sh.id);
+      box(PAD,y,W-2*PAD-8,RH-22,34,fill,mb,8);
+      c.fillStyle=LT.has(st.c)?CRM:INK;c.font='700 66px '+FF;c.fillText(hhmm(sh.s),PAD+34,y+66);
+      c.font='700 40px '+FF;c.fillText(sh.noEnd?'':'ATÉ '+hhmm(sh.e),PAD+36,y+108);
+      let fs=84;c.font='700 '+fs+'px '+FF;const nm=sh.name.toUpperCase();while(c.measureText(nm).width>600&&fs>40){fs-=3;c.font='700 '+fs+'px '+FF;}
+      outl(nm,300,y+70,nmc,Math.round(fs/6));
+      c.font='700 38px '+FF;const sn=(stageLong(sh.stage)+(mb?' · TALVEZ':'')).toUpperCase(),sw=c.measureText(sn).width;
+      rr(300,y+84,sw+34,40,20);c.fillStyle=CRM;c.fill();c.lineWidth=4;c.strokeStyle=INK;c.stroke();c.fillStyle=INK;c.fillText(sn,317,y+115);
+      y+=RH;});
+    y+=14;});
+  const fy=H-FOOT+20;box(PAD,fy,W-2*PAD-8,FOOT-92,36,T.foot,false,8);
+  try{const q=QR.make(rotLink(),0);if(q){const m=Math.floor(220/(q.size+2));const qs=m*(q.size+2),qx=PAD+34,qy=fy+(FOOT-92-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
+  const logo=await _ld('sticker.webp');if(logo){const lw=210,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W-PAD-8-lw/2-26,fy+(FOOT-92)/2);c.rotate(.06);c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
+  c.fillStyle=T.footTx;c.font='700 64px '+FF;c.fillText('QUER ESTE ROTEIRO?',320,fy+82);c.fillText('ESCANEIE!',320,fy+142);
+  c.font='700 38px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO.',320,fy+190);c.fillText('GRÁTIS, SEM BAIXAR NADA.',320,fy+230);
+  c.fillStyle=T.footSub;c.font='700 42px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',320,fy+282);
+  c.font='700 30px '+FF;c.globalAlpha=.75;c.fillStyle=T.footTx;c.fillText('APP NÃO OFICIAL DO ROCK THE MOUNTAIN',320,fy+318);c.globalAlpha=1;
+  return new Promise(r=>cv.toBlob(r,'image/png'));
 }
-function pdfDownload(b){
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='meu-roteiro-rock-the-mountain.pdf';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);
+async function imgShare(dl,th){
+  try{const b=await imgRotBlob(th),f=new File([b],'meu-roteiro-rock-the-mountain.png',{type:'image/png'});
+    if(!dl&&navigator.canShare&&navigator.canShare({files:[f]}))return navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}catch(e){}
 }
-function pdfShare(){
-  try{const b=pdfRotBlob(),f=new File([b],'meu-roteiro-rock-the-mountain.pdf',{type:'application/pdf'});
-    if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
-    else pdfDownload(b);}catch(e){}
+let MOD={act:'sh',th:'claro'};
+async function modSheet(act){
+  let th='claro';try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])th=s;}catch(e){}
+  MOD={act,th};
+  sheetHtml('Escolha o modelo','<div class="mods" id="mods" role="group" aria-label="Modelos"><p class="note">Preparando as prévias…</p></div><div class="acts2"><button class="btnp" id="mod-go">'+(act==='dl'?'Baixar roteiro':'Compartilhar roteiro')+'</button><button class="btns" data-close>Cancelar</button></div>');
+  const box=$('#mods');let html='';
+  for(const k of Object.keys(IMG_THEMES)){const b=await imgRotBlob(k);html+=`<button class="mod" data-mod="${k}" aria-pressed="${k===MOD.th}"><img src="${URL.createObjectURL(b)}" alt="Modelo ${IMG_THEMES[k].n}"><span>${IMG_THEMES[k].n}</span></button>`;if(!$('#mods'))return;}
+  box.innerHTML=html;
+}
+async function importImg(file){
+  const err=$('#imp-err'); if(err)err.hidden=true; if(!file)return;
+  try{
+    if(!('BarcodeDetector' in window))throw 0;
+    const bm=await createImageBitmap(file),d=new BarcodeDetector({formats:['qr_code']}),r=await d.detect(bm),p=r.length&&parseCode(r[0].rawValue);
+    if(p)return importPreview(p);
+  }catch(e){}
+  if(err){err.textContent='Não consegui ler o QR dessa imagem. Aponte a câmera do celular para o QR da imagem: o link abre o app e coloca o roteiro.';err.hidden=false;}
 }
 function leaveFsState(){S.mapFs=false;document.body.classList.remove('mapfs','lista-aberta');if(S.zoomBeforeFs){S.zoom=S.zoomBeforeFs;S.zoomBeforeFs=0;const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';}}
 
@@ -1482,8 +1607,10 @@ function shareClick(t){
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
-  if(t.id==='sh-pdf')return pdfShare(),true;
-  if(t.id==='dl-pdf')return (()=>{try{pdfDownload(pdfRotBlob())}catch(e){}})(),true;
+  if(t.id==='sh-img')return modSheet('sh'),true;
+  if(t.id==='dl-img')return modSheet('dl'),true;
+  if(t.dataset.mod){MOD.th=t.dataset.mod;document.querySelectorAll('.mod').forEach(x=>x.setAttribute('aria-pressed',x===t));return true;}
+  if(t.id==='mod-go'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}closeSheet();return imgShare(MOD.act==='dl',MOD.th),true;}
   if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
   if(t.id==='import-rot')return importSheet(),true;
   if(t.id==='imp-pick'){const f=$('#imp-file');if(f)f.click();return true;}
@@ -1491,6 +1618,7 @@ function shareClick(t){
   if(t.id==='imp-rep')return applyImport(true),true;
   return false;
 }
+(function(){try{const pn=+new URLSearchParams(location.search).get('pin');if(pn&&PINS.some(p=>p.n===pn)){history.replaceState(null,'',location.pathname);setTimeout(()=>{S.pin=null;if(S.tab!=='map')setTab('map');setTimeout(()=>openPin(pn,true),60);},600);}}catch(e){}})();
 (function(){try{const q=new URLSearchParams(location.search).get('r');if(!q)return;const p=parseCode('?r='+q);history.replaceState(null,'',location.pathname+location.hash);if(p)setTimeout(()=>importPreview(p),500);}catch(e){}})();
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.mapFs)exitMapFs();else closeSheet();}});
@@ -1499,6 +1627,9 @@ window.addEventListener('hashchange',route);
 function purgePast(){let ch=false;[S.sel,S.maybe].forEach(set=>[...set].forEach(id=>{if(byId[id]&&showOver(byId[id])){set.delete(id);ch=true;}}));if(ch)save();return ch;}
 function fixDay(){if(dayOver(S.day)){const i=DAYS.findIndex((x,d)=>!dayOver(d));S.day=i<0?0:i;return true;}return false;}
 purgePast();fixDay();
+try{S.fav=new Set(JSON.parse(localStorage.getItem('rta_fav')||'[]').filter(n=>PINS.some(p=>p.n===n)));}catch(e){S.fav=new Set();}
+try{const m=JSON.parse(localStorage.getItem('rta_me')||'[]');S.me=(Array.isArray(m)?m:[m]).filter(q=>q&&q.x>=0&&q.x<=1&&q.y>=0&&q.y<=1).slice(0,5);}catch(e){S.me=[];}
+try{const c=localStorage.getItem('rta_cat');if(c&&CATS.some(k=>k[0]===c))S.cat=c;}catch(e){}
 paintTheme(); paintInstall(); render(); loadWx(); setInterval(loadWx,600000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!S.wx||Date.now()-S.wx.t>300000))loadWx();});
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.host))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
