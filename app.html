@@ -1026,7 +1026,7 @@ function livePanel(){
 }
 function rRot(){
   let html='';
-  if(!planIds().length) html='<div class="empty"><b>Seu roteiro está vazio</b>Toque em "Quero ir" ou "Talvez" nos shows da Programação. Se dois "Quero ir" baterem no horário, eu aviso.</div>';
+  if(!planIds().length) html='<div class="empty"><b>Seu roteiro está vazio</b>Toque em "Quero ir" ou "Talvez" nos shows da Programação.</div>';
   DAYS.forEach((D,d)=>{
     const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
     if(!items.length)return;
@@ -1266,7 +1266,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.129';
+const APP_VER='1.0.130';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
