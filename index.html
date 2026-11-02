@@ -1252,7 +1252,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.123';
+const APP_VER='1.0.124';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1283,7 +1283,7 @@ let _rs=Math.floor(Date.now()/ROT_MS);
 let _ov=DAYS.map((d,i)=>dayOver(i)).join();
 const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notification' in window&&Notification.permission==='granted';}catch(e){return false;}};
 async function toggleRemind(){
-  if(remindOn()){try{localStorage.setItem('rta_remind','0');}catch(e){}return render();}
+  if(remindOn()){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Para ver como ele chega, toque em testar e saia do app: o aviso aparece em 5 segundos.</p><div class="acts2"><button class="btnp" id="rem-test">Testar aviso</button><button class="btns" id="rem-off">Desligar lembretes</button><button class="btns" data-close>Fechar</button></div>';return openSheet();}
   if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
   let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
   if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();render();$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso 15 minutos antes de cada show marcado. Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>';openSheet();}
@@ -1371,6 +1371,8 @@ document.addEventListener('click',e=>{
   if(shareClick(t))return;
   if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
   if(t.id==='remind')return toggleRemind();
+  if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}closeSheet();return render();}
+  if(t.id==='rem-test'){closeSheet();setTimeout(()=>{const o={body:'Palco Floresta · começa às 17:40. É assim que o lembrete aparece.',icon:'icon-192.png',tag:'rta-teste'};try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification('Show de teste em 15 min',o)).catch(()=>{try{new Notification('Show de teste em 15 min',o);}catch(e){}});else new Notification('Show de teste em 15 min',o);}catch(e){}},5000);return;}
   if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
   if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
   if(t.id==='copy')return copyText();
