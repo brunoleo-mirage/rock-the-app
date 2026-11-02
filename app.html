@@ -1252,7 +1252,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.122';
+const APP_VER='1.0.123';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1450,6 +1450,20 @@ const QR=(function(){
   const gfMul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x;}return z;};
   const rsDiv=n=>{const r=[];for(let i=0;i<n-1;i++)r.push(0);r.push(1);let root=1;for(let i=0;i<n;i++){for(let j=0;j<r.length;j++){r[j]=gfMul(r[j],root);if(j+1<r.length)r[j]^=r[j+1];}root=gfMul(root,2);}return r;};
   const rsRem=(data,div)=>{const r=div.map(()=>0);data.forEach(b=>{const f=b^r.shift();r.push(0);div.forEach((c,i)=>r[i]^=gfMul(c,f));});return r;};
+  function frame(ver,eccIx){
+    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false));}
+    const set=(x,y,d)=>{m[y][x]=d;fn[y][x]=true;};
+    for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+    [[3,3],[size-4,3],[3,size-4]].forEach(([cx,cy])=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),x=cx+dx,y=cy+dy;if(x>=0&&x<size&&y>=0&&y<size)set(x,y,d!==2&&d!==4);}});
+    if(ver>1){const na=Math.floor(ver/7)+2,step=ver===32?26:Math.ceil((ver*4+4)/(na*2-2))*2,al=[6];for(let p=size-7;al.length<na;p-=step)al.splice(1,0,p);
+      al.forEach((ax,i)=>al.forEach((ay,j)=>{if((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(ax+dx,ay+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}));}
+    const fmt=mask=>{const d=(FMT[eccIx]<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const bitsF=((d<<10)|r)^0x5412;const g=i=>((bitsF>>>i)&1)!==0;
+      for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+      for(let i=0;i<8;i++)set(size-1-i,8,g(i));for(let i=8;i<15;i++)set(8,size-15+i,g(i));set(8,size-8,true);};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const v=(ver<<12)|r;for(let i=0;i<18;i++){const b=((v>>>i)&1)!==0,a=size-11+i%3,c=Math.floor(i/3);set(a,c,b);set(c,a,b);}}
+    return {size,m,fn,fmt};
+  }
   function make(text,eccIx){
     const bytes=[...new TextEncoder().encode(text)];
     let ver=1;for(;ver<=20;ver++){const cap=dataCW(ver,eccIx)*8;if(4+(ver<10?8:16)+bytes.length*8<=cap)break;}
@@ -1462,23 +1476,31 @@ const QR=(function(){
     const nb=NB[eccIx][ver],eb=ECC[eccIx][ver],raw=Math.floor(rawMods(ver)/8),ns=nb-raw%nb,sl=Math.floor(raw/nb),div=rsDiv(eb),blocks=[];
     for(let i=0,k=0;i<nb;i++){const len=sl-eb+(i<ns?0:1);const d=data.slice(k,k+len);k+=len;const e=rsRem(d,div);if(i<ns)d.push(0);blocks.push(d.concat(e));}
     const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-eb||j>=ns)all.push(b[i]);});
-    const size=ver*4+17,m=[],fn=[];for(let i=0;i<size;i++){m.push(new Array(size).fill(false));fn.push(new Array(size).fill(false));}
-    const set=(x,y,d)=>{m[y][x]=d;fn[y][x]=true;};
-    for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
-    [[3,3],[size-4,3],[3,size-4]].forEach(([cx,cy])=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy)),x=cx+dx,y=cy+dy;if(x>=0&&x<size&&y>=0&&y<size)set(x,y,d!==2&&d!==4);}});
-    if(ver>1){const na=Math.floor(ver/7)+2,step=ver===32?26:Math.ceil((ver*4+4)/(na*2-2))*2,al=[6];for(let p=size-7;al.length<na;p-=step)al.splice(1,0,p);
-      al.forEach((ax,i)=>al.forEach((ay,j)=>{if((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(ax+dx,ay+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}));}
-    const fmt=mask=>{const d=(FMT[eccIx]<<3)|mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const bitsF=((d<<10)|r)^0x5412;const g=i=>((bitsF>>>i)&1)!==0;
-      for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
-      for(let i=0;i<8;i++)set(size-1-i,8,g(i));for(let i=8;i<15;i++)set(8,size-15+i,g(i));set(8,size-8,true);};
-    fmt(0);
-    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const v=(ver<<12)|r;for(let i=0;i<18;i++){const b=((v>>>i)&1)!==0,a=size-11+i%3,c=Math.floor(i/3);set(a,c,b);set(c,a,b);}}
+    const {size,m,fn,fmt}=frame(ver,eccIx);
     let i=0;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-vert:vert;if(!fn[y][x]&&i<all.length*8){m[y][x]=((all[i>>>3]>>>(7-(i&7)))&1)!==0;i++;}}}
     const apply=mk=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++){let inv;switch(mk){case 0:inv=(x+y)%2===0;break;case 1:inv=y%2===0;break;case 2:inv=x%3===0;break;case 3:inv=(x+y)%3===0;break;case 4:inv=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;case 5:inv=x*y%2+x*y%3===0;break;case 6:inv=(x*y%2+x*y%3)%2===0;break;default:inv=((x+y)%2+x*y%3)%2===0;}if(!fn[y][x]&&inv)m[y][x]=!m[y][x];}};
     apply(0);fmt(0);
     return {size,get:(x,y)=>m[y][x]};
   }
-  return {make};
+
+  /* leitura de um QR já alinhado (sem correção de erros): devolve o texto ou null */
+  function decode(get,size){
+    const ver=(size-17)/4; if(ver<1||ver>20||ver%1)return null;
+    let f=0;const fb=[];for(let i=0;i<=5;i++)fb.push(get(8,i));fb.push(get(8,7),get(8,8),get(7,8));for(let i=9;i<15;i++)fb.push(get(14-i,8));
+    fb.forEach((b,i)=>{if(b)f|=1<<i;});f^=0x5412;
+    const code=(f>>13)&3,eccIx=code===1?0:code===0?1:-1,mask=(f>>10)&7; if(eccIx<0)return null;
+    const fr=frame(ver,eccIx),fn=fr.fn,raw=Math.floor(rawMods(ver)/8),bits=[];
+    for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let vert=0;vert<size;vert++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-vert:vert;
+      if(!fn[y][x]&&bits.length<raw*8){let b=get(x,y),inv;switch(mask){case 0:inv=(x+y)%2===0;break;case 1:inv=y%2===0;break;case 2:inv=x%3===0;break;case 3:inv=(x+y)%3===0;break;case 4:inv=(Math.floor(x/3)+Math.floor(y/2))%2===0;break;case 5:inv=x*y%2+x*y%3===0;break;case 6:inv=(x*y%2+x*y%3)%2===0;break;default:inv=((x+y)%2+x*y%3)%2===0;}bits.push(inv?!b:b);}}}
+    const cw=[];for(let i=0;i+7<bits.length;i+=8){let b=0;for(let k=0;k<8;k++)b=(b<<1)|(bits[i+k]?1:0);cw.push(b);}
+    const nb=NB[eccIx][ver],eb=ECC[eccIx][ver],ns=nb-raw%nb,sl=Math.floor(raw/nb),blocks=[];for(let i=0;i<nb;i++)blocks.push([]);
+    let p=0;for(let i=0;i<sl+1;i++)for(let j=0;j<nb;j++){if(i!==sl-eb||j>=ns){blocks[j][i]=cw[p++];}}
+    const data=[];blocks.forEach((b,j)=>{const len=(j<ns?sl:sl+1)-eb;for(let i=0;i<len;i++)data.push(b[i]);});
+    let q=0;const rd=n=>{let v=0;for(let k=0;k<n;k++){const by=data[q>>3]||0;v=(v<<1)|((by>>(7-(q&7)))&1);q++;}return v;};
+    if(rd(4)!==4)return null;const len=rd(ver<10?8:16),out=[];for(let i=0;i<len;i++)out.push(rd(8));
+    try{return new TextDecoder().decode(new Uint8Array(out));}catch(e){return null;}
+  }
+  return {make,decode};
 })();
 
 /* imagem do roteiro (para postar e compartilhar) */
@@ -1540,13 +1562,26 @@ async function imgShare(dl,th){
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}catch(e){}
 }
 let MOD={th:'claro'};
+function qrFromImage(bm){
+  const W=1080,H=Math.round(bm.height*W/bm.width),cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d',{willReadFrequently:true});c.fillStyle='#fff';c.fillRect(0,0,W,H);c.drawImage(bm,0,0,W,H);
+  const px=c.getImageData(0,0,W,H).data,lum=(x,y)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=H)return 255;const i=(y*W+x)*4;return px[i]*.3+px[i+1]*.59+px[i+2]*.11;};
+  for(let ver=1;ver<=20;ver++){
+    const size=17+4*ver,m=Math.floor(220/(size+2)); if(m<2)break;
+    const qs=m*(size+2),qx=82,qy=H-420+20+(328-qs)/2;
+    const get=(x,y)=>{const cx=qx+(x+1)*m+m/2,cy=qy+(y+1)*m+m/2,d=Math.max(0,m/4);let s=0;for(const [dx,dy] of [[0,0],[-d,0],[d,0],[0,-d],[0,d]])s+=lum(cx+dx,cy+dy);return s/5<128;};
+    let ok=true;for(let k=0;k<7&&ok;k++){const e=k===0||k===6;if(!get(k,0)||!get(0,k)||!get(k,6)||!get(6,k))ok=false;}
+    if(ok&&get(3,3)&&!get(1,1)&&!get(5,5)){const s=QR.decode(get,size);if(s&&/[?&]r=/.test(s))return s;}
+  }
+  return null;
+}
 async function importImg(file){
   const err=$('#imp-err'); if(err)err.hidden=true; if(!file)return;
-  try{
-    if(!('BarcodeDetector' in window))throw 0;
-    const bm=await createImageBitmap(file),d=new BarcodeDetector({formats:['qr_code']}),r=await d.detect(bm),p=r.length&&parseCode(r[0].rawValue);
-    if(p)return importPreview(p);
-  }catch(e){}
+  let bm=null;try{bm=await createImageBitmap(file);}catch(e){}
+  if(bm){
+    try{if('BarcodeDetector' in window){const r=await new BarcodeDetector({formats:['qr_code']}).detect(bm),p=r.length&&parseCode(r[0].rawValue);if(p)return importPreview(p);}}catch(e){}
+    try{const s=qrFromImage(bm),p=s&&parseCode(s);if(p)return importPreview(p);}catch(e){}
+  }
   if(err){err.textContent='Não consegui ler o QR dessa imagem. Aponte a câmera do celular para o QR da imagem: o link abre o app e coloca o roteiro.';err.hidden=false;}
 }
 function leaveFsState(){S.mapFs=false;document.body.classList.remove('mapfs','lista-aberta');if(S.zoomBeforeFs){S.zoom=S.zoomBeforeFs;S.zoomBeforeFs=0;const mb=document.querySelector('#mapbox');if(mb)mb.style.width=S.zoom*100+'%';}}
