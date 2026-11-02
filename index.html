@@ -600,7 +600,10 @@ html,body{touch-action:pan-x pan-y}
 .lmini .warnlist{padding:4px 8px 5px}
 .warnlist .wh{font-weight:700;font-size:14px;line-height:1.1;margin-bottom:2px}
 .warnlist ul{list-style:none;margin:0;padding:0}
-.warnlist li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 8px;align-items:baseline;padding:3px 0;border-top:1.5px dashed rgba(26,20,32,.35);font-size:14px;line-height:1.05}
+.warnlist li{display:block;padding:3px 0;font-size:14px;line-height:1.1}
+.warnlist li+li{border-top:1.5px dashed rgba(26,20,32,.35);margin-top:3px;padding-top:5px}
+.warnlist .wh2{display:block;font-weight:700;font-size:14px;line-height:1.1}
+.warnlist .wn{display:block}
 .warnlist .wn{min-width:0;flex:1 1 auto;overflow-wrap:break-word}
 .warnlist .wt{flex:none;white-space:nowrap;font-size:13px;opacity:.85;margin-left:auto}
 .chips[aria-label="Palco"]{position:sticky;top:-18px;z-index:20;background:var(--bg);padding-top:8px;padding-bottom:10px;margin-top:-8px;box-shadow:0 8px 8px -8px rgba(26,20,32,.35)}
@@ -910,7 +913,7 @@ RAW.forEach((txt,d)=>txt.trim().split('\n').forEach((l,i)=>{
 const byId=Object.fromEntries(SHOWS.map(s=>[s.id,s]));
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const inter=(a,b)=>'das '+hhmm(Math.max(a.s,b.s))+' às '+hhmm(Math.min(a.e,b.e));
+const inter=(a,b)=>'das\u00A0'+hhmm(Math.max(a.s,b.s))+'\u00A0às\u00A0'+hhmm(Math.min(a.e,b.e));
 const range=s=>hhmm(s.s)+(s.noEnd?'':'–'+hhmm(s.e));
 
 /* ===================== ESTADO ===================== */
@@ -961,7 +964,7 @@ function dayRain(i){ return ''; }
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
-  const warn=on&&cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${inter(sh,o)}</span></li>`).join('')}</ul></div>`:'';
+  const warn=on&&cf.length?`<div class="warn warnlist"><ul>${cf.map(o=>`<li><span class="wh2">⚠ Bate ${inter(sh,o)}</span><span class="wn">com ${esc(o.name)}</span></li>`).join('')}</ul></div>`:'';
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
@@ -1005,7 +1008,7 @@ function liveMini(sh,kind){
   const when=kind==='now'
     ? `até ${hhmm(sh.e)}${sh.noEnd?'':' · faltam '+fmtIn(sh.e-NOW.mins)}`
     : (abs-now>=1440?`começa ${DAYS[sh.d].short.toLowerCase()} ${DAYS[sh.d].n}, ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`:`começa ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`);
-  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}" aria-label="Ver no mapa, ponto ${pin}">Mapa <i class="pin ${(PINS.find(p=>p.n===pin)||{}).cat||'palco'}">${pin}</i> ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${inter(sh,o)}</span></li>`).join('')}</ul></div>`:''}</article>`;
+  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}" aria-label="Ver no mapa, ponto ${pin}">Mapa <i class="pin ${(PINS.find(p=>p.n===pin)||{}).cat||'palco'}">${pin}</i> ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><ul>${cf.map(o=>`<li><span class="wh2">⚠ Bate ${inter(sh,o)}</span><span class="wn">com ${esc(o.name)}</span></li>`).join('')}</ul></div>`:''}</article>`;
 }
 const BELLB='M6.2 16.6V11a5.8 5.8 0 0 1 11.6 0v5.6l1.7 1.9H4.5z';
 const bellSvg=on=>on?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`:`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4.5l16 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
@@ -1263,7 +1266,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.127';
+const APP_VER='1.0.128';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
