@@ -413,12 +413,13 @@ h2.sec{font-size:25px}
 .lhead h2{margin:0;font-size:30px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink)}
 .lclock{margin:2px 0 6px;font-size:16px;color:var(--ink2)}
 .livebox h4{margin:8px 0 5px;font-size:18px;letter-spacing:.18em;text-transform:uppercase;color:var(--deep);font-weight:700}
-.lnone{border:2.5px dashed var(--ink2);border-radius:12px;padding:8px 10px;font-size:17px;color:var(--ink)}
+.lnone{border:2.5px dashed var(--ink2);border-radius:12px;padding:8px 10px;font-size:clamp(13px,4.3vw,17px);white-space:nowrap;color:var(--ink)}
 .lmini{background:var(--c);border:2.5px solid #1A1420;border-radius:var(--rx);box-shadow:3px 3px 0 #1A1420;padding:8px 10px 9px;margin-bottom:8px;color:#1A1420}
 .lmini.lt{color:#FEFAD9}
 .lrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lmini .st{background:#FEFAD9;color:#1A1420;border:2px solid #1A1420;font-size:15px}
-.mapbtn{border:2px solid #1A1420;background:#FEFAD9;color:#1A1420;border-radius:999px;padding:0 10px;font-size:15px;font-weight:700;min-height:28px;text-transform:uppercase;letter-spacing:.02em}
+.mapbtn .pin{position:static;transform:none;width:21px;height:21px;font-size:11.5px;display:inline-grid;vertical-align:-5px;margin:0 3px;box-shadow:none}
+.mapbtn{display:inline-flex;align-items:center;border:2px solid #1A1420;background:#FEFAD9;color:#1A1420;border-radius:999px;padding:0 10px;font-size:15px;font-weight:700;min-height:28px;text-transform:uppercase;letter-spacing:.02em}
 .lmini h3{margin:4px 0 2px;color:var(--nm)!important;-webkit-text-stroke:3px #1A1420;paint-order:stroke fill;text-shadow:2px 2px 0 #1A1420;font-size:32px;font-weight:700;line-height:.95;text-transform:uppercase}
 .lwhen{font-size:18px;font-weight:700}
 .lmini .warn{background:#FEFAD9;color:#1A1420;border:2px solid #1A1420;margin-top:5px}
@@ -526,6 +527,10 @@ h2.sec{font-size:25px}
 nav button{min-width:0}
 nav #share-app{padding-left:6px;padding-right:6px}
 #sheet .how a{color:inherit;font-weight:700;text-decoration:underline}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 10px}
+.hrow h4{margin:0!important}
+.bell{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:1.5px 1.5px 0 var(--ink)}
+.bell[aria-pressed="true"]{background:#FFD653;color:#1A1420}
 .leads{display:flex;flex-wrap:nowrap;gap:6px;margin:4px 0 10px}
 .leads .chip-btn{min-height:40px;padding:0 8px;flex:1 1 0;font-size:19px}
 .shprev{display:flex;justify-content:center;margin:2px 0 8px;min-height:10px}
@@ -905,6 +910,7 @@ RAW.forEach((txt,d)=>txt.trim().split('\n').forEach((l,i)=>{
 const byId=Object.fromEntries(SHOWS.map(s=>[s.id,s]));
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const inter=(a,b)=>'das '+hhmm(Math.max(a.s,b.s))+' às '+hhmm(Math.min(a.e,b.e));
 const range=s=>hhmm(s.s)+(s.noEnd?'':'–'+hhmm(s.e));
 
 /* ===================== ESTADO ===================== */
@@ -955,7 +961,7 @@ function dayRain(i){ return ''; }
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
-  const warn=on&&cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${range(o)}</span></li>`).join('')}</ul></div>`:'';
+  const warn=on&&cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${inter(sh,o)}</span></li>`).join('')}</ul></div>`:'';
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
@@ -999,8 +1005,10 @@ function liveMini(sh,kind){
   const when=kind==='now'
     ? `até ${hhmm(sh.e)}${sh.noEnd?'':' · faltam '+fmtIn(sh.e-NOW.mins)}`
     : (abs-now>=1440?`começa ${DAYS[sh.d].short.toLowerCase()} ${DAYS[sh.d].n}, ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`:`começa ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`);
-  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}">Mapa ${pin} ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${range(o)}</span></li>`).join('')}</ul></div>`:''}</article>`;
+  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}" aria-label="Ver no mapa, ponto ${pin}">Mapa <i class="pin ${(PINS.find(p=>p.n===pin)||{}).cat||'palco'}">${pin}</i> ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><div class="wh">⚠ Bate com</div><ul>${cf.map(o=>`<li><span class="wn">${esc(o.name)}</span><span class="wt">${inter(sh,o)}</span></li>`).join('')}</ul></div>`:''}</article>`;
 }
+const BELLB='M6.2 16.6V11a5.8 5.8 0 0 1 11.6 0v5.6l1.7 1.9H4.5z';
+const bellSvg=on=>on?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`:`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4.5l16 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 function livePanel(){
   const now=absMin(NOW.date,NOW.mins);
   const items=[...S.sel].map(i=>byId[i]).filter(x=>!x.bg);
@@ -1011,7 +1019,7 @@ function livePanel(){
   const base=NOW.mins;
   return `<section class="livebox" aria-label="Ao vivo"><div class="lhead"><span class="ldot"></span><h2>Ao vivo</h2></div><p class="lclock">${esc(lbl)} · ${hhmm(base)}</p>
   <h4>Agora</h4>${cur.length?cur.map(x=>liveMini(x,'now')).join(''):'<div class="lnone">Nada seu tocando agora.'+(nxt?' Dá tempo pra comer e se hidratar.':'')+'</div>'}
-  <h4>Próximo</h4>${nxt?liveMini(nxt,'next'):'<div class="lnone">Nenhum show a seguir no seu roteiro.</div>'}</section>`;
+  <div class="hrow"><h4>Próximo</h4><button class="bell" id="remind" type="button" aria-pressed="${remindOn()}" aria-label="${remindOn()?'Lembretes ligados. Toque para ajustar':'Ligar lembretes dos shows'}">${bellSvg(remindOn())}</button></div>${nxt?liveMini(nxt,'next'):'<div class="lnone">Nenhum show a seguir no seu roteiro.</div>'}</section>`;
 }
 function rRot(){
   let html='';
@@ -1038,7 +1046,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="remind" aria-pressed="${remindOn()}">${remindOn()?'Lembretes ligados':'Avisar '+leadMin()+' min antes'}</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1255,7 +1263,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.126';
+const APP_VER='1.0.127';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1307,15 +1315,15 @@ async function pushOff(){
 const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notification' in window&&Notification.permission==='granted';}catch(e){return false;}};
 const LEADS=[5,10,15,30,60];
 const leadMin=()=>{try{const v=+localStorage.getItem('rta_lead');return LEADS.includes(v)?v:15;}catch(e){return 15;}};
-function remindSheet(extra,btns){
-  $('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes ligados</h2><p>Você recebe um aviso <b id="lead-n">'+leadMin()+'</b> minutos antes de cada show marcado. '+extra+'</p><p class="note">Quanto tempo antes?</p><div class="leads" role="group" aria-label="Minutos antes">'+LEADS.map(n=>`<button class="chip-btn" data-lead="${n}" aria-pressed="${n===leadMin()}">${n} min</button>`).join('')+'</div><div class="acts2">'+btns+'</div>';
+function remindSheet(){
+  $('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Receba um aviso <b id="lead-n">'+leadMin()+'</b> minutos antes da próxima atração</p><div class="leads" role="group" aria-label="Minutos antes">'+LEADS.map(n=>`<button class="chip-btn" data-lead="${n}" aria-pressed="${n===leadMin()}">${n} min</button>`).join('')+'</div><div class="acts2"><button class="btns" id="rem-off">Desligar lembretes</button><button class="btnp" data-close>Ok</button></div>';
   openSheet();
 }
 async function toggleRemind(){
-  if(remindOn())return remindSheet('Para ver como ele chega, toque em testar e saia do app: o aviso aparece em 5 segundos.','<button class="btnp" id="rem-test">Testar aviso</button><button class="btns" id="rem-off">Desligar lembretes</button><button class="btns" data-close>Fechar</button>');
+  if(remindOn())return remindSheet();
   if(!('Notification' in window)){$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Seu aparelho ou navegador não permite avisos. Instale o app pelo botão "Instalar app" e tente de novo.</p>';return openSheet();}
   let p=Notification.permission; if(p==='default'){try{p=await Notification.requestPermission();}catch(e){}}
-  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();pushSync();render();remindSheet(pushOk()?'Os avisos chegam mesmo com o app fechado.':'Os avisos funcionam com o app aberto ou em segundo plano.<br>Se o celular fechar o app, o aviso pode não chegar.','<button class="btns" data-close>Ok</button>');}
+  if(p==='granted'){try{localStorage.setItem('rta_remind','1');}catch(e){}remindCheck();pushSync();render();remindSheet();}
   else{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Avisos bloqueados</h2><p>Libere as notificações deste site nas configurações do navegador e toque de novo.</p>';openSheet();}
 }
 
@@ -1324,7 +1332,7 @@ function remindCheck(){
   if(!remindOn())return;
   const now=absMin(NOW.date,NOW.mins);
   S.sel.forEach(id=>{const sh=byId[id];if(!sh||_rn.has(id))return;const d=absMin(DAYS[sh.d].date,sh.s)-now;
-    if(d>0&&d<=leadMin()){_rn.add(id);const o={body:stageById[sh.stage].n+' · começa às '+hhmm(sh.s),icon:'icon-192.png',tag:'rta-'+id};
+    if(d>0&&d<=leadMin()){_rn.add(id);const o={body:stageById[sh.stage].n+' · começa às '+hhmm(sh.s),icon:'icons/icon-192.png',badge:'icons/badge-96.png',tag:'rta-'+id};
       try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification(sh.name+' em '+d+' min',o)).catch(()=>{try{new Notification(sh.name+' em '+d+' min',o);}catch(e){}});else new Notification(sh.name+' em '+d+' min',o);}catch(e){}}});
 }
 function tick(){
@@ -1402,8 +1410,7 @@ document.addEventListener('click',e=>{
   if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
   if(t.id==='remind')return toggleRemind();
   if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}pushOff();closeSheet();return render();}
-  if(t.dataset.lead){try{localStorage.setItem('rta_lead',t.dataset.lead);}catch(e){}_rn.clear();document.querySelectorAll('[data-lead]').forEach(x=>x.setAttribute('aria-pressed',x===t));const n=$('#lead-n');if(n)n.textContent=t.dataset.lead;const b=$('#remind');if(b)b.textContent='Lembretes ligados';pushSync();return true;}
-  if(t.id==='rem-test'){closeSheet();setTimeout(()=>{const o={body:'Palco Floresta · começa às 17:40. É assim que o lembrete aparece.',icon:'icon-192.png',tag:'rta-teste'};try{if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(r=>r.showNotification('Show de teste em 15 min',o)).catch(()=>{try{new Notification('Show de teste em 15 min',o);}catch(e){}});else new Notification('Show de teste em 15 min',o);}catch(e){}},5000);return;}
+  if(t.dataset.lead){try{localStorage.setItem('rta_lead',t.dataset.lead);}catch(e){}_rn.clear();document.querySelectorAll('[data-lead]').forEach(x=>x.setAttribute('aria-pressed',x===t));const n=$('#lead-n');if(n)n.textContent=t.dataset.lead;pushSync();return true;}
   if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
   if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
   if(t.id==='copy')return copyText();
