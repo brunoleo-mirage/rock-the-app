@@ -1250,7 +1250,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.118';
+const APP_VER='1.0.119';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1418,7 +1418,7 @@ function shareRotSheet(){
    '</div><p class="note">A imagem leva um QR: quem escanear coloca o seu roteiro no próprio app.</p>');
 }
 function importSheet(){
-  sheetHtml('Importar roteiro','<p class="note">Cole a mensagem ou o link que seu amigo mandou, ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
+  sheetHtml('Importar roteiro','<p class="note">Cole aqui a mensagem que seu amigo enviou (ela termina com um link do Rock the App), ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
 }
 document.addEventListener('change',e=>{if(e.target.id==='imp-file')importImg(e.target.files&&e.target.files[0]);});
 let IMP=null;
