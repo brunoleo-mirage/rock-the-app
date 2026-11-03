@@ -65,6 +65,8 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--rose)
 .chips::-webkit-scrollbar{display:none}
 .chip-btn{flex:none;border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;min-height:38px;white-space:nowrap}
 .chip-btn[aria-pressed="true"]{background:var(--rose)}
+.rotdays .chip-btn{min-height:38px;padding:4px 6px;font-size:18px;border-radius:12px}
+.rotdays{margin:2px 0 6px}
 .days{margin-bottom:10px}.days .chip-btn{flex:1;text-align:center;border-radius:14px;padding:8px 6px;line-height:1.15}
 .days .chip-btn b{display:block;font-family:var(--f-display);font-size:17px}
 .days .chip-btn small{font-weight:600;color:var(--ink2)}
@@ -1026,13 +1028,16 @@ function livePanel(){
   <h4>Agora</h4>${cur.length?cur.map(x=>liveMini(x,'now')).join(''):'<div class="lnone">Nada seu tocando agora.'+(nxt?' Dá tempo pra comer e se hidratar.':'')+'</div>'}
   <div class="hrow"><h4>Próximo</h4><button class="bell" id="remind" type="button" aria-pressed="${remindOn()}" aria-label="${remindOn()?'Lembretes ligados. Toque para ajustar':'Ligar lembretes dos shows'}">${bellSvg(remindOn())}</button></div>${nxt?liveMini(nxt,'next'):'<div class="lnone">Nenhum show a seguir no seu roteiro.</div>'}</section>`;
 }
+function rotDayBtns(){
+  return '<div class="row days rotdays" role="group" aria-label="Ir para o dia">'+DAYS.map((D,d)=>{const has=planIds().some(i=>byId[i].d===d);return `<button class="chip-btn" data-rotday="${d}"${has?'':' disabled'}><b>${D.short} ${D.n}</b></button>`;}).join('')+'</div>';
+}
 function rRot(){
   let html='';
   if(!planIds().length) html='<div class="empty"><b>Seu roteiro está vazio</b>Toque em "Quero ir" ou "Talvez" nas atrações da Programação.</div>';
   DAYS.forEach((D,d)=>{
     const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
     if(!items.length)return;
-    html+=`<h2 class="sec">${D.full}</h2>`;
+    html+=`<h2 class="sec" id="rotday-${d}">${D.full}</h2>`;
     /* grupos de shows "Quero ir" que batem entre si: o aviso vai logo acima do primeiro do grupo */
     const going=items.filter(x=>S.sel.has(x.id)&&!x.bg), par={}; going.forEach(x=>par[x.id]=x.id);
     const fnd=x=>{while(par[x]!==x)x=par[x]=par[par[x]];return x;};
@@ -1051,7 +1056,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="clear">Limpar tudo</button></div>`+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="clear">Limpar tudo</button></div>`+rotDayBtns()+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1268,7 +1273,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.134';
+const APP_VER='1.0.135';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1393,6 +1398,7 @@ document.addEventListener('click',e=>{
   if(t.id==='theme-btn')return toggleTheme();
   if(t.id==='about-btn')return aboutSheet();
   if(t.hasAttribute('data-close')||t.id==='scrim')return closeSheet();
+  if(t.dataset.rotday!==undefined){const el=document.getElementById('rotday-'+t.dataset.rotday);if(el){main.scrollTop+=el.getBoundingClientRect().top-main.getBoundingClientRect().top-8;}return;}
   if(t.dataset.day!==undefined){S.day=+t.dataset.day;return render();}
   if(t.dataset.stage&&t.classList.contains('chip-btn')){const id=t.dataset.stage;if(id==='all')S.stages=[];else if(S.stages.includes(id))S.stages=S.stages.filter(x=>x!==id);else S.stages.push(id);return render();}
   if(t.dataset.maybe){const id=t.dataset.maybe;
@@ -1458,11 +1464,11 @@ function shareAppSheet(){
 }
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque algumas atrações antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
-  if(!dayItems(SH.day).length)SH.day=shFirstDay();
+  if(SH.day!=='all'&&!dayItems(SH.day).length)SH.day='all';
   try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])MOD.th=s;}catch(e){}
-  const post=SH.mode==='post',dias=DAYS.map((D,i)=>[D,i]).filter(([D,i])=>dayItems(i).length);
-  sheetHtml('Compartilhar roteiro','<div class="leads" role="group" aria-label="Tipo"><button class="chip-btn" data-shmode="full" aria-pressed="'+!post+'">Roteiro completo</button><button class="chip-btn" data-shmode="post" aria-pressed="'+post+'">Para postar</button></div>'+
-   (post?'<p class="note">Uma imagem no formato de story, de um só dia. Escolha o dia:</p><div class="leads" role="group" aria-label="Dia">'+dias.map(([D,i])=>`<button class="chip-btn" data-shday="${i}" aria-pressed="${i===SH.day}">${D.short} ${D.n}</button>`).join('')+'</div>'+(S.maybe.size?`<div class="leads"><button class="chip-btn smallbtn" id="sh-maybe" aria-pressed="${SH.maybe}">Incluir <span class="maybetag">Talvez</span></button></div>`:''):'<p class="note">Uma imagem por dia, todas com o QR: qualquer uma importa o roteiro inteiro.</p>')+
+  const dias=DAYS.map((D,i)=>[D,i]).filter(([D,i])=>dayItems(i).length);
+  sheetHtml('Compartilhar roteiro','<p class="note">Uma imagem por dia, pronta para postar, todas com o QR: qualquer uma importa o roteiro inteiro.</p><div class="leads" role="group" aria-label="Dia"><button class="chip-btn" data-shday="all" aria-pressed="'+(SH.day==='all')+'">Todos</button>'+dias.map(([D,i])=>`<button class="chip-btn" data-shday="${i}" aria-pressed="${i===SH.day}">${D.short} ${D.n}</button>`).join('')+'</div>'+
+   (S.maybe.size?`<div class="leads"><button class="chip-btn smallbtn" id="sh-maybe" aria-pressed="${SH.maybe}">Incluir <span class="maybetag">Talvez</span></button></div>`:'')+
    '<div class="mods" id="mods" role="group" aria-label="Modelos"></div><p class="note" id="sh-count"></p><div class="shbtns">'+
    '<button class="btnp" id="sh-img">Compartilhar</button><button class="btns" id="dl-img">Baixar</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
@@ -1472,7 +1478,7 @@ function shareRotSheet(){
 }
 let _shTok=0;
 async function shPreviews(){
-  const tok=++_shTok,spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe}:{mode:'full'},pgs=imgPageSpecs(spec),cnt=$('#sh-count');
+  const tok=++_shTok,spec={day:SH.day,maybe:SH.maybe},pgs=imgPageSpecs(spec),cnt=$('#sh-count');
   if(!pgs.length){const m=$('#mods');if(m)m.innerHTML='<p class="note">Nenhuma atração marcada neste dia.</p>';return;}
   if(cnt)cnt.textContent=pgs.length===1?'1 imagem':pgs.length+' imagens';
   let html='';
@@ -1573,15 +1579,10 @@ const rotCodeOf=its=>its.filter(x=>S.sel.has(x.id)).map(x=>x.id).concat(its.filt
 const linkOf=its=>APP_URL+'/?r='+rotCodeOf(its);
 const dayItems=(d,maybe=true)=>planIds().map(i=>byId[i]).filter(x=>x&&x.d===d&&(maybe||S.sel.has(x.id))).sort((a,b)=>a.s-b.s);
 function imgPageSpecs(spec){
-  const out=[];
-  if(spec.mode==='post'){
-    const its=dayItems(spec.day,spec.maybe!==false); if(!its.length)return out;
+  const out=[],days=spec.day==null||spec.day==='all'?DAYS.map((D,d)=>d):[spec.day];
+  days.forEach(d=>{const its=dayItems(d,spec.maybe!==false);if(!its.length)return;
     const n=its.length,pages=Math.ceil(n/16),per=Math.ceil(n/pages);
-    for(let p=0;p<pages;p++){const ch=its.slice(p*per,(p+1)*per);out.push({mode:'post',D:DAYS[spec.day],items:ch,cont:p>0,tier:ch.length<=6?'A':ch.length<=10?'B':'C',link:rotLink()});}
-    return out;
-  }
-  DAYS.forEach((D,d)=>{const its=dayItems(d);if(!its.length)return;const n=its.length,pages=Math.ceil(n/6),per=Math.ceil(n/pages);
-    for(let p=0;p<pages;p++)out.push({mode:'full',D,items:its.slice(p*per,(p+1)*per),cont:p>0,tier:'A',link:rotLink()});});
+    for(let p=0;p<pages;p++){const ch=its.slice(p*per,(p+1)*per);out.push({mode:'post',D:DAYS[d],items:ch,cont:p>0,tier:ch.length<=6?'A':ch.length<=10?'B':'C',link:rotLink()});}});
   return out;
 }
 async function imgPageBlob(th,pg){
@@ -1661,12 +1662,12 @@ async function imgPageBlob(th,pg){
   return new Promise(r=>cv.toBlob(r,'image/png'));
 }
 async function imgRotBlobs(th,spec){const pgs=imgPageSpecs(spec||{mode:'full'}),o=[];for(const p of pgs)o.push(await imgPageBlob(th,p));return o;}
-async function imgRotBlob(th){const p=imgPageSpecs({mode:'full'});return p.length?imgPageBlob(th,p[0]):null;}
-const SH={mode:'full',day:0,maybe:true};
+async function imgRotBlob(th){const p=imgPageSpecs({day:'all'});return p.length?imgPageBlob(th,p[0]):null;}
+const SH={day:'all',maybe:true};
 function shFirstDay(){const d=DAYS.findIndex((D,i)=>dayItems(i).length);return d<0?0:d;}
 async function imgShare(dl,th){
-  try{const spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe}:{mode:'full'},pgs=imgPageSpecs(spec),bl=await imgRotBlobs(th,spec);
-    const files=bl.map((b,i)=>new File([b],SH.mode==='post'?'roteiro-dia-'+pgs[i].D.n.replace('/','-')+(pgs.length>1?'-'+(i+1):'')+'.png':'meu-roteiro-'+pgs[i].D.n.replace('/','-')+(pgs.filter(x=>x.D===pgs[i].D).length>1?'-'+(pgs.slice(0,i).filter(x=>x.D===pgs[i].D).length+1):'')+'.png',{type:'image/png'}));
+  try{const spec={day:SH.day,maybe:SH.maybe},pgs=imgPageSpecs(spec),bl=await imgRotBlobs(th,spec);
+    const files=bl.map((b,i)=>{const same=pgs.filter(x=>x.D===pgs[i].D),k=same.indexOf(pgs[i])+1;return new File([b],'roteiro-dia-'+pgs[i].D.n.replace('/','-')+(same.length>1?'-'+k:'')+'.png',{type:'image/png'});});
     if(!dl&&navigator.canShare&&navigator.canShare({files}))return navigator.share({files,title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
     for(let i=0;i<files.length;i++){const a=document.createElement('a');a.href=URL.createObjectURL(files[i]);a.download=files[i].name;document.body.appendChild(a);a.click();const u=a.href;setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},4000);await new Promise(r=>setTimeout(r,500));}
   }catch(e){}
@@ -1736,8 +1737,7 @@ function shareClick(t){
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
   if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
-  if(t.dataset.shmode){SH.mode=t.dataset.shmode;if(SH.mode==='post'&&!dayItems(SH.day).length)SH.day=shFirstDay();return shareRotSheet(),true;}
-  if(t.dataset.shday!==undefined){SH.day=+t.dataset.shday;return shareRotSheet(),true;}
+  if(t.dataset.shday!==undefined){SH.day=t.dataset.shday==='all'?'all':+t.dataset.shday;return shareRotSheet(),true;}
   if(t.id==='sh-maybe'){SH.maybe=!SH.maybe;return shareRotSheet(),true;}
   if(t.dataset.mod){MOD.th=t.dataset.mod;document.querySelectorAll('.mod').forEach(x=>x.setAttribute('aria-pressed',x===t));return true;}
   if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
