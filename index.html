@@ -532,6 +532,8 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .bell{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:1.5px 1.5px 0 var(--ink)}
 .bell[aria-pressed="true"]{background:#FFD653;color:#1A1420}
 .leads{display:flex;flex-wrap:nowrap;gap:6px;margin:4px 0 10px}
+.leads .chip-btn.smallbtn{flex:none!important;min-height:36px;padding:0 12px;font-size:17px;display:inline-flex;align-items:center;gap:6px}
+.smallbtn .maybetag{margin:0!important;transform:none!important;line-height:14px;font-size:12px;padding:1px 8px;display:inline-block;align-self:center}
 .leads .chip-btn{min-height:40px;padding:0 8px;flex:1 1 0;font-size:19px}
 .shprev{display:flex;justify-content:center;margin:2px 0 8px;min-height:10px}
 .shprev img{display:block;max-height:150px;width:auto;max-width:100%;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
@@ -1266,7 +1268,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.131';
+const APP_VER='1.0.132';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1455,14 +1457,27 @@ function shareAppSheet(){
    '<button class="btns" id="sh-app-copy">Copiar link</button></div><p class="note">Instagram: use "Compartilhar…" ou copie o link e cole no adesivo de link do story.</p>');
 }
 function shareRotSheet(){
-  if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque alguns shows antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
-  sheetHtml('Compartilhar roteiro','<p class="note">Escolha o modelo. Você envia uma imagem pronta para postar. Ela já leva um QR para seus amigos colocarem o roteiro no app deles.</p><div class="mods" id="mods" role="group" aria-label="Modelos"></div><div class="shbtns">'+
-   '<button class="btnp" id="sh-img">Compartilhar imagem do roteiro</button><button class="btns" id="dl-img">Baixar imagem do roteiro</button>'+
+  if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque algumas atrações antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
+  if(!dayItems(SH.day).length)SH.day=shFirstDay();
+  try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])MOD.th=s;}catch(e){}
+  const post=SH.mode==='post',dias=DAYS.map((D,i)=>[D,i]).filter(([D,i])=>dayItems(i).length);
+  sheetHtml('Compartilhar roteiro','<div class="leads" role="group" aria-label="Tipo"><button class="chip-btn" data-shmode="full" aria-pressed="'+!post+'">Roteiro completo</button><button class="chip-btn" data-shmode="post" aria-pressed="'+post+'">Para postar</button></div>'+
+   (post?'<p class="note">Uma imagem no formato de story, de um só dia. Escolha o dia:</p><div class="leads" role="group" aria-label="Dia">'+dias.map(([D,i])=>`<button class="chip-btn" data-shday="${i}" aria-pressed="${i===SH.day}">${D.short} ${D.n}</button>`).join('')+'</div>'+(S.maybe.size?`<div class="leads"><button class="chip-btn smallbtn" id="sh-maybe" aria-pressed="${SH.maybe}">Incluir <span class="maybetag">Talvez</span></button></div>`:''):'<p class="note">Uma imagem por dia, todas com o QR: qualquer uma importa o roteiro inteiro.</p>')+
+   '<div class="mods" id="mods" role="group" aria-label="Modelos"></div><p class="note" id="sh-count"></p><div class="shbtns">'+
+   '<button class="btnp" id="sh-img">Compartilhar</button><button class="btns" id="dl-img">Baixar</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
    '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
    '</div>');
-  try{const s=localStorage.getItem('rta_mod');if(IMG_THEMES[s])MOD.th=s;}catch(e){}
-  (async()=>{let html='';for(const k of Object.keys(IMG_THEMES)){const b=await imgRotBlob(k);if(!$('#mods'))return;html+=`<button class="mod" data-mod="${k}" aria-pressed="${k===MOD.th}"><img src="${URL.createObjectURL(b)}" alt="Modelo ${IMG_THEMES[k].n}"></button>`;}$('#mods').innerHTML=html;})();
+  shPreviews();
+}
+let _shTok=0;
+async function shPreviews(){
+  const tok=++_shTok,spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe}:{mode:'full'},pgs=imgPageSpecs(spec),cnt=$('#sh-count');
+  if(!pgs.length){const m=$('#mods');if(m)m.innerHTML='<p class="note">Nenhuma atração marcada neste dia.</p>';return;}
+  if(cnt)cnt.textContent=pgs.length===1?'1 imagem':pgs.length+' imagens';
+  let html='';
+  for(const k of Object.keys(IMG_THEMES)){const b=await imgPageBlob(k,pgs[0]);if(tok!==_shTok||!$('#mods'))return;html+=`<button class="mod" data-mod="${k}" aria-pressed="${k===MOD.th}"><img src="${URL.createObjectURL(b)}" alt="Modelo ${IMG_THEMES[k].n}"></button>`;}
+  if(tok===_shTok&&$('#mods'))$('#mods').innerHTML=html;
 }
 function importSheet(){
   sheetHtml('Importar roteiro','<p class="note">Cole aqui a mensagem que seu amigo enviou (ela termina com um link do Rock the App), ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
@@ -1554,21 +1569,34 @@ const IMG_THEMES={
   festival:{n:'Festival',bg:['#884AFE','#5B2FC4'],line:'#1A1420',txt:'#1A1420',sub:'#FFD653',pill:'#FFD653',pillTx:'#1A1420',foot:'#FEFAD9',footTx:'#1A1420',footSub:'#6034BD',title:'#FFD653',titleLine:'#1A1420',char:'chars/fest-duo.webp',dots:'rgba(254,250,217,.14)'},
   sol:{n:'Pôr do sol',bg:['#FE5A5E','#FFD653'],line:'#1A1420',txt:'#1A1420',sub:'#1A1420',pill:'#1A1420',pillTx:'#FEFAD9',foot:'#FEFAD9',footTx:'#1A1420',footSub:'#6034BD',title:'#FEFAD9',titleLine:'#1A1420',char:'chars/fest-rock.webp',dots:'rgba(26,20,32,.08)'}
 };
-async function imgRotBlob(th){
+const rotCodeOf=its=>its.filter(x=>S.sel.has(x.id)).map(x=>x.id).concat(its.filter(x=>S.maybe.has(x.id)&&!S.sel.has(x.id)).map(x=>'m'+x.id)).join('.');
+const linkOf=its=>APP_URL+'/?r='+rotCodeOf(its);
+const dayItems=(d,maybe=true)=>planIds().map(i=>byId[i]).filter(x=>x&&x.d===d&&(maybe||S.sel.has(x.id))).sort((a,b)=>a.s-b.s);
+function imgPageSpecs(spec){
+  const out=[];
+  if(spec.mode==='post'){
+    const its=dayItems(spec.day,spec.maybe!==false); if(!its.length)return out;
+    const n=its.length,pages=Math.ceil(n/16),per=Math.ceil(n/pages);
+    for(let p=0;p<pages;p++){const ch=its.slice(p*per,(p+1)*per);out.push({mode:'post',D:DAYS[spec.day],items:ch,cont:p>0,tier:ch.length<=6?'A':ch.length<=10?'B':'C',link:rotLink()});}
+    return out;
+  }
+  DAYS.forEach((D,d)=>{const its=dayItems(d);if(!its.length)return;const n=its.length,pages=Math.ceil(n/6),per=Math.ceil(n/pages);
+    for(let p=0;p<pages;p++)out.push({mode:'full',D,items:its.slice(p*per,(p+1)*per),cont:p>0,tier:'A',link:rotLink()});});
+  return out;
+}
+async function imgPageBlob(th,pg){
   const T=IMG_THEMES[th]||IMG_THEMES.claro;
   try{await document.fonts.load('700 40px "Amatic SC"');}catch(e){}
   const cs=getComputedStyle(document.documentElement),FF='"Amatic SC","Arial Narrow",sans-serif',INK='#1A1420',CRM='#FEFAD9',LN=T.line,W=1080,PAD=48;
-  const days=DAYS.map((D,d)=>({D,items:planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s)})).filter(x=>x.items.length);
-  const RH=172,HEAD=430,FOOT=420,DH=112;
-  const H=Math.max(1350,HEAD+days.reduce((a,x)=>a+DH+x.items.length*RH+14,0)+FOOT);
+  const post=pg.mode==='post',HEAD=430,FOOT=post?340:420,DH=112,n=pg.items.length;
+  const H=post?1920:Math.max(1350,HEAD+DH+n*172+14+FOOT);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
   const grd=c.createLinearGradient(0,0,0,H);grd.addColorStop(0,T.bg[0]);grd.addColorStop(1,T.bg[1]);c.fillStyle=grd;c.fillRect(0,0,W,H);
   if(T.dots){c.fillStyle=T.dots;for(let yy=60;yy<H;yy+=70)for(let xx=(yy/70%2)*35+20;xx<W;xx+=70){c.beginPath();c.arc(xx,yy,9,0,7);c.fill();}}
-  const cols=['#EB4B94','#FE5A5E','#FFD653','#92FE71','#884AFE'];
-  cols.forEach((k,i)=>{c.fillStyle=k;c.fillRect(i*W/5,0,W/5+1,34);c.fillRect(i*W/5,H-34,W/5+1,34);});
+  ['#EB4B94','#FE5A5E','#FFD653','#92FE71','#884AFE'].forEach((k,i)=>{c.fillStyle=k;c.fillRect(i*W/5,0,W/5+1,34);c.fillRect(i*W/5,H-34,W/5+1,34);});
   c.fillStyle=LN;c.fillRect(0,34,W,6);c.fillRect(0,H-40,W,6);
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
-  const box=(x,y,w,h,r,fill,dash,sh)=>{if(sh){rr(x+sh,y+sh,w,h,r);c.fillStyle=LN;c.fill();}rr(x,y,w,h,r);c.fillStyle=fill;c.fill();c.lineWidth=6;c.strokeStyle=LN;c.setLineDash(dash?[18,12]:[]);c.stroke();c.setLineDash([]);};
+  const box=(x,y,w,h,r,fill,dash,sh,lw)=>{if(sh){rr(x+sh,y+sh,w,h,r);c.fillStyle=LN;c.fill();}rr(x,y,w,h,r);c.fillStyle=fill;c.fill();c.lineWidth=lw||6;c.strokeStyle=LN;c.setLineDash(dash?[18,12]:[]);c.stroke();c.setLineDash([]);};
   const outl=(s,x,y,fill,sw,ln)=>{c.lineJoin='round';c.lineWidth=sw;c.strokeStyle=ln||INK;c.strokeText(s,x,y);c.fillStyle=fill;c.fillText(s,x,y);};
   c.textBaseline='alphabetic';c.textAlign='left';
   if(T.char){const im=await _ld(T.char);if(im){const sc=Math.min(260/im.naturalWidth,262/im.naturalHeight),iw=im.naturalWidth*sc,ih=im.naturalHeight*sc;c.drawImage(im,850-iw/2,433-ih/2,iw,ih);}}
@@ -1579,44 +1607,78 @@ async function imgRotBlob(th){
   c.font='700 140px '+FF;outl('MEU',PAD,196,T.title,12,T.titleLine);outl('ROTEIRO',PAD,306,T.title,12,T.titleLine);
   c.font='700 40px '+FF;c.fillStyle=T.sub;
   const d0=DAYS[0],d1=DAYS[DAYS.length-1];c.fillText(('2º FINAL DE SEMANA · '+d0.n.slice(0,2)+' A '+d1.n.slice(0,2)+' DE NOVEMBRO').toUpperCase(),PAD+4,364);
-  let y=HEAD+20;
-  days.forEach(({D,items})=>{
-    c.font='700 76px '+FF;const tw=c.measureText(D.full.toUpperCase()).width;
-    box(PAD,y,tw+70,84,42,T.pill,false,6);c.fillStyle=T.pillTx;c.fillText(D.full.toUpperCase(),PAD+35,y+64);y+=DH;
-    items.forEach(sh=>{
-      const st=stageById[sh.stage],fill=(cs.getPropertyValue(st.c)||'#EB4B94').trim()||'#EB4B94',nmc=(cs.getPropertyValue(st.c.replace('--st','--nm'))||'#92FE71').trim()||'#92FE71',mb=S.maybe.has(sh.id);
-      box(PAD,y,W-2*PAD-8,134,34,fill,mb,8);
-      c.fillStyle=LT.has(st.c)?CRM:INK;c.font='700 54px '+FF;c.fillText(hhmm(sh.s),PAD+42,y+70);
+  /* dia */
+  let y=HEAD+20;const ptxt=(pg.cont?'CONTINUAÇÃO DO DIA '+pg.D.n:pg.D.full).toUpperCase();
+  c.font='700 76px '+FF;const tw0=c.measureText(ptxt).width;
+  box(PAD,y,tw0+70,84,42,T.pill,false,6);c.fillStyle=T.pillTx;c.fillText(ptxt,PAD+35,y+64);y+=DH;
+  const colorsOf=sh=>{const st=stageById[sh.stage];return {st,fill:(cs.getPropertyValue(st.c)||'#EB4B94').trim()||'#EB4B94',nmc:(cs.getPropertyValue(st.c.replace('--st','--nm'))||'#92FE71').trim()||'#92FE71',tx:LT.has(st.c)?CRM:INK,mb:S.maybe.has(sh.id)&&!S.sel.has(sh.id)};};
+  const talvez=(x,cy,fs,bh)=>{c.font='700 '+fs+'px '+FF;const tw=c.measureText('TALVEZ').width;rr(x,cy-bh/2,tw+bh*.75,bh,bh/2);c.fillStyle='rgba(254,250,217,.9)';c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.setLineDash([8,6]);c.stroke();c.setLineDash([]);c.fillStyle=INK;c.fillText('TALVEZ',x+bh*.375,cy+fs*.33);return tw+bh*.75;};
+  const fitName=(nm,maxw,fs,min)=>{c.font='700 '+fs+'px '+FF;while(c.measureText(nm).width>maxw&&fs>min){fs-=2;c.font='700 '+fs+'px '+FF;}return fs;};
+  const avail=(H-FOOT-18)-y;
+  if(pg.tier==='A'){
+    const step=post?Math.min(172,Math.floor(avail/n)):172,chh=post?step-38:134;
+    pg.items.forEach(sh=>{const k=colorsOf(sh),mb=k.mb;
+      box(PAD,y,W-2*PAD-8,chh,34,k.fill,mb,8);
+      c.fillStyle=k.tx;c.font='700 54px '+FF;c.fillText(hhmm(sh.s),PAD+42,y+70);
       c.font='700 32px '+FF;c.fillText(sh.noEnd?'':'ATÉ '+hhmm(sh.e),PAD+44,y+106);
-      let fs=64;c.font='700 '+fs+'px '+FF;const nm=sh.name.toUpperCase();while(c.measureText(nm).width>600&&fs>38){fs-=3;c.font='700 '+fs+'px '+FF;}
-      outl(nm,290,y+70,nmc,Math.round(fs/6));
-      if(mb){const nw=c.measureText(nm).width;c.font='700 30px '+FF;const tw=c.measureText('TALVEZ').width,bx=290+nw+20,bh=40,by=y+70-fs*0.34-bh/2;rr(bx,by,tw+30,bh,20);c.fillStyle='rgba(254,250,217,.9)';c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.setLineDash([8,6]);c.stroke();c.setLineDash([]);c.fillStyle=INK;c.fillText('TALVEZ',bx+15,by+30);}
+      const nm=sh.name.toUpperCase();const fs=fitName(nm,600,64,38);
+      outl(nm,290,y+70,k.nmc,Math.round(fs/6));
+      if(mb){const nw=c.measureText(nm).width;talvez(290+nw+20,y+70-fs*0.34,30,40);}
       c.font='700 30px '+FF;const sn=stageLong(sh.stage).toUpperCase(),sw=c.measureText(sn).width;
       rr(290,y+84,sw+30,36,18);c.fillStyle=CRM;c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.stroke();c.fillStyle=INK;c.fillText(sn,305,y+111);
-      y+=RH;});
-    y+=14;});
-  const fy=H-FOOT+20;box(PAD,fy,W-2*PAD-8,FOOT-92,36,T.foot,false,8);
-  try{const q=QR.make(rotLink(),0);if(q){const m=Math.floor(220/(q.size+2));const qs=m*(q.size+2),qx=PAD+34,qy=fy+(FOOT-92-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
-  const logo=await _ld('sticker.webp');if(logo){const lw=270,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W-PAD-8-lw/2-22,fy+(FOOT-92)/2);c.rotate(.06);c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
+      y+=step;});
+  } else if(pg.tier==='B'){
+    const step=Math.min(130,Math.floor(avail/n)),chh=step-24;
+    pg.items.forEach(sh=>{const k=colorsOf(sh),mb=k.mb,w=W-2*PAD-8,cy=y+chh/2;
+      box(PAD,y,w,chh,28,k.fill,mb,7,5);
+      c.fillStyle=k.tx;c.font='700 46px '+FF;c.fillText(hhmm(sh.s),PAD+30,cy+15);
+      c.font='700 26px '+FF;const sn=stageLong(sh.stage).toUpperCase(),sw=c.measureText(sn).width,pw=sw+26,px=PAD+w-22-pw;
+      rr(px,cy-17,pw,34,17);c.fillStyle=CRM;c.fill();c.lineWidth=3;c.strokeStyle=INK;c.stroke();c.fillStyle=INK;c.fillText(sn,px+13,cy+9);
+      const nm=sh.name.toUpperCase(),nx=PAD+170,maxw=px-nx-(mb?140:30),fs=fitName(nm,maxw,54,30);
+      outl(nm,nx,cy+fs*0.34,k.nmc,Math.max(4,Math.round(fs/7)));
+      if(mb){const nw=c.measureText(nm).width,bx=nx+nw+18;if(bx+120<px)talvez(bx,cy-fs*0.02,24,32);}
+      y+=step;});
+  } else {
+    const rows=Math.ceil(n/2),step=Math.min(130,Math.floor(avail/rows)),chh=step-20,colw=Math.floor((W-2*PAD-8-24)/2);
+    pg.items.forEach((sh,i)=>{const k=colorsOf(sh),mb=k.mb,col=i<rows?0:1,r=i<rows?i:i-rows,x=PAD+col*(colw+24),yy=y+r*step;
+      box(x,yy,colw,chh,26,k.fill,mb,6,5);
+      c.fillStyle=k.tx;c.font='700 38px '+FF;const tt=hhmm(sh.s);c.fillText(tt,x+22,yy+40);const tw=c.measureText(tt).width;
+      c.font='700 22px '+FF;let sn=stageLong(sh.stage).toUpperCase();const maxs=colw-22-tw-60-(mb?110:0);while(c.measureText(sn).width>maxs&&sn.length>4)sn=sn.slice(0,-2);
+      if(sn!==stageLong(sh.stage).toUpperCase())sn=sn.trim()+'…';
+      c.globalAlpha=.85;c.textAlign='right';c.fillText(sn,x+colw-22,yy+38);c.textAlign='left';c.globalAlpha=1;
+      if(mb)talvez(x+22+tw+14,yy+29,20,28);
+      const nm=sh.name.toUpperCase(),fs=fitName(nm,colw-44,46,28);outl(nm,x+22,yy+chh-20,k.nmc,Math.max(4,Math.round(fs/7)));
+    });
+  }
+  /* rodapé com QR */
+  const fy=H-FOOT+20,fb=FOOT-92;box(PAD,fy,W-2*PAD-8,fb,36,T.foot,false,8);
+  try{const q=QR.make(pg.link,0);if(q){const m=Math.floor(220/(q.size+2));const qs=m*(q.size+2),qx=PAD+34,qy=fy+(fb-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
+  const logo=await _ld('sticker.webp');if(logo){const lw=270,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W-PAD-8-lw/2-22,fy+fb/2);c.rotate(.06);c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
   c.fillStyle=T.footTx;c.font='700 54px '+FF;c.fillText('QUER ESTE ROTEIRO?',320,fy+80);c.fillText('ESCANEIE!',320,fy+132);
-  c.font='700 32px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO.',320,fy+180);c.fillText('GRÁTIS, SEM BAIXAR NADA.',320,fy+216);
-  c.fillStyle=T.footSub;c.font='700 36px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',320,fy+262);
-  c.font='700 26px '+FF;c.globalAlpha=.75;c.fillStyle=T.footTx;c.fillText('APP NÃO OFICIAL DO ROCK THE MOUNTAIN',320,fy+296);c.globalAlpha=1;
+  if(!post){c.font='700 32px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO.',320,fy+180);c.fillText('GRÁTIS, SEM BAIXAR NADA.',320,fy+216);}
+  c.fillStyle=T.footSub;c.font='700 36px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',320,fy+(post?186:262));
+  c.font='700 26px '+FF;c.globalAlpha=.75;c.fillStyle=T.footTx;c.fillText('APP NÃO OFICIAL DO ROCK THE MOUNTAIN',320,fy+(post?222:296));c.globalAlpha=1;
   return new Promise(r=>cv.toBlob(r,'image/png'));
 }
+async function imgRotBlobs(th,spec){const pgs=imgPageSpecs(spec||{mode:'full'}),o=[];for(const p of pgs)o.push(await imgPageBlob(th,p));return o;}
+async function imgRotBlob(th){const p=imgPageSpecs({mode:'full'});return p.length?imgPageBlob(th,p[0]):null;}
+const SH={mode:'full',day:0,maybe:true};
+function shFirstDay(){const d=DAYS.findIndex((D,i)=>dayItems(i).length);return d<0?0:d;}
 async function imgShare(dl,th){
-  try{const b=await imgRotBlob(th),f=new File([b],'meu-roteiro-rock-the-mountain.png',{type:'image/png'});
-    if(!dl&&navigator.canShare&&navigator.canShare({files:[f]}))return navigator.share({files:[f],title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
-    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}catch(e){}
+  try{const spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe}:{mode:'full'},pgs=imgPageSpecs(spec),bl=await imgRotBlobs(th,spec);
+    const files=bl.map((b,i)=>new File([b],SH.mode==='post'?'roteiro-dia-'+pgs[i].D.n.replace('/','-')+(pgs.length>1?'-'+(i+1):'')+'.png':'meu-roteiro-'+pgs[i].D.n.replace('/','-')+(pgs.filter(x=>x.D===pgs[i].D).length>1?'-'+(pgs.slice(0,i).filter(x=>x.D===pgs[i].D).length+1):'')+'.png',{type:'image/png'}));
+    if(!dl&&navigator.canShare&&navigator.canShare({files}))return navigator.share({files,title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
+    for(let i=0;i<files.length;i++){const a=document.createElement('a');a.href=URL.createObjectURL(files[i]);a.download=files[i].name;document.body.appendChild(a);a.click();const u=a.href;setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},4000);await new Promise(r=>setTimeout(r,500));}
+  }catch(e){}
 }
 let MOD={th:'claro'};
 function qrFromImage(bm){
   const W=1080,H=Math.round(bm.height*W/bm.width),cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const c=cv.getContext('2d',{willReadFrequently:true});c.fillStyle='#fff';c.fillRect(0,0,W,H);c.drawImage(bm,0,0,W,H);
   const px=c.getImageData(0,0,W,H).data,lum=(x,y)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=H)return 255;const i=(y*W+x)*4;return px[i]*.3+px[i+1]*.59+px[i+2]*.11;};
-  for(let ver=1;ver<=20;ver++){
+  for(const F of [420,340])for(let ver=1;ver<=20;ver++){
     const size=17+4*ver,m=Math.floor(220/(size+2)); if(m<2)break;
-    const qs=m*(size+2),qx=82,qy=H-420+20+(328-qs)/2;
+    const qs=m*(size+2),qx=82,qy=H-F+20+((F-92)-qs)/2;
     const get=(x,y)=>{const cx=qx+(x+1)*m+m/2,cy=qy+(y+1)*m+m/2,d=Math.max(0,m/4);let s=0;for(const [dx,dy] of [[0,0],[-d,0],[d,0],[0,-d],[0,d]])s+=lum(cx+dx,cy+dy);return s/5<128;};
     let ok=true;for(let k=0;k<7&&ok;k++){const e=k===0||k===6;if(!get(k,0)||!get(0,k)||!get(k,6)||!get(6,k))ok=false;}
     if(ok&&get(3,3)&&!get(1,1)&&!get(5,5)){const s=QR.decode(get,size);if(s&&/[?&]r=/.test(s))return s;}
@@ -1674,6 +1736,9 @@ function shareClick(t){
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
   if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
+  if(t.dataset.shmode){SH.mode=t.dataset.shmode;if(SH.mode==='post'&&!dayItems(SH.day).length)SH.day=shFirstDay();return shareRotSheet(),true;}
+  if(t.dataset.shday!==undefined){SH.day=+t.dataset.shday;return shareRotSheet(),true;}
+  if(t.id==='sh-maybe'){SH.maybe=!SH.maybe;return shareRotSheet(),true;}
   if(t.dataset.mod){MOD.th=t.dataset.mod;document.querySelectorAll('.mod').forEach(x=>x.setAttribute('aria-pressed',x===t));return true;}
   if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
   if(t.id==='import-rot')return importSheet(),true;
