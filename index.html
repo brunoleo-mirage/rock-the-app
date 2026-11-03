@@ -1268,7 +1268,7 @@ function conflictSheet(sh,cf){
   <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.133';
+const APP_VER='1.0.134';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1464,7 +1464,7 @@ function shareRotSheet(){
   sheetHtml('Compartilhar roteiro','<div class="leads" role="group" aria-label="Tipo"><button class="chip-btn" data-shmode="full" aria-pressed="'+!post+'">Roteiro completo</button><button class="chip-btn" data-shmode="post" aria-pressed="'+post+'">Para postar</button></div>'+
    (post?'<p class="note">Uma imagem no formato de story, de um só dia. Escolha o dia:</p><div class="leads" role="group" aria-label="Dia">'+dias.map(([D,i])=>`<button class="chip-btn" data-shday="${i}" aria-pressed="${i===SH.day}">${D.short} ${D.n}</button>`).join('')+'</div>'+(S.maybe.size?`<div class="leads"><button class="chip-btn smallbtn" id="sh-maybe" aria-pressed="${SH.maybe}">Incluir <span class="maybetag">Talvez</span></button></div>`:''):'<p class="note">Uma imagem por dia, todas com o QR: qualquer uma importa o roteiro inteiro.</p>')+
    '<div class="mods" id="mods" role="group" aria-label="Modelos"></div><p class="note" id="sh-count"></p><div class="shbtns">'+
-   (post?'<button class="btnp" id="sh-story">Postar no story</button><p class="note">O link do roteiro é copiado. No story, toque em Adesivos, depois em Link e cole.</p><button class="btns" id="sh-img">Compartilhar</button>':'<button class="btnp" id="sh-img">Compartilhar</button>')+'<button class="btns" id="dl-img">Baixar</button>'+
+   '<button class="btnp" id="sh-img">Compartilhar</button><button class="btns" id="dl-img">Baixar</button>'+
    (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
    '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
    '</div>');
@@ -1577,7 +1577,7 @@ function imgPageSpecs(spec){
   if(spec.mode==='post'){
     const its=dayItems(spec.day,spec.maybe!==false); if(!its.length)return out;
     const n=its.length,pages=Math.ceil(n/16),per=Math.ceil(n/pages);
-    for(let p=0;p<pages;p++){const ch=its.slice(p*per,(p+1)*per);const a=spec.story?5:6,bb=spec.story?9:10;out.push({mode:'post',D:DAYS[spec.day],items:ch,cont:p>0,tier:ch.length<=a?'A':ch.length<=bb?'B':'C',link:rotLink(),story:!!spec.story});}
+    for(let p=0;p<pages;p++){const ch=its.slice(p*per,(p+1)*per);out.push({mode:'post',D:DAYS[spec.day],items:ch,cont:p>0,tier:ch.length<=6?'A':ch.length<=10?'B':'C',link:rotLink()});}
     return out;
   }
   DAYS.forEach((D,d)=>{const its=dayItems(d);if(!its.length)return;const n=its.length,pages=Math.ceil(n/6),per=Math.ceil(n/pages);
@@ -1614,7 +1614,7 @@ async function imgPageBlob(th,pg){
   const colorsOf=sh=>{const st=stageById[sh.stage];return {st,fill:(cs.getPropertyValue(st.c)||'#EB4B94').trim()||'#EB4B94',nmc:(cs.getPropertyValue(st.c.replace('--st','--nm'))||'#92FE71').trim()||'#92FE71',tx:LT.has(st.c)?CRM:INK,mb:S.maybe.has(sh.id)&&!S.sel.has(sh.id)};};
   const talvez=(x,cy,fs,bh)=>{c.font='700 '+fs+'px '+FF;const tw=c.measureText('TALVEZ').width;rr(x,cy-bh/2,tw+bh*.75,bh,bh/2);c.fillStyle='rgba(254,250,217,.9)';c.fill();c.lineWidth=3.5;c.strokeStyle=INK;c.setLineDash([8,6]);c.stroke();c.setLineDash([]);c.fillStyle=INK;c.fillText('TALVEZ',x+bh*.375,cy+fs*.33);return tw+bh*.75;};
   const fitName=(nm,maxw,fs,min)=>{c.font='700 '+fs+'px '+FF;while(c.measureText(nm).width>maxw&&fs>min){fs-=2;c.font='700 '+fs+'px '+FF;}return fs;};
-  const avail=(H-FOOT-18-(pg.story?96:0))-y;
+  const avail=(H-FOOT-18)-y;
   if(pg.tier==='A'){
     const step=post?Math.min(172,Math.floor(avail/n)):172,chh=post?step-38:134;
     pg.items.forEach(sh=>{const k=colorsOf(sh),mb=k.mb;
@@ -1650,7 +1650,6 @@ async function imgPageBlob(th,pg){
       const nm=sh.name.toUpperCase(),fs=fitName(nm,colw-44,46,28);outl(nm,x+22,yy+chh-20,k.nmc,Math.max(4,Math.round(fs/7)));
     });
   }
-  if(pg.story){const sw=600,sx=(W-sw)/2,sy=H-FOOT-18-80;rr(sx,sy,sw,72,36);c.fillStyle='rgba(254,250,217,.28)';c.fill();c.lineWidth=4;c.strokeStyle=LN;c.setLineDash([14,10]);c.stroke();c.setLineDash([]);c.fillStyle=T.txt;c.font='700 34px '+FF;c.textAlign='center';c.fillText('ADICIONE AQUI O ADESIVO DE LINK',W/2,sy+47);c.textAlign='left';}
   /* rodapé com QR */
   const fy=H-FOOT+20,fb=FOOT-92;box(PAD,fy,W-2*PAD-8,fb,36,T.foot,false,8);
   try{const q=QR.make(pg.link,0);if(q){const m=Math.floor(220/(q.size+2));const qs=m*(q.size+2),qx=PAD+34,qy=fy+(fb-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
@@ -1665,8 +1664,8 @@ async function imgRotBlobs(th,spec){const pgs=imgPageSpecs(spec||{mode:'full'}),
 async function imgRotBlob(th){const p=imgPageSpecs({mode:'full'});return p.length?imgPageBlob(th,p[0]):null;}
 const SH={mode:'full',day:0,maybe:true};
 function shFirstDay(){const d=DAYS.findIndex((D,i)=>dayItems(i).length);return d<0?0:d;}
-async function imgShare(dl,th,story){
-  try{const spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe,story:!!story}:{mode:'full'},pgs=imgPageSpecs(spec),bl=await imgRotBlobs(th,spec);
+async function imgShare(dl,th){
+  try{const spec=SH.mode==='post'?{mode:'post',day:SH.day,maybe:SH.maybe}:{mode:'full'},pgs=imgPageSpecs(spec),bl=await imgRotBlobs(th,spec);
     const files=bl.map((b,i)=>new File([b],SH.mode==='post'?'roteiro-dia-'+pgs[i].D.n.replace('/','-')+(pgs.length>1?'-'+(i+1):'')+'.png':'meu-roteiro-'+pgs[i].D.n.replace('/','-')+(pgs.filter(x=>x.D===pgs[i].D).length>1?'-'+(pgs.slice(0,i).filter(x=>x.D===pgs[i].D).length+1):'')+'.png',{type:'image/png'}));
     if(!dl&&navigator.canShare&&navigator.canShare({files}))return navigator.share({files,title:'Meu roteiro · Rock the Mountain 2026'}).catch(()=>{});
     for(let i=0;i<files.length;i++){const a=document.createElement('a');a.href=URL.createObjectURL(files[i]);a.download=files[i].name;document.body.appendChild(a);a.click();const u=a.href;setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},4000);await new Promise(r=>setTimeout(r,500));}
@@ -1736,7 +1735,6 @@ function shareClick(t){
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
-  if(t.id==='sh-story'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}try{navigator.clipboard.writeText(rotLink()).catch(()=>{});}catch(e){}return imgShare(false,MOD.th,true),true;}
   if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
   if(t.dataset.shmode){SH.mode=t.dataset.shmode;if(SH.mode==='post'&&!dayItems(SH.day).length)SH.day=shFirstDay();return shareRotSheet(),true;}
   if(t.dataset.shday!==undefined){SH.day=+t.dataset.shday;return shareRotSheet(),true;}
