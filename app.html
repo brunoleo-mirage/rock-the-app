@@ -346,6 +346,8 @@ h2.sec{font-size:36px;font-weight:700}
 .irl{color:#6034BD}
 :root[data-theme="dark"] .irl{color:#884AFE}
 .plabel .irl{color:#6034BD}
+.plabel{max-width:none!important;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.plabel .nm{white-space:nowrap}
 
 /* escala para celular (v2): um pouco menor; cartão do tempo compacto para caber numa tela */
 body{font-size:17.5px}
@@ -533,6 +535,23 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .hrow h4{margin:0!important}
 .bell{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:1.5px 1.5px 0 var(--ink)}
 .bell[aria-pressed="true"]{background:#FFD653;color:#1A1420}
+.ic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#sheet .shbtns .btns,#sheet .shbtns .btnp{display:flex;align-items:center;justify-content:center;gap:10px}
+.rbar .btnp,.rbar .btns{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+#sheet .shbtns .ic{width:22px;height:22px;margin-top:-3px}
+.rbar .ic{margin-top:-2px}
+.go .ic{width:15px;height:15px;margin:-2px 5px 0 0;stroke-width:2.6;vertical-align:middle}
+.go.unmark{display:inline-flex;align-items:center;justify-content:center}
+#install-btn{display:inline-flex;align-items:center;gap:6px}
+#install-btn .ic{width:18px;height:18px}
+.fsbar .btns,.fsbar .btnp{display:inline-flex;align-items:center;gap:6px}
+.fsbar .ic{width:17px;height:17px}
+.fsbar .btns,.fsbar .btnp{white-space:nowrap;padding:0 10px;font-size:16px}
+.acts2 .btns,.acts2 .btnp{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.acts2 .ic{width:18px;height:18px;margin-top:-2px}
+.irl .ic{width:13px;height:13px;margin:-2px 4px 0 0;stroke-width:2.6;vertical-align:middle}
+.irl[data-meet] .ic{width:15px;height:15px;margin:-2px 0 0;stroke-width:2.4}
+.rbar .ic{width:17px;height:17px}
 .leads{display:flex;flex-wrap:nowrap;gap:6px;margin:4px 0 10px}
 .leads .chip-btn.smallbtn{flex:none!important;min-height:36px;padding:0 12px;font-size:17px;display:inline-flex;align-items:center;gap:6px}
 .smallbtn .maybetag{margin:0!important;transform:none!important;line-height:14px;font-size:12px;padding:1px 8px;display:inline-block;align-self:center}
@@ -974,7 +993,7 @@ function card(sh,opts={}){
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
     <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
-      ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true">Desmarcar</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true">Desmarcar</button>`)
+      ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true">${IC.x}Desmarcar</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true">${IC.x}Desmarcar</button>`)
       : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
   </article>`;
 }
@@ -1056,7 +1075,7 @@ function rRot(){
     });
   });
   if(planIds().length){
-    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">Compartilhar</button><button class="btns" id="import-rot">Importar de um amigo</button><button class="btns" id="clear">Limpar tudo</button></div>`+rotDayBtns()+html;
+    html=livePanel()+`<div class="row rbar"><button class="btnp" id="share-rot">${IC.share}Compartilhar</button><button class="btns" id="import-rot">${IC.inbox}Importar de um amigo</button><button class="btns" id="clear">${IC.trash}Limpar tudo</button></div>`+rotDayBtns()+html;
   } else {
     html+='<div class="row rbar"><button class="btns" id="import-rot">Importar de um amigo</button></div>';
   }
@@ -1070,13 +1089,13 @@ function legendHtml(qq){
 function rMap(){
   const _cc=main.querySelector('.chips[aria-label="Categoria"]'), _cs=_cc?_cc.scrollLeft:0; /* mantém a posição da fila de categorias */
   const cats='<div class="chips" role="group" aria-label="Categoria">'+CATS.map(([k,n])=>`<button class="chip-btn" data-cat="${k}" aria-pressed="${S.cat===k}">${n}</button>`).join('')+'</div>';
-  const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${!inCat(p)?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ir para a programação: ${esc(stageById[sid].n)}">ir</a>`:''}${p.n===8?'':` <a class="irl" role="button" tabindex="0" data-fav="${p.n}" aria-label="Guardar nos favoritos">${S.fav.has(p.n)?'♥':'♡'}</a> <a class="irl" role="button" tabindex="0" data-meet="${p.n}">compartilhar</a>`}</span>`}).join('');
+  const labels=PINS.map(p=>{const sid=PIN_STAGE[p.n];return `<span class="plabel ${!inCat(p)?'dim':''} ${S.pin===p.n?'show':''}" data-pin="${p.n}"><span class="nm">${esc(p.n===8?'Você está aqui':p.name)}</span>${sid?` <a class="irl" role="link" tabindex="0" data-stageprog="${sid}" aria-label="Ver a programação: ${esc(stageById[sid].n)}">${IC.cal}Ver</a>`:''}${p.n===8?'':` <a class="irl" role="button" tabindex="0" data-fav="${p.n}" aria-label="Guardar nos favoritos">${S.fav.has(p.n)?'♥':'♡'}</a> <a class="irl" role="button" tabindex="0" data-meet="${p.n}" aria-label="Compartilhar este lugar" title="Compartilhar">${IC.share}</a>`}</span>`}).join('');
   const pins=PINS.map(p=>`<button class="pin ${p.cat} ${!inCat(p)?'dim':''} ${S.pin===p.n?'act':''}" style="left:${(p.x/MAPW*100).toFixed(2)}%;top:${(p.y/MAPH*100).toFixed(2)}%" data-pin="${p.n}" aria-label="Ponto ${p.n}: ${esc(p.name)}">${p.n}</button>`).join('');
   const lg=legendHtml();
   main.innerHTML=`${cats}
   <div id="mapframe"><div id="mapwrap"><div id="mapbox" class="${S.fsNames?'names ':''}${S.orig?'orig':''}${S.showPins?'':' nopins'}" style="width:${S.zoom*100}%"><img src="map.jpg" alt="Mapa do parque com pontos numerados" width="1848" height="850">${labels}${PINS.map(p=>`<span class="pname ${p.cat}" data-pin="${p.n}">${esc(p.n===8?'Você está aqui':p.name)}</span>`).join('')}${pins}</div></div>
   <div class="mapctl"><button class="btns favbtn" type="button" aria-pressed="${S.cat==='fav'}">♥ Favoritos</button><button class="btns fsbtn" id="map-fs"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Tela cheia</button></div></div>
-  <div class="fsbar"><div class="fsl"><button class="btns favbtn" type="button" aria-pressed="${S.cat==='fav'}">♥ Favoritos</button><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">Nomes</button><button class="btns" id="map-list">Lista</button></div><button class="btnp" id="map-fs-x">Fechar</button></div>
+  <div class="fsbar"><div class="fsl"><button class="btns favbtn" type="button" aria-pressed="${S.cat==='fav'}">♥ Favoritos</button><button class="btns" id="map-names" aria-pressed="${!!S.fsNames}">${IC.tag}Nomes</button><button class="btns" id="map-list">${IC.list}Lista</button></div><button class="btnp" id="map-fs-x">${IC.x}Fechar</button></div>
   <div id="fslist" class="fslist" role="dialog" aria-label="Legenda do mapa"><input class="search" id="fsq" type="search" placeholder="Buscar lugar" aria-label="Buscar lugar"><div class="legend" id="fslegend">${legendHtml('')}</div></div>
   <p class="note" id="maphint">${S.showPins?'Toque num número para ver o nome.':'Toque no mapa para mostrar os números.'} Dois dedos dão zoom.</p><input class="search" id="mq" type="search" placeholder="Buscar lugar (banheiro, bebedouro, palco...)" value="${esc(S.mq||'')}" aria-label="Buscar lugar no mapa"><div class="legend" id="legend">${lg}</div>`;
   const _nc=main.querySelector('.chips[aria-label="Categoria"]'); if(_nc)_nc.scrollLeft=_cs;
@@ -1270,10 +1289,10 @@ function openSheet(){$('#scrim').classList.add('open');$('#sheet').classList.add
 function closeSheet(){ if(!sheetOpen)return; hideSheet(); if(location.hash.endsWith('-info'))history.back(); }
 function conflictSheet(sh,cf){
   $('#sheet').innerHTML=`<h2>Esse horário já está ocupado</h2><p><b>${esc(sh.name)}</b> (${esc(stageById[sh.stage].n)}, ${range(sh)}) bate com:</p><ul>${cf.map(o=>`<li><b>${esc(o.name)}</b> (${esc(stageById[o.stage].n)}, ${range(o)})</li>`).join('')}</ul>
-  <div class="acts2"><button class="btnp" data-swap="${sh.id}">Trocar pelo novo</button><button class="btns" data-both="${sh.id}">Marcar mesmo assim</button><button class="btns" data-close>Cancelar</button></div>`;
+  <div class="acts2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button><button class="btns" data-close>${IC.x}Cancelar</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.135';
+const APP_VER='1.0.136';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1285,10 +1304,10 @@ function aboutSheet(){
   <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
   <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
   <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
-  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar como texto com link. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
+  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar um link curto, que abre o app já com o seu roteiro. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
   <li><b>Lembretes.</b> Em Meu roteiro, "Avisar antes" liga um aviso antes de cada show marcado, e você escolhe quanto tempo antes (5, 10, 15, 30 ou 60 min). ${pushOk()?'Ele chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial. Para isso, o servidor guarda apenas o endereço de notificação do seu aparelho e os horários dos shows marcados, e apaga tudo se você desligar os lembretes.':'Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.'}</li>
   <li><b>Horários podem mudar.</b> A programação pode ser alterada pela organização do festival. Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li>
-  <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam só no seu aparelho. O app conta visitas de forma anônima, sem cookies e sem pedir localização.</li>
+  <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam no seu aparelho. Só vão para o nosso servidor, e apenas se você usar, o código do roteiro (ao compartilhar um link, guardado por 20 dias) e os horários dos lembretes. Nada de nome, e-mail ou localização. O app conta visitas de forma anônima, sem cookies.</li>
   <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
   </ul><p class="ver">Versão ${APP_VER}</p>`;
   openSheet();
@@ -1326,7 +1345,7 @@ const remindOn=()=>{try{return localStorage.getItem('rta_remind')==='1'&&'Notifi
 const LEADS=[5,10,15,30,60];
 const leadMin=()=>{try{const v=+localStorage.getItem('rta_lead');return LEADS.includes(v)?v:15;}catch(e){return 15;}};
 function remindSheet(){
-  $('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Receba um aviso <b id="lead-n">'+leadMin()+'</b> minutos antes da próxima atração</p><div class="leads" role="group" aria-label="Minutos antes">'+LEADS.map(n=>`<button class="chip-btn" data-lead="${n}" aria-pressed="${n===leadMin()}">${n} min</button>`).join('')+'</div><div class="acts2"><button class="btns" id="rem-off">Desligar lembretes</button><button class="btnp" data-close>Ok</button></div>';
+  $('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Lembretes</h2><p>Receba um aviso <b id="lead-n">'+leadMin()+'</b> minutos antes da próxima atração</p><div class="leads" role="group" aria-label="Minutos antes">'+LEADS.map(n=>`<button class="chip-btn" data-lead="${n}" aria-pressed="${n===leadMin()}">${n} min</button>`).join('')+'</div><div class="acts2"><button class="btns" id="rem-off">'+IC.bellx+'Desligar lembretes</button><button class="btnp" data-close>Ok</button></div>';
   openSheet();
 }
 async function toggleRemind(){
@@ -1422,8 +1441,8 @@ document.addEventListener('click',e=>{
   if(t.id==='remind')return toggleRemind();
   if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}pushOff();closeSheet();return render();}
   if(t.dataset.lead){try{localStorage.setItem('rta_lead',t.dataset.lead);}catch(e){}_rn.clear();document.querySelectorAll('[data-lead]').forEach(x=>x.setAttribute('aria-pressed',x===t));const n=$('#lead-n');if(n)n.textContent=t.dataset.lead;pushSync();return true;}
-  if(t.id==='sh-copy')return copyTo(rotText(),t,'Copiado'),true;
-  if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value,p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}if(err)err.hidden=false;return;}
+  if(t.id==='sh-copy'){const c=curShort();if(c)copyTo(rotText(c),t,'Copiado');else shortRotUrl().then(u=>copyTo(rotText(u),t,'Copiado'));return true;}
+  if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value||'',p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}const ms=v.match(/[?&]s=([0-9a-z]{4,12})/i);if(ms){loadShort(ms[1].toLowerCase()).then(q=>{if(q){if(err)err.hidden=true;importPreview(q);}else if(err)err.hidden=false;}).catch(()=>{if(err)err.hidden=false;});return true;}if(err)err.hidden=false;return;}
   if(t.id==='copy')return copyText();
   if(t.id==='clear'){S.sel.clear();S.maybe.clear();save();return render();}
 });
@@ -1436,8 +1455,20 @@ const enc=encodeURIComponent;
 const sheetHtml=(title,body)=>{$('#sheet').innerHTML='<button class="xbtn" data-close aria-label="Fechar">×</button><h2>'+title+'</h2>'+body;openSheet();};
 const rotCode=()=>[...S.sel].filter(i=>byId[i]).concat([...S.maybe].filter(i=>byId[i]).map(i=>'m'+i)).join('.');
 const rotLink=()=>APP_URL+'/?r='+rotCode();
-function rotText(){
-  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\nEsse roteiro foi feito no *Rock the App*. Clique e faça também sua programação para curtir o melhor do Rock The Mountain:\n'+APP_URL+'\n\nPara colocar este roteiro no seu app, é só tocar aqui:\n'+rotLink();
+let _short={code:'',url:''};
+const curShort=()=>_short.url&&_short.code===rotCode()?_short.url:'';
+async function shortRotUrl(){
+  const code=rotCode(),c0=curShort(); if(c0)return c0;
+  if(!PUSH_URL||!code)return rotLink();
+  try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),4500);
+    const r=await fetch(PUSH_URL+'/r',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code}),signal:ac.signal});clearTimeout(to);
+    const j=await r.json();if(j&&j.id){_short={code,url:APP_URL+'/?s='+j.id};return _short.url;}}catch(e){}
+  return rotLink();
+}
+const linkMsg=u=>'Esse roteiro foi feito no *Rock the App*. Toque para colocar no seu app:\n'+u;
+async function loadShort(id){const r=await fetch(PUSH_URL+'/r/'+id);if(!r.ok)return null;const j=await r.json();return parseCode('?r='+j.code);}
+function rotText(l){
+  return '*Meu roteiro · Rock the Mountain 2026*\n\n'+[0,1,2].map(dayText).filter(Boolean).join('\n\n')+'\n\n'+linkMsg(l||curShort()||rotLink());
 }
 function parseCode(txt){
   const s=String(txt||''), m=s.match(/[?&]r=([0-9m.\-]+)/)||s.match(/^\s*([0-9m][0-9m.\-]{2,})\s*$/);
@@ -1451,6 +1482,25 @@ function copyTo(text,btn,done){
   const fb=()=>{sheetHtml('Copie manualmente','<p class="note">Seu aparelho não deixou copiar sozinho. Selecione o texto abaixo.</p><textarea id="ta" readonly>'+esc(text)+'</textarea>');setTimeout(()=>{const a=$('#ta');if(a){a.focus();a.select();}},50);};
   try{navigator.clipboard.writeText(text).then(ok,fb);}catch(e){fb();}
 }
+const IC={
+ share:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.7l7.4-4.2M8.3 13.3l7.4 4.2"/></svg>',
+ dl:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></svg>',
+ link:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+ copy:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg>',
+ inbox:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13l2.4-7a2 2 0 0 1 1.9-1.4h9.4a2 2 0 0 1 1.9 1.4L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></svg>',
+ x:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+ phone:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/><path d="M12 8v6M9.3 11.5L12 14.2l2.7-2.7"/></svg>',
+ tag:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.6 1.6 0 0 1 0 2.3l-6.4 6.4a1.6 1.6 0 0 1-2.3 0z"/><circle cx="8.3" cy="8.3" r="1.4"/></svg>',
+ list:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.7" cy="6" r="1"/><circle cx="4.7" cy="12" r="1"/><circle cx="4.7" cy="18" r="1"/></svg>',
+ cal:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.8"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+ go:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5"/></svg>',
+ swap:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14M14.5 4.5L18 8l-3.5 3.5M20 16H6M9.5 12.5L6 16l3.5 3.5"/></svg>',
+ warn:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.4v.2"/></svg>',
+ clip:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2.5"/><path d="M9 4.5V3.6A1.1 1.1 0 0 1 10.1 2.5h3.8A1.1 1.1 0 0 1 15 3.6v.9M8.5 11h7M8.5 15h4.5"/></svg>',
+ photo:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.8"/><circle cx="9" cy="10" r="1.8"/><path d="M3.8 17.5l5-4.6 3.6 3.2 2.6-2.4 5.6 4.4"/></svg>',
+ bellx:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 16.6V11a5.8 5.8 0 0 1 11.6 0v5.6l1.7 1.9H4.5z"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0M4 4.5l16 15"/></svg>',
+ trash:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>'
+};
 const A_ATTR='class="btns" target="_blank" rel="noopener"';
 function shareAppSheet(){
   const u=APP_URL,t=SHARE_TXT+' '+u;
@@ -1470,11 +1520,12 @@ function shareRotSheet(){
   sheetHtml('Compartilhar roteiro','<p class="note">Uma imagem por dia, pronta para postar, todas com o QR: qualquer uma importa o roteiro inteiro.</p><div class="leads" role="group" aria-label="Dia"><button class="chip-btn" data-shday="all" aria-pressed="'+(SH.day==='all')+'">Todos</button>'+dias.map(([D,i])=>`<button class="chip-btn" data-shday="${i}" aria-pressed="${i===SH.day}">${D.short} ${D.n}</button>`).join('')+'</div>'+
    (S.maybe.size?`<div class="leads"><button class="chip-btn smallbtn" id="sh-maybe" aria-pressed="${SH.maybe}">Incluir <span class="maybetag">Talvez</span></button></div>`:'')+
    '<div class="mods" id="mods" role="group" aria-label="Modelos"></div><p class="note" id="sh-count"></p><div class="shbtns">'+
-   '<button class="btnp" id="sh-img">Compartilhar</button><button class="btns" id="dl-img">Baixar</button>'+
-   (navigator.share?'<button class="btns" id="sh-rot-native">Compartilhar como texto</button>':`<a ${A_ATTR} href="https://wa.me/?text=${enc(rotText())}">Compartilhar como texto</a>`)+
-   '<button class="btns" id="sh-copy">Copiar texto do roteiro</button>'+
+   `<button class="btnp" id="sh-img">${IC.share}Compartilhar</button><button class="btns" id="dl-img">${IC.dl}Baixar</button>`+
+   (navigator.share?`<button class="btns" id="sh-rot-native">${IC.link}Compartilhar link</button>`:`<a ${A_ATTR} id="sh-wa" href="https://wa.me/?text=${enc(linkMsg(curShort()||rotLink()))}">${IC.link}Compartilhar link</a>`)+
+   `<button class="btns" id="sh-copy">${IC.copy}Copiar texto do roteiro</button>`+
    '</div>');
   shPreviews();
+  shortRotUrl().then(u=>{const a=$('#sh-wa');if(a)a.href='https://wa.me/?text='+enc(linkMsg(u));});
 }
 let _shTok=0;
 async function shPreviews(){
@@ -1486,7 +1537,7 @@ async function shPreviews(){
   if(tok===_shTok&&$('#mods'))$('#mods').innerHTML=html;
 }
 function importSheet(){
-  sheetHtml('Importar roteiro','<p class="note">Cole aqui a mensagem que seu amigo enviou (ela termina com um link do Rock the App), ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
+  sheetHtml('Importar roteiro','<p class="note">Cole aqui a mensagem que seu amigo enviou (ela termina com um link do Rock the App), ou escolha a imagem do roteiro dele.</p><textarea id="imp-txt" rows="2" placeholder="Cole aqui a mensagem ou o link" style="width:100%;height:76px;min-height:0"></textarea><div class="acts2"><button class="btnp" id="imp-paste">'+IC.clip+'Importar da mensagem</button></div><input type="file" id="imp-file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1"><p class="note" id="imp-err" role="alert" hidden>Não encontrei um roteiro do Rock the App aí.</p><div class="acts2"><button class="btns" id="imp-pick">'+IC.photo+'Escolher imagem</button><button class="btns" data-close>Cancelar</button></div>');
 }
 document.addEventListener('change',e=>{if(e.target.id==='imp-file')importImg(e.target.files&&e.target.files[0]);});
 let IMP=null;
@@ -1740,7 +1791,7 @@ function shareClick(t){
   if(t.dataset.shday!==undefined){SH.day=t.dataset.shday==='all'?'all':+t.dataset.shday;return shareRotSheet(),true;}
   if(t.id==='sh-maybe'){SH.maybe=!SH.maybe;return shareRotSheet(),true;}
   if(t.dataset.mod){MOD.th=t.dataset.mod;document.querySelectorAll('.mod').forEach(x=>x.setAttribute('aria-pressed',x===t));return true;}
-  if(t.id==='sh-rot-native')return navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:rotText()}).catch(()=>{}),true;
+  if(t.id==='sh-rot-native'){const go=u=>navigator.share({title:'Meu roteiro · Rock the Mountain 2026',text:linkMsg(u)}).catch(()=>{}),c=curShort();if(c)go(c);else shortRotUrl().then(go);return true;}
   if(t.id==='import-rot')return importSheet(),true;
   if(t.id==='imp-pick'){const f=$('#imp-file');if(f)f.click();return true;}
   if(t.id==='imp-add')return applyImport(false),true;
@@ -1748,6 +1799,7 @@ function shareClick(t){
   return false;
 }
 (function(){try{const pn=+new URLSearchParams(location.search).get('pin');if(pn&&PINS.some(p=>p.n===pn)){history.replaceState(null,'',location.pathname);setTimeout(()=>{S.pin=null;if(S.tab!=='map')setTab('map');setTimeout(()=>openPin(pn,true),60);},600);}}catch(e){}})();
+(function(){try{const q=new URLSearchParams(location.search).get('s');if(!q||!/^[0-9a-z]{4,12}$/i.test(q))return;history.replaceState(null,'',location.pathname+location.hash);setTimeout(()=>{loadShort(q.toLowerCase()).then(p=>{if(p)importPreview(p);else sheetHtml('Roteiro não encontrado','<p>Esse link expirou ou não existe mais. Peça para quem enviou compartilhar de novo.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');}).catch(()=>sheetHtml('Não consegui abrir','<p>Confira se você está com internet e toque no link de novo.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>'));},500);}catch(e){}})();
 (function(){try{const q=new URLSearchParams(location.search).get('r');if(!q)return;const p=parseCode('?r='+q);history.replaceState(null,'',location.pathname+location.hash);if(p)setTimeout(()=>importPreview(p),500);}catch(e){}})();
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(S.mapFs)exitMapFs();else closeSheet();}});
@@ -1758,7 +1810,7 @@ function fixDay(){if(dayOver(S.day)){const i=DAYS.findIndex((x,d)=>!dayOver(d));
 purgePast();fixDay();
 try{S.fav=new Set(JSON.parse(localStorage.getItem('rta_fav')||'[]').filter(n=>PINS.some(p=>p.n===n)));}catch(e){S.fav=new Set();}
 try{const c=localStorage.getItem('rta_cat');if(c&&CATS.some(k=>k[0]===c))S.cat=c;}catch(e){}
-paintTheme(); paintInstall(); render(); loadWx(); setInterval(loadWx,600000);
+paintTheme(); paintInstall(); (function(){const b=$('#install-btn');if(b)b.innerHTML=IC.phone+'Instalar app';})(); render(); loadWx(); setInterval(loadWx,600000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!S.wx||Date.now()-S.wx.t>300000))loadWx();});
 try{if('serviceWorker' in navigator&&location.protocol==='https:'&&!/claude/.test(location.host))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 </script>
