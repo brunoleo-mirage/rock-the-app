@@ -1305,7 +1305,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.137';
+const APP_VER='1.0.138';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1457,7 +1457,8 @@ document.addEventListener('click',e=>{
   if(t.id==='sh-copy'){const c=curShort();if(c)copyTo(rotText(c),t,'Copiado');else shortRotUrl().then(u=>copyTo(rotText(u),t,'Copiado'));return true;}
   if(t.id==='imp-paste'){const v=($('#imp-txt')||{}).value||'',p=parseCode(v),err=$('#imp-err');if(p){if(err)err.hidden=true;return importPreview(p);}const ms=v.match(/[?&]s=([0-9a-z]{4,12})/i);if(ms){loadShort(ms[1].toLowerCase()).then(q=>{if(q){if(err)err.hidden=true;importPreview(q);}else if(err)err.hidden=false;}).catch(()=>{if(err)err.hidden=false;});return true;}if(err)err.hidden=false;return;}
   if(t.id==='copy')return copyText();
-  if(t.id==='clear'){S.sel.clear();S.maybe.clear();save();return render();}
+  if(t.id==='clear'){const n=S.sel.size+S.maybe.size;$('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Cancelar">×</button><h2>Limpar o roteiro?</h2><p>Essa ação não pode ser desfeita.</p><div class="acts2 row2"><button class="btnp" id="clear-ok">${IC.trash}Limpar tudo</button><button class="btns" data-close>Cancelar</button></div>`;openSheet();return;}
+  if(t.id==='clear-ok'){S.sel.clear();S.maybe.clear();save();closeSheet();return render();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='fsq'){const l=$('#fslegend');if(l)l.innerHTML=legendHtml(e.target.value);return;}if(e.target.id==='mq'){S.mq=e.target.value;const l=$('#legend');if(l)l.innerHTML=legendHtml();return;}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;rProg();const n=$('#q');n.focus();n.setSelectionRange(pos,pos);}});
 
