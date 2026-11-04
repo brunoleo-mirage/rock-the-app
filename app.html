@@ -55,7 +55,7 @@ header h1{font-family:var(--f-display);font-size:22px;line-height:1.1;margin:0;f
 header p{margin:0;font-size:13px;color:var(--ink2)}
 #about-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);font-weight:800}
 main{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px 24px;-webkit-overflow-scrolling:touch}
-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(64px,auto);background:var(--paper);border-top:2px solid var(--ink);padding-bottom:env(safe-area-inset-bottom)}
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) minmax(54px,auto);background:var(--paper);border-top:2px solid var(--ink);padding-bottom:env(safe-area-inset-bottom)}
 nav button{border:0;background:none;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--ink2);position:relative;min-height:56px}
 nav button svg{width:24px;height:24px}
 nav button[aria-selected="true"]{color:var(--ink);background:var(--butter)}
@@ -684,6 +684,8 @@ html,body{touch-action:pan-x pan-y}
 .hlp-t{display:flex;align-items:center;gap:10px;margin:6px 0 8px}
 .hlp-back{border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:999px;padding:2px 14px;font-family:inherit;font-weight:700;font-size:18px;min-height:34px}
 .hlp-body ul{margin:0;padding-left:20px}.hlp-body li{margin:8px 0;line-height:1.25}
+.hback{display:inline-flex;align-items:center;gap:2px;margin:-8px 0 6px -4px;padding:0 10px 0 4px;min-height:30px;border:0;background:none;color:var(--lav);font-family:inherit;font-weight:700;font-size:18px}
+.hback svg{width:18px;height:18px}
 .mn-op{background:var(--paper);border:2px solid var(--ink);border-radius:16px;margin:0 0 8px;box-shadow:2px 2px 0 var(--ink)}
 .mn-op summary{list-style:none;cursor:pointer;padding:10px 44px 10px 14px;display:flex;flex-direction:column;gap:2px;position:relative}
 .mn-ch{position:absolute;right:14px;top:50%;width:22px;height:22px;margin-top:-11px;color:var(--lav);transition:transform .2s}
@@ -717,6 +719,7 @@ html,body{touch-action:pan-x pan-y}
     <button role="tab" data-tab="rot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></svg>Meu roteiro<span class="badge" id="cnt" hidden>0</span></button>
     <button role="tab" data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mapa</button>
     <button role="tab" data-tab="wx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17a4.5 4.5 0 1 1 1.2-8.8A5.5 5.5 0 0 1 18.5 10a3.5 3.5 0 0 1-.5 7z"/><path d="M9 20l1-2M13 20l1-2"/></svg>Tempo</button>
+    <button role="tab" data-tab="food"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v7M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 4-3.5 7.5H17"/></svg>Alimentação</button>
     <button id="share-app" aria-label="Compartilhar o app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/></svg>Compartilhar</button>
   </nav>
 </div>
@@ -1052,6 +1055,7 @@ function render(){
   $('#app').classList.toggle('is-home',S.tab==='home');
   const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);
   ({home:rHome,prog:rProg,rot:rRot,map:rMap,wx:rWx,food:rFood})[S.tab]();
+  if(S.tab!=='home')main.insertAdjacentHTML('afterbegin','<button class="hback" data-tab="home" aria-label="Voltar ao menu inicial"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Início</button>');
 }
 function dayRain(i){ return ''; }
 const HI={
@@ -1408,7 +1412,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.140';
+const APP_VER='1.0.141';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
