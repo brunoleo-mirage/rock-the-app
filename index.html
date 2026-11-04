@@ -683,6 +683,8 @@ html,body{touch-action:pan-x pan-y}
 .achips{flex-wrap:nowrap;overflow:visible;gap:6px;margin:0 0 10px}
 .achips .chip-btn{padding:4px 9px;min-height:34px;font-size:14px;flex:1 1 auto;min-width:0;text-align:center}
 .hlp-lead{margin:2px 0 10px;color:var(--ink2)}
+.hlp-q{margin:4px 0 10px}.hlp-res{display:grid;gap:10px}.hlp-r{flex-direction:row;align-items:center;min-height:0;gap:12px;width:100%}.hlp-rt{display:flex;flex-direction:column;gap:4px;min-width:0}.hlp-rt small{font-size:17px;font-weight:600;color:var(--ink2);line-height:1.15}.hlp-rt mark{background:rgba(255,214,83,.8);color:inherit;border-radius:3px;padding:0 1px}.hlp-none{color:var(--ink2);padding:6px 2px;line-height:1.2}
+
 .hlp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hlp-b{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:16px;box-shadow:2px 2px 0 var(--ink);padding:10px 12px;font-family:inherit;font-size:22px;font-weight:700;line-height:1.05;min-height:84px}
 .hlp-b.wide{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;gap:12px}
@@ -1456,7 +1458,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.150';
+const APP_VER='1.0.151';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
@@ -1471,6 +1473,24 @@ const HELP={
  mirage:['Sobre a Mirage AI','mirage',()=>`<p>A <a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener"><b>Mirage</b></a> é a frente de <b>inteligência artificial</b> da <a href="https://www.instagram.com/officeginger" target="_blank" rel="noopener"><b>Ginger</b> Agency</a>. Unindo <b>criatividade</b> e <b>tecnologia</b> pra criar campanhas e experiências digitais de <b>alto impacto</b>.</p><p>O <b>Rock the App</b> nasceu de uma ideia nossa.<br>É um <b>projeto independente</b>, feito por quem vive o festival e quer deixar a sua experiência no Rock The Mountain ainda mais fácil,<br>do primeiro show ao último.</p><p><b>Curtiu o app?</b> Quer um desses pro seu evento ou pra sua marca? <b>Chama a gente:</b></p><p>Instagram: <a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener"><b>@mirage.ia</b></a></p>`]
 };
 Object.assign(HI,{mirage:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',remind:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',install:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',info:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/>'});
+const HKW={prog:'show artista palco horario line up lineup atracao banda destaque dia sexta sabado domingo busca quero ir talvez choque',rot:'roteiro agenda minha lista choque conflito horario limpar lixeira avisos',map:'mapa banheiro wc toalete agua bebedouro pin ponto favorito localizacao onde fica tela cheia categoria',wx:'clima chuva previsao temperatura calor frio sol nublado tempo meteorologia',food:'comida bebida cardapio restaurante barraca vegetariano vegano preco cerveja lanche fome sede praca alimentacao',share:'compartilhar enviar mandar qr link whatsapp instagram story direct importar amigo imagem postar',remind:'lembrete notificacao push alarme sino aviso alerta',install:'instalar offline sem internet sem sinal tela inicial escuro dark claro tema pwa baixar',info:'locker armario guarda volumes guarda-volumes mochila transfer onibus van estacionamento carro local endereco como chegar maps google ingresso site oficial privacidade dados lgpd carregar celular usb',mirage:'mirage ginger agencia criador contato orcamento instagram empresa'};
+const hnorm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+let _hidx=null;
+function helpIdx(){ if(_hidx)return _hidx; _hidx=Object.keys(HELP).map(k=>{const d=document.createElement('div');d.innerHTML=HELP[k][2]();const txt=d.textContent.replace(/\s+/g,' ').trim();return{k,t:HELP[k][0],txt,n:hnorm(txt),nt:hnorm(HELP[k][0]),kw:hnorm(HKW[k]||'')};}); return _hidx; }
+function helpSearch(q){
+  const terms=hnorm(q).split(/\s+/).filter(Boolean); if(!terms.length)return null;
+  const out=[];
+  helpIdx().forEach(it=>{
+    let sc=0,ok=true;
+    terms.forEach(t=>{const a=it.nt.includes(t),b=it.kw.includes(t),c=it.n.includes(t); if(!(a||b||c))ok=false; sc+=(a?3:0)+(b?2:0)+(c?1:0);});
+    if(!ok)return;
+    let ix=it.n.indexOf(terms[0]), snip='';
+    if(ix>=0){const a=Math.max(0,ix-28),b=Math.min(it.txt.length,ix+terms[0].length+60);snip=(a>0?'…':'')+esc(it.txt.slice(a,ix))+'<mark>'+esc(it.txt.slice(ix,ix+terms[0].length))+'</mark>'+esc(it.txt.slice(ix+terms[0].length,b))+(b<it.txt.length?'…':'');}
+    else snip=esc(it.txt.slice(0,70))+'…';
+    out.push({k:it.k,sc,snip});
+  });
+  return out.sort((x,y)=>y.sc-x.sc);
+}
 function aboutSheet(k){
   const sh=$('#sheet');
   const ic=n=>n==='mirage'?'<img src="mirage-icon.webp" alt="" width="20" height="32">':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HI[n]}</svg>`;
@@ -1478,8 +1498,15 @@ function aboutSheet(k){
     const h=HELP[k];
     sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><button class="hlp-back" data-help="home">‹ Ajuda</button><h2 class="hlp-t"><span class="hlp-i${k==='mirage'?' nobg':''}">${ic(h[1])}</span>${h[0]}</h2><div class="hlp-body">${h[2]()}</div>`;
   }else{
-    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Ajuda</h2><p class="hlp-lead">${S.tab==='home'?'Toque num tema para ver como funciona.':'Toque num tema. Para voltar à tela inicial, toque no logo, no topo.'}</p><div class="hlp-grid">${Object.keys(HELP).map(x=>`<button class="hlp-b" data-help="${x}"><span class="hlp-i${x==='mirage'?' nobg':''}">${ic(HELP[x][1])}</span>${HELP[x][0]}</button>`).join('')}</div><p class="ver">Versão ${APP_VER}</p>`;
+    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Ajuda</h2><input class="search hlp-q" id="hq" type="search" placeholder="Buscar na ajuda (ex.: locker)" aria-label="Buscar na ajuda" autocomplete="off" autocapitalize="off" enterkeyhint="search"><p class="hlp-lead">${S.tab==='home'?'Toque num tema para ver como funciona.':'Toque num tema. Para voltar à tela inicial, toque no logo, no topo.'}</p><div class="hlp-res" id="hres" style="display:none"></div><div class="hlp-grid" id="hgrid">${Object.keys(HELP).map(x=>`<button class="hlp-b" data-help="${x}"><span class="hlp-i${x==='mirage'?' nobg':''}">${ic(HELP[x][1])}</span>${HELP[x][0]}</button>`).join('')}</div><p class="ver">Versão ${APP_VER}</p>`;
   }
+  const hq=sh.querySelector('#hq');
+  if(hq)hq.addEventListener('input',()=>{
+    const r=helpSearch(hq.value),res=sh.querySelector('#hres'),grid=sh.querySelector('#hgrid'),lead=sh.querySelector('.hlp-lead');
+    if(!r){res.style.display='none';grid.style.display='';if(lead)lead.style.display='';return;}
+    grid.style.display='none';if(lead)lead.style.display='none';res.style.display='grid';
+    res.innerHTML=r.length?r.map(x=>`<button class="hlp-b hlp-r" data-help="${x.k}"><span class="hlp-i${x.k==='mirage'?' nobg':''}">${ic(HELP[x.k][1])}</span><span class="hlp-rt"><span>${HELP[x.k][0]}</span><small>${x.snip}</small></span></button>`).join(''):'<p class="hlp-none">Nada encontrado. Tente outra palavra, como "banheiro", "locker" ou "chuva".</p>';
+  });
   sh.classList.toggle('full',S.tab==='home'); sh.scrollTop=0; openSheet();
 }
 function copyText(){
