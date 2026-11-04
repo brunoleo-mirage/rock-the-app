@@ -687,6 +687,8 @@ html,body{touch-action:pan-x pan-y}
 .hlp-i svg{width:22px;height:22px}
 .hlp-t{display:flex;align-items:center;gap:10px;margin:6px 0 8px}
 .hlp-back{border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:999px;padding:2px 14px;font-family:inherit;font-weight:700;font-size:18px;min-height:34px}
+.hlp-body p b{white-space:nowrap;font-size:1.12em;background:linear-gradient(transparent 58%,rgba(255,214,83,.75) 58%);padding:0 1px}
+:root[data-theme="dark"] .hlp-body p b{background:linear-gradient(transparent 58%,rgba(255,214,83,.28) 58%)}
 .hlp-body p{margin:8px 0;line-height:1.25}.hlp-body a:not(.btnp):not(.btns){color:var(--lav);text-decoration:underline;font-weight:700}
 .hlp-links{display:flex;flex-direction:column;gap:10px;margin:14px 0 4px}.hlp-links a{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:48px;font-size:22px}
 .hlp-body ul{margin:0;padding-left:20px}.hlp-body li{margin:8px 0;line-height:1.25}
@@ -1419,7 +1421,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.144';
+const APP_VER='1.0.145';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
@@ -1430,7 +1432,7 @@ const HELP={
  remind:['Lembretes','remind',()=>`<ul><li>Em Meu roteiro, o sino liga um aviso antes de cada show marcado. Você escolhe quanto tempo antes: 5, 10, 15, 30 ou 60 min.</li><li>${pushOk()?'O aviso chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial.':'O aviso funciona com o app aberto ou em segundo plano. Se o celular fechar o app, ele pode não chegar.'}</li>${pushOk()?'<li>O servidor guarda só o endereço de notificação do seu aparelho e os horários marcados, e apaga tudo se você desligar os lembretes.</li>':''}</ul>`],
  install:['Instalar e usar sem sinal','install',()=>`<ul><li>"Instalar app" coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita.</li><li>No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li><li>A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha.</li></ul>`],
  info:['Bom saber','info',()=>`<ul><li><b>Horários podem mudar.</b> Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li><li><b>Seus dados.</b> Os "Quero ir" e o tema ficam no seu aparelho. Só vão para o servidor, e apenas se você usar, o código do roteiro (guardado por 20 dias ao compartilhar um link) e os horários dos lembretes. Nada de nome, e-mail ou localização. O app conta visitas de forma anônima, sem cookies.</li><li><b>Aplicativo não oficial.</b> Não é do Rock the Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li></ul>`],
- mirage:['Sobre a Mirage AI','mirage',()=>`<p>A <b>Mirage AI</b> é a frente de inteligência artificial da <a href="https://www.instagram.com/officeginger" target="_blank" rel="noopener">Ginger Group</a>. Criamos experiências visuais, campanhas e aplicativos com IA.</p><p>O Rock the App nasceu de uma ideia nossa, feita de forma independente, para ajudar quem vai ao festival.</p><p>Quer conhecer o nosso trabalho ou falar com a gente? Chame no Instagram.</p><p><a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener">Instagram da Mirage AI</a><br><a href="https://www.instagram.com/officeginger" target="_blank" rel="noopener">Instagram da Ginger Group</a></p>`]
+ mirage:['Sobre a Mirage AI','mirage',()=>`<p>A <a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener"><b>Mirage</b></a> é a frente de <b>inteligência artificial</b> da <a href="https://www.instagram.com/officeginger" target="_blank" rel="noopener"><b>Ginger</b> Agency</a>. Unindo <b>criatividade</b> e <b>tecnologia</b> pra criar campanhas e experiências digitais de <b>alto impacto</b>.</p><p>O <b>Rock the App</b> nasceu de uma ideia nossa.<br>É um <b>projeto independente</b>, feito por quem vive o festival e quer deixar a sua experiência no Rock The Mountain ainda mais fácil,<br>do primeiro show ao último.</p><p><b>Curtiu o app?</b> Quer um desses pro seu evento ou pra sua marca? <b>Chama a gente:</b></p><p>Instagram: <a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener"><b>@mirage.ia</b></a></p>`]
 };
 Object.assign(HI,{mirage:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',remind:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',install:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',info:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/>'});
 function aboutSheet(k){
@@ -1656,7 +1658,7 @@ function shareAppSheet(){
    more:sv('<circle cx="6" cy="12" r="1.800" fill="#fff"/><circle cx="12" cy="12" r="1.800" fill="#fff"/><circle cx="18" cy="12" r="1.800" fill="#fff"/>')};
   const L=(k,bg,label,href)=>`<a class="shi" ${'target="_blank" rel="noopener"'} href="${href}"><span style="background:${bg}">${G[k]}</span>${label}</a>`;
   const B=(k,bg,label,id)=>`<button class="shi" id="${id}"><span style="background:${bg}">${G[k]}</span>${label}</button>`;
-  sheetHtml('Compartilhar o app','<p class="note">Mande o link para quem vai ao festival com você. No Instagram, o link é copiado e o Stories abre: toque no adesivo de link e cole.</p><div class="shgrid">'+
+  sheetHtml('Compartilhar o app','<p class="note">Mande o link para quem vai ao festival com você.</p><div class="shgrid" style="grid-template-columns:repeat('+(navigator.share?3:4)+',1fr)">'+
    L('wa','#25A244','WhatsApp','https://wa.me/?text='+enc(t))+
    B('ig','linear-gradient(45deg,#F9A03F,#E1306C 55%,#8A3AB9)','Instagram','sh-app-ig')+
    L('tg','#2A9AD6','Telegram','https://t.me/share/url?url='+enc(u)+'&text='+enc(SHARE_TXT))+
@@ -1667,6 +1669,48 @@ function shareAppSheet(){
    B('cp','#6B5B7B','Copiar link','sh-app-copy')+
    (navigator.share?B('more','#E04E8F','Mais…','sh-app-native'):'')+
    '</div>');
+}
+
+async function igStoryBlob(){
+  try{await document.fonts.load('700 40px "Amatic SC"');}catch(e){}
+  const W=1080,H=1920,FF='"Amatic SC","Arial Narrow",sans-serif',INK='#1A1420',CRM='#FEFAD9';
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#884AFE');g.addColorStop(1,'#5B2FC4');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.fillStyle='rgba(254,250,217,.10)';for(let y=40;y<H;y+=70)for(let x=(y/70%2)*35+30;x<W;x+=70){c.beginPath();c.arc(x,y,5,0,7);c.fill();}
+  const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
+  c.textAlign='center';
+  c.fillStyle=CRM;c.font='700 78px '+FF;c.fillText('ESTOU USANDO O',W/2,330);
+  const logo=await _ld('sticker.webp');
+  if(logo){const lw=900,lh=lw*logo.naturalHeight/logo.naturalWidth;c.save();c.translate(W/2,640);c.rotate(-.04);c.shadowColor='rgba(0,0,0,.35)';c.shadowBlur=30;c.shadowOffsetY=14;c.drawImage(logo,-lw/2,-lh/2,lw,lh);c.restore();}
+  c.fillStyle='#FFD653';c.font='700 92px '+FF;c.fillText('NO ROCK THE MOUNTAIN!',W/2,1010);
+  c.fillStyle=CRM;c.font='700 58px '+FF;c.fillText('PROGRAMAÇÃO, MAPA E TEMPO',W/2,1100);c.fillText('GRÁTIS, SEM BAIXAR NADA.',W/2,1170);
+  const bx=140,by=1260,bw=W-280,bh=470;rr(bx+8,by+8,bw,bh,44);c.fillStyle=INK;c.fill();rr(bx,by,bw,bh,44);c.fillStyle=CRM;c.fill();c.lineWidth=8;c.strokeStyle=INK;c.stroke();
+  try{const q=QR.make(APP_URL,0);if(q){const m=Math.floor(300/(q.size+2)),qs=m*(q.size+2),qx=bx+50,qy=by+(bh-qs)/2;c.fillStyle='#fff';c.fillRect(qx,qy,qs,qs);c.fillStyle='#000';for(let yy=0;yy<q.size;yy++)for(let xx=0;xx<q.size;xx++)if(q.get(xx,yy))c.fillRect(qx+(xx+1)*m,qy+(yy+1)*m,m,m);}}catch(e){}
+  c.textAlign='left';c.fillStyle=INK;c.font='700 70px '+FF;c.fillText('ESCANEIE',bx+390,by+190);c.fillStyle='#6034BD';c.font='700 46px '+FF;c.fillText('ROCK-THE-APP.PAGES.DEV',bx+390,by+260);
+  c.fillStyle=INK;c.globalAlpha=.7;c.font='700 30px '+FF;c.fillText('APP NÃO OFICIAL DO FESTIVAL',bx+390,by+320);c.globalAlpha=1;
+  return new Promise(r=>cv.toBlob(r,'image/png'));
+}
+function igSheet(){
+  const sv=p=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  sheetHtml('Compartilhar no Instagram','<p class="note">Escolha como enviar o Rock the App.</p><div class="shbtns"><div class="shrow">'+
+   `<button class="btnp" id="ig-story">${sv('<circle cx="12" cy="12" r="8" stroke-dasharray="3.2 2.4"/><path d="M12 8.500v7M8.500 12h7"/>')}Story</button>`+
+   `<button class="btns" id="ig-direct">${sv('<path d="M21 3 10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>')}Direct</button></div></div>`+
+   '');
+}
+async function igStory(btn){
+  const o=btn.innerHTML;btn.textContent='Criando imagem…';
+  try{const b=await igStoryBlob(),f=new File([b],'rock-the-app-story.png',{type:'image/png'});
+    try{navigator.clipboard.writeText(APP_URL);}catch(e){}
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]}).catch(()=>{});}
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);setTimeout(()=>{location.href='instagram://story-camera';},900);}
+  }catch(e){}
+  btn.innerHTML=o;
+}
+function igDirect(btn){
+  const t=SHARE_TXT+' '+APP_URL;
+  if(navigator.share)return navigator.share({text:t}).catch(()=>{});
+  try{navigator.clipboard.writeText(t);}catch(e){}
+  btn.textContent='Mensagem copiada';setTimeout(()=>{location.href='instagram://direct-inbox';},800);
 }
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque algumas atrações antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
@@ -1941,7 +1985,9 @@ function shareClick(t){
   if(t.id==='map-list'){document.body.classList.toggle('lista-aberta');const l=$('#fsq');if(document.body.classList.contains('lista-aberta')&&l)l.focus();return true;}
   if(t.id==='share-app')return shareAppSheet(),true;
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
-  if(t.id==='sh-app-ig'){copyTo(APP_URL,t,'Link copiado');setTimeout(()=>{location.href='instagram://story-camera';},700);setTimeout(()=>{if(!document.hidden)window.open('https://www.instagram.com/','_blank');},2200);return true;}
+  if(t.id==='sh-app-ig')return igSheet(),true;
+  if(t.id==='ig-story')return igStory(t),true;
+  if(t.id==='ig-direct')return igDirect(t),true;
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
   if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
