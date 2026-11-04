@@ -189,6 +189,7 @@ nav button[aria-selected="true"]{background:var(--hdr)}
 #sheet{position:fixed;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;background:var(--paper);border:2px solid var(--ink);border-bottom:0;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));z-index:21;transform:translateY(105%);transition:transform .2s;max-height:82%;overflow:auto}
 #sheet.open{transform:none}
 @media (prefers-reduced-motion:reduce){#sheet{transition:none}}
+#sheet.full{top:0;height:100%;max-height:none;max-width:none;border:0;border-radius:0;padding-top:max(16px,env(safe-area-inset-top))}
 #sheet h2{font-family:var(--f-display);font-size:21px;margin:0 0 6px}
 #sheet p{margin:6px 0}
 #sheet .acts2{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
@@ -671,6 +672,18 @@ html,body{touch-action:pan-x pan-y}
 .hdev{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--ink2)}
 .hfoot img{height:auto;width:56px;display:block;opacity:.85}
 .hfoot p{margin:0;font-size:15px;color:var(--ink2)}
+.achips{flex-wrap:nowrap;overflow:visible;gap:6px;margin:0 0 10px}
+.achips .chip-btn{padding:4px 9px;min-height:34px;font-size:14px;flex:1 1 auto;min-width:0;text-align:center}
+.hlp-lead{margin:2px 0 10px;color:var(--ink2)}
+.hlp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hlp-b{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;background:var(--paper);color:var(--ink);border:2px solid var(--ink);border-radius:16px;box-shadow:2px 2px 0 var(--ink);padding:10px 12px;font-family:inherit;font-size:22px;font-weight:700;line-height:1.05;min-height:84px}
+.hlp-b.wide{grid-column:1/-1;flex-direction:row;align-items:center;min-height:0;gap:12px}
+.hlp-b:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.hlp-i{flex:none;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--lav) 16%,var(--paper));color:var(--lav);display:inline-grid;place-items:center}
+.hlp-i svg{width:22px;height:22px}
+.hlp-t{display:flex;align-items:center;gap:10px;margin:6px 0 8px}
+.hlp-back{border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:999px;padding:2px 14px;font-family:inherit;font-weight:700;font-size:18px;min-height:34px}
+.hlp-body ul{margin:0;padding-left:20px}.hlp-body li{margin:8px 0;line-height:1.25}
 .mn-op{background:var(--paper);border:2px solid var(--ink);border-radius:16px;margin:0 0 8px;box-shadow:2px 2px 0 var(--ink)}
 .mn-op summary{list-style:none;cursor:pointer;padding:10px 44px 10px 14px;display:flex;flex-direction:column;gap:2px;position:relative}
 .mn-ch{position:absolute;right:14px;top:50%;width:22px;height:22px;margin-top:-11px;color:var(--lav);transition:transform .2s}
@@ -1078,13 +1091,13 @@ function foodList(){
   }
   const L=MENU_F.filter(o=>(S.fa==='all'||o[1].includes(S.fa))&&(!q||norm(o[0]).includes(q)||o[2].some(x=>norm(x[0]).includes(q))));
   if(!L.length)return '<p class="note">Nada encontrado.</p>';
-  return L.map(o=>`<details class="mn-op"${q?' open':''}><summary><span class="mn-n">${esc(o[0])}</span><span class="mn-m">${esc(o[1].join(' · '))} · ${o[2].length} ${o[2].length===1?'item':'itens'}</span><svg class="mn-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${foodItems(o[2])}</details>`).join('');
+  return L.map(o=>`<details class="mn-op"${q?' open':''}><summary><span class="mn-n">${esc(o[0])}</span><span class="mn-m">${esc(o[1].join(' · '))}</span><svg class="mn-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${foodItems(o[2])}</details>`).join('');
 }
 function rFood(){
   if(!S.ft)S.ft='c'; if(!S.fa)S.fa='all'; if(S.fq==null)S.fq='';
   const ar=[['all','Todas'],['Aurora','Aurora'],['Samba','Samba'],['Roda Gigante','Roda Gigante'],['Ambulante','Ambulante']];
   main.innerHTML=`<h2 class="ptitle">Alimentação</h2><div class="row" role="group" aria-label="Tipo"><button class="chip-btn" data-ft="c" aria-pressed="${S.ft==='c'}">Comidas</button><button class="chip-btn" data-ft="b" aria-pressed="${S.ft==='b'}">Bebidas</button></div>`+
-  (S.ft==='c'?`<input class="search" id="fq" type="search" placeholder="Buscar barraca ou prato" value="${esc(S.fq)}" aria-label="Buscar"><div class="chips" role="group" aria-label="Área">${ar.map(a=>`<button class="chip-btn" data-fa="${a[0]}" aria-pressed="${S.fa===a[0]}">${a[1]}</button>`).join('')}</div>`:'')+
+  (S.ft==='c'?`<input class="search" id="fq" type="search" placeholder="Buscar barraca ou prato" value="${esc(S.fq)}" aria-label="Buscar"><div class="chips achips" role="group" aria-label="Área">${ar.map(a=>`<button class="chip-btn" data-fa="${a[0]}" aria-pressed="${S.fa===a[0]}">${a[1]}</button>`).join('')}</div>`:'')+
   `<div id="foodlist">${foodList()}</div><p class="note">Praça de alimentação 100% vegetariana. Cardápios e preços enviados pelos operadores para 2026, podem mudar no dia.</p>`+credit();
 }
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
@@ -1387,7 +1400,7 @@ function rWx(){
 }
 
 /* ===================== FOLHAS ===================== */
-function hideSheet(){sheetOpen=false;$('#scrim').classList.remove('open');$('#sheet').classList.remove('open');}
+function hideSheet(){sheetOpen=false;$('#scrim').classList.remove('open');$('#sheet').classList.remove('open');setTimeout(()=>{if(!sheetOpen)$('#sheet').classList.remove('full');},250);}
 function openSheet(){$('#scrim').classList.add('open');$('#sheet').classList.add('open'); if(!sheetOpen){sheetOpen=true; try{location.hash=S.tab+'-info';}catch(e){}}}
 function closeSheet(){ if(!sheetOpen)return; hideSheet(); if(location.hash.endsWith('-info'))history.back(); }
 function conflictSheet(sh,cf){
@@ -1395,25 +1408,29 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.139';
-function aboutSheet(){
-  $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
-  <ul class="how">
-  <li><b>Programação.</b> Lista os shows de cada dia por horário. Toque no dia, busque por artista ou palco, ou filtre por um palco. Shows que já acabaram saem da lista, e o dia fica indisponível depois do último show.</li>
-  <li><b>Quero ir.</b> Marca o show para o seu roteiro. Se ele bater com outro já marcado no mesmo dia, o app avisa e deixa você trocar pelo novo, marcar mesmo assim ou cancelar. "Talvez" guarda o show como possibilidade, sem checar conflito. Atrações que duram o dia todo não entram nessa checagem.</li>
-  <li><b>Meu roteiro.</b> Mostra o que você marcou, separado por dia. Avisa conflitos e trocas apertadas (menos de 10 minutos entre palcos diferentes). "Copiar texto" copia o roteiro para você colar no WhatsApp. Shows e dias que já acabaram saem do roteiro sozinhos.</li>
-  <li><b>Mapa.</b> Mapa do parque com os pontos numerados da legenda oficial. Toque no mapa para mostrar os números e em um número para ver o nome do ponto. Nos palcos, o "ir" ao lado do nome leva para a programação desse palco. Os filtros mostram só um tipo de ponto. "Tela cheia" abre o mapa sobre a tela inteira, com os mesmos números e o zoom com dois dedos; nela, "Nomes" escreve o nome ao lado dos números e "Lista" mostra todos os pontos com busca. O botão Fechar ou o voltar do celular saem dela.</li>
-  <li><b>Favoritos.</b> Toque no ♡ nos lugares da legenda ou no nome do ponto para guardar. O botão "♥ Favoritos" no mapa mostra só os seus favoritos. "Compartilhar", ao lado do nome do ponto, manda o lugar por mensagem com um link para o mapa. O mapa é ilustrativo, sem escala real.</li>
-  <li><b>Tempo.</b> Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia. Atualiza a cada 10 minutos quando há internet. Sem internet, mostra a última previsão salva, com o horário dela. No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo. Fonte: Open-Meteo.</li>
-  <li><b>Botões do topo.</b> A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha. A logo "developed by" abre o Instagram de quem desenvolveu o app.</li>
-  <li><b>Instalar app.</b> Coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita. No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li>
-  <li><b>Compartilhar.</b> O botão "Compartilhar", depois de Tempo, manda o link para WhatsApp, redes sociais ou qualquer app. Em Meu roteiro, "Compartilhar" gera uma imagem do seu roteiro, pronta para postar, com um QR: quem escanear com a câmera coloca o roteiro no próprio app. Também dá para enviar um link curto, que abre o app já com o seu roteiro. "Importar de um amigo" aceita a mensagem, o link ou a imagem.</li>
-  <li><b>Lembretes.</b> Em Meu roteiro, "Avisar antes" liga um aviso antes de cada show marcado, e você escolhe quanto tempo antes (5, 10, 15, 30 ou 60 min). ${pushOk()?'Ele chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial. Para isso, o servidor guarda apenas o endereço de notificação do seu aparelho e os horários dos shows marcados, e apaga tudo se você desligar os lembretes.':'Ele funciona com o app aberto ou em segundo plano; se o celular fechar o app, o aviso pode não chegar.'}</li>
-  <li><b>Horários podem mudar.</b> A programação pode ser alterada pela organização do festival. Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li>
-  <li><b>Seus dados.</b> Os "Quero ir" e o tema ficam no seu aparelho. Só vão para o nosso servidor, e apenas se você usar, o código do roteiro (ao compartilhar um link, guardado por 20 dias) e os horários dos lembretes. Nada de nome, e-mail ou localização. O app conta visitas de forma anônima, sem cookies.</li>
-  <li><b>Aplicativo não oficial.</b> Este aplicativo não é oficial do Rock The Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li>
-  </ul><p class="ver">Versão ${APP_VER}</p>`;
-  openSheet();
+const APP_VER='1.0.140';
+const HELP={
+ prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
+ rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
+ map:['Mapa e favoritos','map',()=>`<ul><li>Toque no mapa para mostrar os números e em um número para ver o nome do ponto.</li><li>Nos palcos, "Ver" abre a programação daquele palco.</li><li>O ♡ guarda o lugar nos favoritos, e o botão "♥ Favoritos" mostra só eles.</li><li>"Tela cheia" abre o mapa grande, com dois dedos para zoom, "Nomes" e "Lista" de todos os pontos.</li><li>O mapa é ilustrativo, sem escala real.</li></ul>`],
+ wx:['Tempo','wx',()=>`<ul><li>Previsão de Itaipava, hora a hora, das 12h às 4h de cada dia.</li><li>Atualiza a cada 10 minutos quando há internet. Sem sinal, mostra a última previsão salva, com o horário dela.</li><li>No dia de hoje aparece a temperatura de agora, e o personagem acompanha o tempo.</li><li>Fonte: Open-Meteo.</li></ul>`],
+ food:['Alimentação','food',()=>`<ul><li>Escolha entre Comidas e Bebidas.</li><li>Em Comidas, busque por barraca ou prato e filtre pela área: Aurora, Samba, Roda Gigante ou Ambulante.</li><li>Toque na barraca para abrir o cardápio dela.</li><li>A praça é 100% vegetariana. Os preços vêm dos operadores e podem mudar no dia.</li></ul>`],
+ share:['Compartilhar e importar','share',()=>`<ul><li>Em Meu roteiro, "Compartilhar" gera uma imagem pronta para postar, com um QR. Quem escanear coloca o roteiro no próprio app.</li><li>"Compartilhar link" manda um link curto que abre o app com o seu roteiro.</li><li>"Importar de um amigo" aceita a mensagem, o link ou a imagem.</li><li>O botão Compartilhar, na barra de baixo, manda o link do app.</li></ul>`],
+ remind:['Lembretes','remind',()=>`<ul><li>Em Meu roteiro, o sino liga um aviso antes de cada show marcado. Você escolhe quanto tempo antes: 5, 10, 15, 30 ou 60 min.</li><li>${pushOk()?'O aviso chega mesmo com o app fechado. No iPhone, o app precisa estar instalado na tela inicial.':'O aviso funciona com o app aberto ou em segundo plano. Se o celular fechar o app, ele pode não chegar.'}</li>${pushOk()?'<li>O servidor guarda só o endereço de notificação do seu aparelho e os horários marcados, e apaga tudo se você desligar os lembretes.</li>':''}</ul>`],
+ install:['Instalar e usar sem sinal','install',()=>`<ul><li>"Instalar app" coloca o ícone na tela inicial e deixa o app abrir sem sinal depois da primeira visita.</li><li>No iPhone, use Compartilhar e depois "Adicionar à Tela de Início".</li><li>A lua ou o sol troca entre modo claro e escuro e guarda a sua escolha.</li></ul>`],
+ info:['Bom saber','info',()=>`<ul><li><b>Horários podem mudar.</b> Confira o site oficial, <a href="https://www.rockthemountain.com.br/" target="_blank" rel="noopener">rockthemountain.com.br</a>, para avisos de última hora.</li><li><b>Seus dados.</b> Os "Quero ir" e o tema ficam no seu aparelho. Só vão para o servidor, e apenas se você usar, o código do roteiro (guardado por 20 dias ao compartilhar um link) e os horários dos lembretes. Nada de nome, e-mail ou localização. O app conta visitas de forma anônima, sem cookies.</li><li><b>Aplicativo não oficial.</b> Não é do Rock the Mountain. Foi criado de forma independente para ajudar quem vai ao festival.</li></ul>`]
+};
+Object.assign(HI,{remind:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',install:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',info:'<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/>'});
+function aboutSheet(k){
+  const sh=$('#sheet');
+  const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HI[n]}</svg>`;
+  if(k&&HELP[k]){
+    const h=HELP[k];
+    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><button class="hlp-back" data-help="home">‹ Ajuda</button><h2 class="hlp-t"><span class="hlp-i">${ic(h[1])}</span>${h[0]}</h2><div class="hlp-body">${h[2]()}</div>`;
+  }else{
+    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Ajuda</h2><p class="hlp-lead">${S.tab==='home'?'Toque num tema para ver como funciona.':'Toque num tema. Para voltar à tela inicial, toque no logo, no topo.'}</p><div class="hlp-grid">${Object.keys(HELP).map(x=>`<button class="hlp-b${x==='info'?' wide':''}" data-help="${x}"><span class="hlp-i">${ic(HELP[x][1])}</span>${HELP[x][0]}</button>`).join('')}</div><p class="ver">Versão ${APP_VER}</p>`;
+  }
+  sh.classList.toggle('full',S.tab==='home'); sh.scrollTop=0; openSheet();
 }
 function copyText(){
   const t=rotText();
@@ -1515,6 +1532,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest('.plabel')&&!e.target.closest('.irl'))return;
   if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=(S.showPins?'Toque num número para ver o nome.':'Toque no mapa para mostrar os números.')+' Dois dedos dão zoom.';}return;}
   const t=e.target.closest('button,a,.irl,img.sticker'); if(!t)return;
+  if(t.dataset.help!==undefined){const k=t.dataset.help;return aboutSheet(k==='home'?'':k);}
   if(t.dataset.ft){S.ft=t.dataset.ft;return render();}
   if(t.dataset.fa){S.fa=t.dataset.fa;return render();}
   if(t.dataset.home){closeSheet();const h=t.dataset.home;if(h==='fav'){S.cat='fav';S.pin=null;return S.tab==='map'?render():setTab('map');}if(h==='share')return shareAppSheet();if(h==='about')return aboutSheet();}
