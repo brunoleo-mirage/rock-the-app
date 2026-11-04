@@ -521,6 +521,11 @@ h2.sec{font-size:25px}
 .card .stbtn .stn{white-space:normal}
 
 .sharebar{display:flex;justify-content:center;margin:22px 0 8px}
+#sheet .shgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 6px;margin-top:16px}
+#sheet .shi{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0;color:var(--ink);font-family:inherit;font-size:17px;font-weight:700;text-decoration:none;text-align:center;line-height:1}
+#sheet .shi span{width:56px;height:56px;border-radius:50%;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);display:grid;place-items:center}
+#sheet .shi svg{width:28px;height:28px}
+#sheet .shi:active span{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
 #sheet .shbtns{display:grid;gap:10px;margin-top:12px}
 #sheet .shbtns .btns,#sheet .shbtns .btnp{display:block;text-align:center;text-decoration:none;color:var(--ink);width:100%}
 #sheet .shbtns .btnp{color:var(--dk)}
@@ -1165,8 +1170,8 @@ function livePanel(){
   const dt=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',weekday:'long',day:'2-digit',month:'2-digit'}).format(new Date());
   const lbl=dt.charAt(0).toUpperCase()+dt.slice(1).replace(', ',' ');
   const base=NOW.mins;
-  return `<section class="livebox" aria-label="Ao vivo"><div class="lhead"><span class="ldot"></span><h2>Ao vivo</h2></div><p class="lclock">${esc(lbl)} · ${hhmm(base)}</p>
-  <h4>Agora</h4>${cur.length?cur.map(x=>liveMini(x,'now')).join(''):'<div class="lnone">Nada seu tocando agora.'+(nxt?' Dá tempo pra comer e se hidratar.':'')+'</div>'}
+  return `<section class="livebox" aria-label="Agora"><div class="lhead"><span class="ldot"></span><h2>Agora</h2></div><p class="lclock">${esc(lbl)} · ${hhmm(base)}</p>
+  <h4>Tocando</h4>${cur.length?cur.map(x=>liveMini(x,'now')).join(''):'<div class="lnone">Nada seu tocando agora.'+(nxt?' Dá tempo pra comer e se hidratar.':'')+'</div>'}
   <div class="hrow"><h4>Próximo</h4><button class="bell" id="remind" type="button" aria-pressed="${remindOn()}" aria-label="${remindOn()?'Lembretes ligados. Toque para ajustar':'Ligar lembretes dos shows'}">${bellSvg(remindOn())}</button></div>${nxt?liveMini(nxt,'next'):'<div class="lnone">Nenhum show a seguir no seu roteiro.</div>'}</section>`;
 }
 function rotDayBtns(){
@@ -1414,7 +1419,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.143';
+const APP_VER='1.0.144';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
@@ -1547,6 +1552,7 @@ document.addEventListener('click',e=>{
   if(t.id==='install-btn')return doInstall();
   if(t.id==='theme-btn'||t.id==='theme-home')return toggleTheme();
   if(t.id==='about-btn')return aboutSheet();
+  if(t.classList.contains('xbtn')&&S.tab==='home'&&$('#sheet .hlp-back'))return aboutSheet('');
   if(t.hasAttribute('data-close')||t.id==='scrim')return closeSheet();
   if(t.dataset.rotday!==undefined){const el=document.getElementById('rotday-'+t.dataset.rotday);if(el){main.scrollTop+=el.getBoundingClientRect().top-main.getBoundingClientRect().top-8;}return;}
   if(t.dataset.day!==undefined){S.day=+t.dataset.day;return render();}
@@ -1637,13 +1643,30 @@ const IC={
 const A_ATTR='class="btns" target="_blank" rel="noopener"';
 function shareAppSheet(){
   const u=APP_URL,t=SHARE_TXT+' '+u;
-  sheetHtml('Compartilhar o app','<p class="note">Mande o link para quem vai ao festival com você.</p><div class="shbtns">'+
-   (navigator.share?'<button class="btnp" id="sh-app-native">Compartilhar…</button>':'')+
-   `<a ${A_ATTR} href="https://wa.me/?text=${enc(t)}">WhatsApp</a>`+
-   `<a ${A_ATTR} href="https://t.me/share/url?url=${enc(u)}&text=${enc(SHARE_TXT)}">Telegram</a>`+
-   `<a ${A_ATTR} href="https://www.facebook.com/sharer/sharer.php?u=${enc(u)}">Facebook</a>`+
-   `<a ${A_ATTR} href="https://twitter.com/intent/tweet?text=${enc(SHARE_TXT)}&url=${enc(u)}">X (Twitter)</a>`+
-   '<button class="btns" id="sh-app-copy">Copiar link</button></div>');
+  const sv=(p)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+  const G={
+   wa:sv('<path fill="#fff" d="M12 3.2a8.7 8.7 0 0 0-7.5 13.1L3.2 20.8l4.6-1.2A8.7 8.7 0 1 0 12 3.2zm0 1.6a7.1 7.1 0 1 1-3.8 13.1l-.3-.2-2.6.7.7-2.5-.2-.3A7.1 7.1 0 0 1 12 4.8zM8.9 7.9c-.2 0-.5.1-.7.4-.3.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.200.8 2.600.700 3.100.600.500-.1 1.500-.6 1.700-1.200.2-.6.2-1.100.2-1.200-.1-.1-.2-.2-.5-.3l-1.600-.8c-.2-.1-.4-.1-.6.1l-.7.9c-.1.200-.3.200-.5.100-.3-.1-1-.4-1.900-1.200-.7-.6-1.200-1.400-1.300-1.700-.1-.2 0-.4.100-.5l.4-.4.200-.4c.1-.1 0-.3 0-.4l-.7-1.700c-.2-.4-.4-.4-.5-.4h-.5z"/>'),
+   tg:sv('<path fill="#fff" d="M20.200 4.300 3.500 10.800c-1.100.4-1.100 1.100-.2 1.400l4.300 1.300 1.700 5.100c.2.600.1.800.7.800.5 0 .7-.2 1-.5l2.100-2 4.300 3.200c.8.400 1.400.2 1.600-.7l2.900-13.700c.3-1.200-.4-1.700-1.200-1.400zM9.200 13.100l8.200-5.100c.4-.2.700-.1.400.2l-6.800 6.100-.3 3.100-1.500-4.300z"/>'),
+   fb:sv('<path fill="#fff" d="M13.500 21v-7.500h2.500l.4-3h-2.900V8.600c0-.9.300-1.500 1.500-1.500h1.500V4.400c-.3 0-1.200-.1-2.200-.1-2.200 0-3.700 1.300-3.700 3.800v2.400H8v3h2.600V21z"/>'),
+   x:sv('<path fill="#fff" d="M17.600 4h2.800l-6.100 7 7.200 9h-5.600l-4.400-5.600L6.400 20H3.600l6.500-7.500L3.200 4h5.700l4 5.100zm-1 14.300h1.500L7.900 5.600H6.300z"/>'),
+   em:sv('<path fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round" d="M4 6.500h16v11H4z"/><path fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round" d="m4.500 7 7.500 6 7.500-6"/>'),
+   sms:sv('<path fill="none" stroke="#fff" stroke-width="1.800" stroke-linejoin="round" d="M4 5h16v11H9l-5 4z"/>'),
+   cp:sv('<rect x="8.500" y="8.500" width="11" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.800"/><path d="M5 15.500V6a2 2 0 0 1 2-2h9.500" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round"/>'),
+   ig:sv('<rect x="4" y="4" width="16" height="16" rx="4.500" fill="none" stroke="#fff" stroke-width="1.800"/><circle cx="12" cy="12" r="3.600" fill="none" stroke="#fff" stroke-width="1.800"/><circle cx="16.800" cy="7.200" r="1.100" fill="#fff"/>'),
+   more:sv('<circle cx="6" cy="12" r="1.800" fill="#fff"/><circle cx="12" cy="12" r="1.800" fill="#fff"/><circle cx="18" cy="12" r="1.800" fill="#fff"/>')};
+  const L=(k,bg,label,href)=>`<a class="shi" ${'target="_blank" rel="noopener"'} href="${href}"><span style="background:${bg}">${G[k]}</span>${label}</a>`;
+  const B=(k,bg,label,id)=>`<button class="shi" id="${id}"><span style="background:${bg}">${G[k]}</span>${label}</button>`;
+  sheetHtml('Compartilhar o app','<p class="note">Mande o link para quem vai ao festival com você. No Instagram, o link é copiado e o Stories abre: toque no adesivo de link e cole.</p><div class="shgrid">'+
+   L('wa','#25A244','WhatsApp','https://wa.me/?text='+enc(t))+
+   B('ig','linear-gradient(45deg,#F9A03F,#E1306C 55%,#8A3AB9)','Instagram','sh-app-ig')+
+   L('tg','#2A9AD6','Telegram','https://t.me/share/url?url='+enc(u)+'&text='+enc(SHARE_TXT))+
+   L('fb','#1877F2','Facebook','https://www.facebook.com/sharer/sharer.php?u='+enc(u))+
+   L('x','#111','X','https://twitter.com/intent/tweet?text='+enc(SHARE_TXT)+'&url='+enc(u))+
+   L('em','#8A5CF6','E-mail','mailto:?subject='+enc('Rock the App')+'&body='+enc(t))+
+   L('sms','#3FA66A','SMS','sms:?&body='+enc(t))+
+   B('cp','#6B5B7B','Copiar link','sh-app-copy')+
+   (navigator.share?B('more','#E04E8F','Mais…','sh-app-native'):'')+
+   '</div>');
 }
 function shareRotSheet(){
   if(!planIds().length)return sheetHtml('Compartilhar roteiro','<p>Seu roteiro está vazio. Marque algumas atrações antes de compartilhar.</p><div class="acts2"><button class="btns" data-close>Ok</button></div>');
@@ -1918,6 +1941,7 @@ function shareClick(t){
   if(t.id==='map-list'){document.body.classList.toggle('lista-aberta');const l=$('#fsq');if(document.body.classList.contains('lista-aberta')&&l)l.focus();return true;}
   if(t.id==='share-app')return shareAppSheet(),true;
   if(t.id==='sh-app-native')return navigator.share({title:'Rock the App',text:SHARE_TXT,url:APP_URL}).catch(()=>{}),true;
+  if(t.id==='sh-app-ig'){copyTo(APP_URL,t,'Link copiado');setTimeout(()=>{location.href='instagram://story-camera';},700);setTimeout(()=>{if(!document.hidden)window.open('https://www.instagram.com/','_blank');},2200);return true;}
   if(t.id==='sh-app-copy')return copyTo(APP_URL,t,'Link copiado'),true;
   if(t.id==='share-rot')return shareRotSheet(),true;
   if(t.id==='sh-img'||t.id==='dl-img'){try{localStorage.setItem('rta_mod',MOD.th);}catch(e){}return imgShare(t.id==='dl-img',MOD.th),true;}
