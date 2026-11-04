@@ -258,7 +258,7 @@ nav .badge{background:var(--rose);color:var(--dk);border:2px solid var(--dk)}
 .hour::after{border-top:3px dotted var(--line)}
 /* caixinha de atração, como na programação oficial */
 .card{background:var(--c,#FEFAD9);color:var(--dk);border:2.5px solid var(--dk);border-radius:var(--rx);box-shadow:3px 3px 0 var(--csh);padding:11px 11px 11px 13px;margin-bottom:12px}
-.card.on{background:var(--c,#FEFAD9);outline:3px solid var(--dk);outline-offset:2px}
+.card.on{background:var(--c,#FEFAD9);outline:3px solid #FF5A5F;outline-offset:2px}
 .card .time,.card .time small,.card h3,.card .note,.card .tag,.card .mini{color:var(--dk)}
 .card h3{font-size:27px;font-weight:900;line-height:1.02;letter-spacing:.01em}
 .card .time{font-size:22px;font-weight:900}
@@ -1122,7 +1122,7 @@ function card(sh,opts={}){
   const mb=S.maybe.has(sh.id);
   return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')});--nms:var(${st.c.replace('--st','--nms')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
-    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
+    <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>':(on?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
       ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true" aria-label="Desmarcar" title="Desmarcar">${IC.x}</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true" aria-label="Desmarcar" title="Desmarcar">${IC.x}</button>`)
       : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
@@ -1423,7 +1423,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.146';
+const APP_VER='1.0.147';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
