@@ -683,6 +683,7 @@ html,body{touch-action:pan-x pan-y}
 .achips{flex-wrap:nowrap;overflow:visible;gap:6px;margin:0 0 10px}
 .achips .chip-btn{padding:4px 9px;min-height:34px;font-size:14px;flex:1 1 auto;min-width:0;text-align:center}
 .hlp-lead{margin:2px 0 10px;color:var(--ink2)}
+.ptitle+.note.subt{margin:-6px 0 10px;font-size:15px;line-height:1.1}
 .hlp-q{margin:4px 0 10px}.hlp-res{display:grid;gap:10px}.hlp-r{flex-direction:row;align-items:center;min-height:0;gap:12px;width:100%}.hlp-rt{display:flex;flex-direction:column;gap:4px;min-width:0}.hlp-rt small{font-size:17px;font-weight:600;color:var(--ink2);line-height:1.15}.hlp-rt mark{background:rgba(255,214,83,.8);color:inherit;border-radius:3px;padding:0 1px}.hlp-none{color:var(--ink2);padding:6px 2px;line-height:1.2}
 
 .hlp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -1146,9 +1147,9 @@ function foodList(){
 function rFood(){
   if(!S.ft)S.ft='c'; if(!S.fa)S.fa='all'; if(S.fq==null)S.fq='';
   const ar=[['all','Todas'],['Aurora','Aurora'],['Samba','Samba'],['Roda Gigante','Roda Gigante'],['Ambulante','Ambulante']];
-  main.innerHTML=`<h2 class="ptitle">Alimentação</h2><div class="row" role="group" aria-label="Tipo"><button class="chip-btn" data-ft="c" aria-pressed="${S.ft==='c'}">Comidas</button><button class="chip-btn" data-ft="b" aria-pressed="${S.ft==='b'}">Bebidas</button></div>`+
+  main.innerHTML=`<h2 class="ptitle">Alimentação</h2><p class="note subt">Praça de Alimentação 100% Vegetariana</p><div class="row" role="group" aria-label="Tipo"><button class="chip-btn" data-ft="c" aria-pressed="${S.ft==='c'}">Comidas</button><button class="chip-btn" data-ft="b" aria-pressed="${S.ft==='b'}">Bebidas</button></div>`+
   (S.ft==='c'?`<input class="search" id="fq" type="search" placeholder="Buscar barraca ou prato" value="${esc(S.fq)}" aria-label="Buscar"><div class="chips achips" role="group" aria-label="Área">${ar.map(a=>`<button class="chip-btn" data-fa="${a[0]}" aria-pressed="${S.fa===a[0]}">${a[1]}</button>`).join('')}</div>`:'')+
-  `<div id="foodlist">${foodList()}</div><p class="note">Praça de alimentação 100% vegetariana. Cardápios e preços enviados pelos operadores para 2026, podem mudar no dia.</p>`+credit();
+  `<div id="foodlist">${foodList()}</div><p class="note">Cardápios e preços enviados pelos operadores para 2026, podem mudar no dia.</p>`+credit();
 }
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
@@ -1458,7 +1459,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.151';
+const APP_VER='1.0.152';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
