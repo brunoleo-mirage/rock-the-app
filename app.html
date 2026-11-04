@@ -94,6 +94,9 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--rose)
 .empty{padding:28px 8px;text-align:center;color:var(--ink2);white-space:nowrap;font-size:clamp(12px,4.8vw,22px)}
 .empty b{display:block;font-family:var(--f-display);font-size:19px;color:var(--ink);margin-bottom:4px}
 h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
+h2.rotsec{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.totop{flex:none;border:0;background:none;padding:4px 6px;margin:0;color:var(--ink2);opacity:.6;font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.totop:active{opacity:1}
 .gap{font-size:13px;color:var(--ink2);padding:2px 0 8px 14px;border-left:3px dotted var(--line);margin-left:6px}
 .gap.tight{color:var(--warn-ink);font-weight:700}
 .btnp{border:2px solid var(--ink);background:var(--rose);border-radius:12px;padding:10px 16px;font-weight:800;min-height:44px}
@@ -713,6 +716,24 @@ html,body{touch-action:pan-x pan-y}
 .foodsoon{text-align:center;background:var(--paper);border:2.5px dashed var(--ink);border-radius:20px;padding:26px 18px;color:var(--ink)}
 .foodsoon h3{margin:8px 0 4px;font-size:30px}.foodsoon p{margin:0;font-size:20px;color:var(--ink2)}
 .card h3,.lmini h3{-webkit-text-stroke-color:var(--nms,#1A1420)!important;text-shadow:2.5px 2.5px 0 var(--nms,#1A1420)!important}
+/* categorias do mapa: suaves quando desmarcadas, cor do pino quando selecionadas */
+.chips .chip-btn[data-cat="palco"]{background:color-mix(in srgb,#EB4B94 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="palco"][aria-pressed="true"]{background:#EB4B94;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="exp"]{background:color-mix(in srgb,#FFD653 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="exp"][aria-pressed="true"]{background:#FFD653;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="beb"]{background:color-mix(in srgb,#884AFE 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="beb"][aria-pressed="true"]{background:#884AFE;color:#FEFAD9;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="ban"]{background:color-mix(in srgb,#6034BD 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="ban"][aria-pressed="true"]{background:#6034BD;color:#FEFAD9;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="sau"]{background:color-mix(in srgb,#92FE71 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="sau"][aria-pressed="true"]{background:#92FE71;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="pcd"]{background:color-mix(in srgb,#FE5A5E 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="pcd"][aria-pressed="true"]{background:#FE5A5E;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="srv"]{background:color-mix(in srgb,#FEFAD9 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="srv"][aria-pressed="true"]{background:#FEFAD9;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-cat="sai"]{background:color-mix(in srgb,#FE5A5E 36%,#FEFAD9);color:#1A1420}
+.chips .chip-btn[data-cat="sai"][aria-pressed="true"]{background:#FE5A5E;color:#1A1420;outline:3px solid var(--ink);outline-offset:1px}
+.chips .chip-btn[data-stage="hl"]:not([data-stage="all"])::before{content:"★";width:auto;height:auto;background:none;border:0;border-radius:0;margin-right:6px;vertical-align:0;font-size:.95em}
 </style>
 </head>
 <body>
@@ -1032,7 +1053,9 @@ let NOW=nowBR();
 const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.e); /* acabou: sai da lista e do roteiro */
 const dayOver=d=>SHOWS.filter(x=>x.d===d).every(showOver); /* o dia só fecha depois que o último show termina */ 
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
-const S={tab:'home',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
+const HLN=['anitta','dexter','dominguinho','duquesa','falamansa','gaby amarantos','ivete','jorge ben jor','jorja','kevin o chris','leci brand','m.i.a','marcelo d2','marcos valle','paulinho da viola','timbalada','urias'];
+const isHl=x=>{const n=(x.name||'').toLowerCase();return HLN.some(h=>n.startsWith(h));};
+const S={tab:'home',hl:false,day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
 try{if(localStorage.getItem('rta_wk')!=='2'){localStorage.removeItem('rta_sel');localStorage.removeItem('rta_maybe');localStorage.setItem('rta_wk','2');}}catch(e){}
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
@@ -1133,13 +1156,13 @@ const hintOff=()=>{try{return localStorage.getItem('rta_hint2')==='1';}catch(e){
 function rProg(){
   const _pc=main.querySelector('.chips[aria-label="Palco"]'), _sl=_pc?_pc.scrollLeft:0; /* mantém a posição da fila de palcos ao tocar num deles */
   const q=norm(S.q.trim());
-  let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
+  let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!S.hl||isHl(x))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
   list.sort((a,b)=>a.s-b.s||stageById[a.stage].i-stageById[b.stage].i);
   let html=dayChips();
   if(!S.sel.size&&!S.maybe.size&&!hintOff())html+='<div class="hint2" role="note"><span>Se programe para o 2º fim de semana</span><button type="button" data-hint-x aria-label="Fechar aviso">×</button></div>';
   html+=`<input class="search" id="q" type="search" placeholder="Buscar artista ou palco" value="${esc(S.q)}" aria-label="Buscar">`;
   const ordered=S.stages.map(id=>stageById[id]).concat(STAGES.filter(s=>!S.stages.includes(s.id)));
-  html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id&&!showOver(x))?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
+  html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0&&!S.hl},{id:'hl',n:'Destaques',c:'--butter',on:S.hl}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&s.id!=='hl'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id&&!showOver(x))?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
   html+=`<p class="note" style="margin:0 0 4px">${DAYS[S.day].full} · ${list.length} ${list.length===1?'atração':'atrações'}${S.sel.size?' · '+[...S.sel].filter(i=>byId[i].d===S.day).length+' marcada(s)':''}</p>`;
   if(!list.length) html+=SHOWS.filter(x=>x.d===S.day).every(showOver)?'<div class="empty"><b>As atrações deste dia já acabaram</b>Escolha outro dia acima.</div>':'<div class="empty"><b>Nada por aqui</b>Troque o palco ou limpe a busca.</div>';
   let lastH=null;
@@ -1188,7 +1211,7 @@ function rRot(){
   DAYS.forEach((D,d)=>{
     const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
     if(!items.length)return;
-    html+=`<h2 class="sec" id="rotday-${d}">${D.full}</h2>`;
+    html+=`<h2 class="sec rotsec" id="rotday-${d}"><span>${D.full}</span><button class="totop" data-totop type="button" aria-label="Voltar ao topo">↑ topo</button></h2>`;
     /* grupos de shows "Quero ir" que batem entre si: o aviso vai logo acima do primeiro do grupo */
     const going=items.filter(x=>S.sel.has(x.id)&&!x.bg), par={}; going.forEach(x=>par[x.id]=x.id);
     const fnd=x=>{while(par[x]!==x)x=par[x]=par[par[x]];return x;};
@@ -1424,7 +1447,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.148';
+const APP_VER='1.0.149';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
@@ -1559,9 +1582,10 @@ document.addEventListener('click',e=>{
   if(t.id==='about-btn')return aboutSheet();
   if(t.classList.contains('xbtn')&&S.tab==='home'&&$('#sheet .hlp-back'))return aboutSheet('');
   if(t.hasAttribute('data-close')||t.id==='scrim')return closeSheet();
+  if(t.dataset.totop!==undefined){main.scrollTo({top:0,behavior:'smooth'});return;}
   if(t.dataset.rotday!==undefined){const el=document.getElementById('rotday-'+t.dataset.rotday);if(el){main.scrollTop+=el.getBoundingClientRect().top-main.getBoundingClientRect().top-8;}return;}
   if(t.dataset.day!==undefined){S.day=+t.dataset.day;return render();}
-  if(t.dataset.stage&&t.classList.contains('chip-btn')){const id=t.dataset.stage;if(id==='all')S.stages=[];else if(S.stages.includes(id))S.stages=S.stages.filter(x=>x!==id);else S.stages.push(id);return render();}
+  if(t.dataset.stage&&t.classList.contains('chip-btn')){const id=t.dataset.stage;if(id==='hl'){S.hl=!S.hl;return render();}if(id==='all'){S.stages=[];S.hl=false;}else if(S.stages.includes(id))S.stages=S.stages.filter(x=>x!==id);else S.stages.push(id);return render();}
   if(t.dataset.maybe){const id=t.dataset.maybe;
     if(S.maybe.has(id)){S.maybe.delete(id);}else{S.sel.delete(id);S.maybe.add(id);}
     save();return render();}
