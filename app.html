@@ -599,9 +599,10 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .nmrow{flex-wrap:wrap}
 .nmbrk{flex-basis:100%;height:0}
 .onair{margin-top:4px!important;transform:none!important}
-.gbox{margin:12px 0;border:4px solid #FE5A5E;border-radius:26px;overflow:hidden;background:#FE5A5E}
-.gwarn{margin:0;padding:5px 14px 6px;background:#FE5A5E;color:#1A1420;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:19px;line-height:24px;font-weight:700;text-transform:uppercase}
-.gbody{padding:8px 6px 8px;border-radius:20px;background:color-mix(in srgb,#FE5A5E 18%,var(--bg))}
+.gbox{margin:12px 0;border:4px solid #FFB3B0;border-radius:26px;overflow:hidden;background:#FFB3B0}
+.gwarn{margin:0;padding:5px 14px 6px;background:#FFB3B0;color:#1A1420;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:19px;line-height:24px;font-weight:700;text-transform:uppercase}
+.gbody{padding:10px 8px 8px;border-radius:20px;background:color-mix(in srgb,#FFB3B0 14%,var(--bg))}
+.gbody .card.on{outline-color:#FF5A5F;outline-width:3px}
 .gbody .card{margin-top:0;margin-bottom:8px}
 .gbody .card:last-child{margin-bottom:0}
 .nowt{white-space:nowrap;margin:2px 0 6px}
@@ -1125,7 +1126,7 @@ function card(sh,opts={}){
     <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>':(on?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
       ? (on?`<button class="go unmark" data-go="${sh.id}" aria-pressed="true" aria-label="Desmarcar" title="Desmarcar">${IC.x}</button>`:`<button class="go" data-go="${sh.id}" aria-pressed="false">Quero ir</button><button class="go unmark" data-maybe="${sh.id}" aria-pressed="true" aria-label="Desmarcar" title="Desmarcar">${IC.x}</button>`)
-      : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Marcado':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
+      : `<button class="go" data-go="${sh.id}" aria-pressed="${on}">${on?'Desmarcar':'Quero ir'}</button><button class="go maybebtn" data-maybe="${sh.id}" aria-pressed="${mb}">Talvez</button>`}</div>
   </article>`;
 }
 const hintOff=()=>{try{return localStorage.getItem('rta_hint2')==='1';}catch(e){return false;}};
@@ -1423,7 +1424,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.147';
+const APP_VER='1.0.148';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
