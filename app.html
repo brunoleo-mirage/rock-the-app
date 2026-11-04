@@ -30,9 +30,10 @@
 <style>
 /* Layout: cabeçalho amarelo manteiga, conteúdo em lista de cartões, navegação fixa embaixo. Paleta suave derivada do KV do festival. */
 :root{
+  --nms1:#FEFAD9;--nms2:#FEFAD9;--nms3:#FEFAD9;--nms4:#1A1420;--nms5:#FEFAD9;--nms6:#1A1420;--nms7:#1A1420;--nms8:#FEFAD9;--nms9:#1A1420;--nms10:#FEFAD9;--nms11:#FEFAD9;--nms12:#1A1420;--nms13:#1A1420;--nms14:#FEFAD9;--nms15:#FEFAD9;
   --bg:#FEFAD9; --paper:#FFFDF8; --butter:#FFD653; --rose:#EBA9CC; --sky:#884AFE; --sage:#A9D3A0;
   --lav:#884AFE; --peach:#F3C7A6; --ink:#3A3340; --ink2:#6E6578; --line:#E6DAC2;
-  --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#92FE71;--nm2:#EB4B94;--nm3:#EB4B94;--nm4:#92FE71;--nm5:#92FE71;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#FEFAD9;--nm9:#FEFAD9;--nm10:#FEFAD9;--nm11:#EB4B94;--nm12:#92FE71;--nm13:#92FE71;--nm14:#EB4B94;--nm15:#92FE71;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;
+  --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#2B1466;--nm2:#2B1466;--nm3:#2B1466;--nm4:#FEFAD9;--nm5:#2B1466;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#2B1466;--nm9:#FEFAD9;--nm10:#2B1466;--nm11:#2B1466;--nm12:#FEFAD9;--nm13:#FEFAD9;--nm14:#2B1466;--nm15:#2B1466;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;
   --f-display:'Amatic SC','Comic Sans MS',cursive; --f-body:'Amatic SC','Comic Sans MS',cursive;
   color-scheme: light;
 }
@@ -131,12 +132,6 @@ h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
 .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .links a{border:2px solid var(--ink);border-radius:12px;padding:8px 12px;font-weight:800;color:var(--ink);background:var(--paper);text-decoration:none;min-height:40px;display:inline-flex;align-items:center}
 
-.credit{margin:28px 0 8px;background:#EBE6E2;border:2px solid var(--ink);border-radius:18px;padding:14px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
-.credit .crl{display:flex;flex-direction:column;align-items:center;gap:2px;color:inherit;text-decoration:none}
-.credit .dev{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6E6578;font-weight:800}
-.credit .mg{height:84px;width:auto;mix-blend-mode:multiply;margin-top:6px}
-.credit .mw{height:30px;width:auto;margin-top:2px}
-.credit .byg{font-family:var(--f-display);font-size:15px;color:#9A4A22;font-weight:600;margin-top:2px}
 .hrs{display:flex;gap:6px;overflow-x:auto;padding:6px 2px 8px;margin-top:10px;scrollbar-width:thin}
 .hc{flex:none;width:52px;text-align:center;font-size:12px;font-weight:700;border-radius:10px;padding:4px 0 5px;border:1.5px solid transparent}
 .hc.now{border-color:var(--ink);background:var(--butter)}
@@ -580,6 +575,7 @@ nav #share-app{padding-left:6px;padding-right:6px}
 .mod[aria-pressed="true"] img{outline:5px solid #EB4B94;outline-offset:1px}
 .lg .fv{margin-left:auto;font-size:22px;line-height:1;padding:6px 4px 6px 10px;cursor:pointer}
 .lg>span:nth-of-type(1){min-width:0}
+.mapctl .favbtn,.mapctl .fsbtn,.mapctl .zoom button{color:#1A1420}
 .mapctl .favbtn{margin:0;min-height:34px;height:34px;padding:0 10px;border-radius:10px;font-size:15px;background:rgba(254,250,217,.94);box-shadow:0 2px 0 rgba(26,20,32,.5)}
 .favbtn[aria-pressed="true"]{background:#FFD653!important;color:#1A1420}
 .hint2{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#FFD653;color:#1A1420;border:2.5px solid #1A1420;border-radius:var(--rx);box-shadow:3px 3px 0 #1A1420;padding:6px 8px 6px 12px;margin:0 0 10px;font-family:var(--f-display);font-size:20px;line-height:1.1}
@@ -701,6 +697,7 @@ html,body{touch-action:pan-x pan-y}
 .ptitle{margin:4px 0 12px;font-size:36px}
 .foodsoon{text-align:center;background:var(--paper);border:2.5px dashed var(--ink);border-radius:20px;padding:26px 18px;color:var(--ink)}
 .foodsoon h3{margin:8px 0 4px;font-size:30px}.foodsoon p{margin:0;font-size:20px;color:var(--ink2)}
+.card h3,.lmini h3{-webkit-text-stroke-color:var(--nms,#1A1420)!important;text-shadow:2.5px 2.5px 0 var(--nms,#1A1420)!important}
 </style>
 </head>
 <body>
@@ -1048,7 +1045,7 @@ function route(){
   if(!sh&&afterClose){const f=afterClose;afterClose=null;f();}
 }
 function closeSheetThen(fn){ if(sheetOpen){hideSheet();afterClose=fn;history.back();} else fn(); }
-function credit(){return '<footer class="credit"><span class="dev">developed by</span><a class="crl" href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener" aria-label="Mirage by Ginger Agency (abre o Instagram)"><img class="mg" src="https://biblioteca-de-prompts-mirage.pages.dev/logo-mirage.jpg" alt="Mirage" width="52" height="84" loading="lazy"><img class="mw" src="https://biblioteca-de-prompts-mirage.pages.dev/mirage-word.png" alt="" width="90" height="30" loading="lazy"><span class="byg">by Ginger</span></a></footer>';}
+function credit(){return '';}
 function render(){
   if(S.mapFs&&S.tab!=='map')leaveFsState();
   document.querySelectorAll('nav button[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
@@ -1109,7 +1106,7 @@ function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
   const warn=on&&cf.length?`<div class="warn warnlist"><ul>${cf.map(o=>`<li><span class="wh2">⚠ Bate ${inter(sh,o)}</span><span class="wn">com ${esc(o.name)}</span></li>`).join('')}</ul></div>`:'';
   const mb=S.maybe.has(sh.id);
-  return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})">
+  return `<article class="card ${on?'on':''}${mb?' maybe':''}${mb&&opts.unmark?' maybe-rot':''}${LT.has(st.c)?' lt':''}${isLive(sh)?' livecard':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')});--nms:var(${st.c.replace('--st','--nms')})">
     <div class="time">${hhmm(sh.s)}${sh.noEnd?'':`<span class="ate">até</span><small>${hhmm(sh.e)}</small>`}</div>
     <div><div class="nmrow"><h3>${esc(sh.name)}</h3>${mb?(opts.unmark?'<span class="maybetag">Talvez</span>':'<span class="maybetag mk" aria-label="Talvez" title="Talvez">?</span>'):(on&&!opts.unmark?'<span class="maybetag mk heart" aria-label="Marcado" title="Marcado">♥</span>':'')}${isLive(sh)?`<span class="nmbrk"></span><span class="onair" title="${liveWord(sh)}${sh.noEnd?'':', termina em '+fmtIn(sh.e-NOW.mins)}"><i class="dot"></i><b>${liveWord(sh)}</b></span>`:''}</div><div class="meta">${st.pins.length?`<button class="st stbtn" data-pinstage="${sh.stage}" aria-label="Ver ${esc(st.n)} no mapa"><span class="stn">${esc(stageLong(sh.stage))}</span><svg class="chev" viewBox="0 0 8 12" width="8" height="12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`:`<span class="st">${esc(st.n)}</span>`}${sh.oficina?'<span class="tag">oficina</span>':''}${sh.bg?'<span class="tag">o dia todo</span>':''}</div>${sh.note?`<div class="note">${esc(sh.note)}</div>`:''}${warn}</div>
     <div class="acts">${opts.unmark
@@ -1151,7 +1148,7 @@ function liveMini(sh,kind){
   const when=kind==='now'
     ? `até ${hhmm(sh.e)}${sh.noEnd?'':' · faltam '+fmtIn(sh.e-NOW.mins)}`
     : (abs-now>=1440?`começa ${DAYS[sh.d].short.toLowerCase()} ${DAYS[sh.d].n}, ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`:`começa ${hhmm(sh.s)} · em ${fmtIn(abs-now)}`);
-  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}" aria-label="Ver no mapa, ponto ${pin}">Mapa <i class="pin ${(PINS.find(p=>p.n===pin)||{}).cat||'palco'}">${pin}</i> ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><ul>${cf.map(o=>`<li><span class="wh2">⚠ Bate ${inter(sh,o)}</span><span class="wn">com ${esc(o.name)}</span></li>`).join('')}</ul></div>`:''}</article>`;
+  return `<article class="lmini${LT.has(st.c)?' lt':''}" style="--c:var(${st.c});--nm:var(${st.c.replace('--st','--nm')});--nms:var(${st.c.replace('--st','--nms')})"><div class="lrow"><span class="st">${esc(st.n)}</span>${pin?`<button class="mapbtn" data-pinstage="${sh.stage}" aria-label="Ver no mapa, ponto ${pin}">Mapa <i class="pin ${(PINS.find(p=>p.n===pin)||{}).cat||'palco'}">${pin}</i> ›</button>`:''}</div><h3>${esc(sh.name)}</h3><div class="lwhen">${when}</div>${cf.length?`<div class="warn warnlist"><ul>${cf.map(o=>`<li><span class="wh2">⚠ Bate ${inter(sh,o)}</span><span class="wn">com ${esc(o.name)}</span></li>`).join('')}</ul></div>`:''}</article>`;
 }
 const BELLB='M6.2 16.6V11a5.8 5.8 0 0 1 11.6 0v5.6l1.7 1.9H4.5z';
 const bellSvg=on=>on?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`:`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="3.4" r="1.4" fill="currentColor"/><path d="${BELLB}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.8 20.6a2.4 2.4 0 0 0 4.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4.5l16 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
@@ -1412,7 +1409,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.141';
+const APP_VER='1.0.142';
 const HELP={
  prog:['Programação','prog',()=>`<ul><li>Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li>Busque por artista ou palco, ou filtre por um palco.</li><li><b>Quero ir</b> coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Talvez</b> guarda como possibilidade, sem checar choque.</li><li>Shows que já acabaram saem da lista.</li></ul>`],
  rot:['Meu roteiro','rot',()=>`<ul><li>Mostra o que você marcou, separado por dia, e os "Talvez" à parte.</li><li>Avisa choques de horário e trocas apertadas, com menos de 10 minutos entre palcos diferentes.</li><li>Shows e dias que já acabaram saem do roteiro sozinhos.</li><li>A lixeira limpa tudo, depois de pedir confirmação.</li></ul>`],
