@@ -132,6 +132,7 @@ h2.sec{font-family:var(--f-display);font-size:20px;margin:16px 0 8px}
 .links a{border:2px solid var(--ink);border-radius:12px;padding:8px 12px;font-weight:800;color:var(--ink);background:var(--paper);text-decoration:none;min-height:40px;display:inline-flex;align-items:center}
 
 .credit{margin:28px 0 8px;background:#EBE6E2;border:2px solid var(--ink);border-radius:18px;padding:14px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.credit .crl{display:flex;flex-direction:column;align-items:center;gap:2px;color:inherit;text-decoration:none}
 .credit .dev{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#6E6578;font-weight:800}
 .credit .mg{height:84px;width:auto;mix-blend-mode:multiply;margin-top:6px}
 .credit .mw{height:30px;width:auto;margin-top:2px}
@@ -643,14 +644,56 @@ html,body{touch-action:pan-x pan-y}
 .warnlist .wn{min-width:0;flex:1 1 auto;overflow-wrap:break-word}
 .warnlist .wt{flex:none;white-space:nowrap;font-size:13px;opacity:.85;margin-left:auto}
 .chips[aria-label="Palco"]{position:sticky;top:-18px;z-index:20;background:var(--bg);padding-top:8px;padding-bottom:10px;margin-top:-8px;box-shadow:0 8px 8px -8px rgba(26,20,32,.35)}
+
+.is-home nav,.is-home header{display:none}
+.is-home #main{display:flex;flex-direction:column;padding-top:10px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.is-home .hero{flex:1 1 auto;justify-content:center;margin:0;min-height:170px}
+.is-home .hgrid{flex:none;margin:0 0 4px}
+.is-home .hfoot{margin:22px 0 6px}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin:14px 0 18px}
+.hlogo{width:min(78vw,300px);height:auto;transform:rotate(-2deg);filter:drop-shadow(0 2px 0 rgba(58,51,64,.28)) drop-shadow(0 7px 8px rgba(58,51,64,.22))}
+.hchar{width:104px;height:104px;object-fit:contain;filter:drop-shadow(0 3px 0 rgba(26,20,32,.22));margin-top:-2px}
+.hdate{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;margin:0 0 14px;color:var(--ink)}
+.hdate .hpill{display:inline-block;background:var(--butter);color:#3A3340;border:2px solid var(--ink);border-radius:999px;padding:0 14px;font-size:19px;font-weight:700;line-height:28px}
+@media(max-height:720px){.is-home .htile{min-height:80px;padding:8px 12px}.is-home .htile .hic{width:30px;height:30px}.is-home .hlogo{width:min(62vw,230px)}.is-home .hero{min-height:120px}.hdate strong{font-size:30px}.is-home .hfoot{margin:14px 0 4px}}
+.hdate strong{font-size:34px;line-height:1;margin-top:4px;letter-spacing:.02em}
+.hdate span:last-child{font-size:19px;color:var(--ink2)}
+.htheme{position:absolute;top:10px;right:12px;width:38px;height:38px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);color:var(--ink);z-index:3;display:grid;place-items:center;padding:0}
+.htheme svg{width:20px;height:20px}
+#main{position:relative}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 12px}
+.htile{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:6px;min-height:104px;padding:12px 14px;background:var(--paper);border:2px solid var(--ink);border-radius:20px;box-shadow:3px 3px 0 var(--ink);color:var(--ink);font-family:inherit;font-size:26px;font-weight:700;line-height:1;text-align:left}
+.htile:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.htile .hic,.foodsoon .hic{width:36px;height:36px;flex:none}
+.htile .hic{color:var(--lav)}
+.hbadge{position:absolute;top:10px;right:10px;min-width:26px;height:26px;border-radius:13px;background:var(--rose);color:#3A3340;border:2px solid var(--ink);font-size:18px;line-height:22px;text-align:center;padding:0 6px}
+.hfoot{display:flex;flex-direction:column;align-items:center;gap:6px;margin:26px 0 10px;text-align:center}
+.hdev{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--ink2)}
+.hfoot img{height:auto;width:56px;display:block;opacity:.85}
+.hfoot p{margin:0;font-size:15px;color:var(--ink2)}
+.mn-op{background:var(--paper);border:2px solid var(--ink);border-radius:16px;margin:0 0 8px;box-shadow:2px 2px 0 var(--ink)}
+.mn-op summary{list-style:none;cursor:pointer;padding:10px 44px 10px 14px;display:flex;flex-direction:column;gap:2px;position:relative}
+.mn-ch{position:absolute;right:14px;top:50%;width:22px;height:22px;margin-top:-11px;color:var(--lav);transition:transform .2s}
+.mn-op[open] .mn-ch{transform:rotate(180deg)}
+.mn-op summary::-webkit-details-marker{display:none}
+.mn-n{font-size:24px;font-weight:700;line-height:1.05}.mn-m{font-size:17px;color:var(--ink2)}
+.mn-its{list-style:none;margin:0;padding:0 14px 8px}
+.mn-it{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1.5px dashed var(--line);font-size:19px;line-height:1.1}
+.mn-it-n{min-width:0}.mn-it-n small{display:block;font-size:15px;color:var(--ink2);margin-top:2px}
+.mn-it-p{flex:none;font-weight:700;white-space:nowrap}
+.mn-sec{background:var(--paper);border:2px solid var(--ink);border-radius:16px;margin:0 0 10px;padding:10px 0 2px;box-shadow:2px 2px 0 var(--ink)}
+.mn-sec h3{margin:0;padding:0 14px 4px;font-size:25px}.mn-sec h3 span{font-size:18px;color:var(--ink2);font-weight:400}
+.ptitle{margin:4px 0 12px;font-size:36px}
+.foodsoon{text-align:center;background:var(--paper);border:2.5px dashed var(--ink);border-radius:20px;padding:26px 18px;color:var(--ink)}
+.foodsoon h3{margin:8px 0 4px;font-size:30px}.foodsoon p{margin:0;font-size:20px;color:var(--ink2)}
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <img class="sticker" src="sticker.webp" width="480" height="195" fetchpriority="high" decoding="async" alt="Rock the App">
+    <img class="sticker" data-tab="home" role="button" tabindex="0" style="cursor:pointer" src="sticker.webp" width="480" height="195" fetchpriority="high" decoding="async" alt="Rock the App">
     <div class="t"><h1 class="sr">Rock the App</h1></div>
-    <a class="dev" href="https://www.instagram.com/officeginger" target="_blank" rel="noopener" aria-label="Desenvolvido por Mirage by Ginger Agency (abre o Instagram)"><span>developed by</span><img src="mirage-logo.webp" alt="Mirage by Ginger Agency" width="64" height="37"></a>
+    <a class="dev" href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener" aria-label="Desenvolvido por Mirage by Ginger Agency (abre o Instagram)"><span>developed by</span><img src="mirage-logo.webp" alt="Mirage by Ginger Agency" width="64" height="37"></a>
     <button id="theme-btn" aria-label="Alternar modo escuro"></button>
     <button id="about-btn" aria-label="Sobre o app e como instalar"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 9.2a3.5 3.5 0 1 1 5.4 2.9c-1.2.8-2 1.5-2 3"/><circle cx="12" cy="19" r="0.9" fill="currentColor" stroke="none"/></svg></button>
   </header>
@@ -961,7 +1004,7 @@ let NOW=nowBR();
 const showOver=sh=>NOW.date>DAYS[sh.d].date||(NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.e); /* acabou: sai da lista e do roteiro */
 const dayOver=d=>SHOWS.filter(x=>x.d===d).every(showOver); /* o dia só fecha depois que o último show termina */ 
 let dayIdx=Math.max(0,DAYS.findIndex((x,d)=>!dayOver(d)));
-const S={tab:'prog',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
+const S={tab:'home',day:dayIdx,stages:[],q:'',sel:new Set(),zoom:2.5,orig:false,cat:'all',pin:null,showPins:true};
 try{if(localStorage.getItem('rta_wk')!=='2'){localStorage.removeItem('rta_sel');localStorage.removeItem('rta_maybe');localStorage.setItem('rta_wk','2');}}catch(e){}
 try{const v=JSON.parse(localStorage.getItem('rta_sel')||'[]');v.forEach(id=>byId[id]&&S.sel.add(id));}catch(e){}
 S.maybe=new Set();
@@ -976,27 +1019,74 @@ const isLive=sh=>NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.s&&NOW.mins<sh.e;
 
 /* ===================== RENDER ===================== */
 const $=s=>document.querySelector(s), main=$('#main');
-const TABS=['prog','rot','map','wx'];
+const TABS=['home','prog','rot','map','wx','food'];
 let sheetOpen=false, afterClose=null;
 const TABSCROLL={}; /* guarda onde a pessoa parou em cada aba */
 function setTab(t){ if(t===S.tab)return; TABSCROLL[S.tab]=main.scrollTop; S.tab=t; try{location.hash=t;}catch(e){} render(); main.scrollTop=TABSCROLL[t]||0; }
 function route(){
   const h=location.hash.slice(1), base=h.split('-')[0], sh=h.endsWith('-info');
-  const tab=TABS.includes(base)?base:'prog';
+  const tab=TABS.includes(base)?base:'home';
   if(!h.endsWith('-fs')&&S.mapFs)leaveFsState();
   if(!sh&&sheetOpen)hideSheet();
   if(tab!==S.tab){TABSCROLL[S.tab]=main.scrollTop;S.tab=tab;render();main.scrollTop=TABSCROLL[tab]||0;}
   if(!sh&&afterClose){const f=afterClose;afterClose=null;f();}
 }
 function closeSheetThen(fn){ if(sheetOpen){hideSheet();afterClose=fn;history.back();} else fn(); }
-function credit(){return '<footer class="credit"><span class="dev">developed by</span><img class="mg" src="https://biblioteca-de-prompts-mirage.pages.dev/logo-mirage.jpg" alt="Mirage" width="52" height="84" loading="lazy"><img class="mw" src="https://biblioteca-de-prompts-mirage.pages.dev/mirage-word.png" alt="" width="90" height="30" loading="lazy"><span class="byg">by Ginger</span></footer>';}
+function credit(){return '<footer class="credit"><span class="dev">developed by</span><a class="crl" href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener" aria-label="Mirage by Ginger Agency (abre o Instagram)"><img class="mg" src="https://biblioteca-de-prompts-mirage.pages.dev/logo-mirage.jpg" alt="Mirage" width="52" height="84" loading="lazy"><img class="mw" src="https://biblioteca-de-prompts-mirage.pages.dev/mirage-word.png" alt="" width="90" height="30" loading="lazy"><span class="byg">by Ginger</span></a></footer>';}
 function render(){
   if(S.mapFs&&S.tab!=='map')leaveFsState();
   document.querySelectorAll('nav button[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  $('#app').classList.toggle('is-home',S.tab==='home');
   const c=$('#cnt');c.textContent=S.sel.size+S.maybe.size;c.hidden=!(S.sel.size+S.maybe.size);
-  ({prog:rProg,rot:rRot,map:rMap,wx:rWx})[S.tab]();
+  ({home:rHome,prog:rProg,rot:rRot,map:rMap,wx:rWx,food:rFood})[S.tab]();
 }
 function dayRain(i){ return ''; }
+const HI={
+ prog:'<path d="M3 10h18M8 3v4M16 3v4"/><rect x="3" y="5" width="18" height="16" rx="3"/>',
+ rot:'<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/>',
+ map:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+ wx:'<path d="M7 17a4.5 4.5 0 1 1 1.2-8.8A5.5 5.5 0 0 1 18.5 10a3.5 3.5 0 0 1-.5 7z"/><path d="M9 20l1-2M13 20l1-2"/>',
+ food:'<path d="M7 3v7M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 4-3.5 7.5H17"/>',
+ fav:'<path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5c0 6.1-8 11-8 11z"/>',
+ share:'<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/>',
+ about:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/>'
+};
+function hTile(k,label,attr,cls,extra){return `<button class="htile ${cls}" ${attr}><svg class="hic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HI[k]}</svg><span>${label}</span>${extra||''}</button>`;}
+const HCH=['fest-dance','fest-duo','fest-guitar','fest-rock'];
+let _hch=null;
+function pickHch(){if(_hch)return _hch;let l=-1;try{l=+localStorage.getItem('rta_hch');}catch(e){}let n;do{n=Math.floor(Math.random()*HCH.length);}while(n===l);try{localStorage.setItem('rta_hch',n);}catch(e){}return _hch=HCH[n];}
+function rHome(){
+  const n=S.sel.size+S.maybe.size;
+  main.innerHTML=`<button class="htheme" id="theme-home" aria-label="Alternar modo escuro"></button><section class="hero"><img class="hlogo" src="sticker.webp" width="480" height="195" alt="Rock the App" decoding="async"></section><div class="hdate"><span class="hpill">2º fim de semana</span><strong>6, 7 e 8 de novembro</strong><span>Itaipava · Petrópolis · RJ</span></div><div class="hgrid">`+
+  hTile('prog','Programação','data-tab="prog"','')+
+  hTile('rot','Meu roteiro','data-tab="rot"','',n?`<b class="hbadge">${n}</b>`:'')+
+  hTile('map','Mapa','data-tab="map"','')+
+  hTile('wx','Tempo','data-tab="wx"','')+
+  hTile('food','Alimentação','data-tab="food"','')+
+  hTile('about','Ajuda','data-home="about"','')+
+  `</div>`+`<footer class="hfoot"><span class="hdev">developed by</span><a href="https://www.instagram.com/mirage.ia" target="_blank" rel="noopener" aria-label="Mirage by Ginger Agency (abre o Instagram)"><img src="mirage-logo.webp" alt="Mirage by Ginger Agency" width="64" height="30" loading="lazy"></a><p>Não é um aplicativo oficial do evento.</p></footer>`;
+  try{paintTheme();}catch(e){}
+}
+const MENU_F=[["1Cafezinn",["Aurora"],[["Café espresso",9],["Café espresso com borda de nutella",13],["Café com leite",13],["Café filtrado tradicional",8,"Produto da agricultura familiar"],["Chocolate quente cremoso",18],["Choconhaque",22],["Espresso 43",22],["Queijo quente",16],["Bolo de pote",16],["Biscoitos artesanais – pote 150g",22],["Brigadeiro de café – 3 unid",16],["Pacote café especial artesanal – 250g",49],["Caneca personalizada 1cafezinn",15],["Recarga café caneca",6]]],["Acelbra",["Aurora"],[["Refeição Salada",34],["Suco Natural",10],["Salada de Fruta",18],["Sanduiche Natural SANDURITA",34],["Panqueca",34],["Café cápsula",6],["Docinho vegano",6],["Cookie/brownie",15],["Doce pote/banoffe/bolo",25],["Biscoito pote",35],["Empadão",18],["Quiche",15],["Nhoque",38],["Mini pizza",22],["Moqueca de banana da terra",38],["Tortinhas doces",18],["Mix frutas e cereais pequeno",17],["Mix frutas e cereais grande",34]]],["Amazonika",["Aurora"],[["Amazonika Rock",40],["Amazonika Crispy",40],["Juka",36],["Batata frita",36],["Combo burger + batata",50],["Combo Juka + batata",50]]],["Anunciatta Massas",["Aurora"],[["Festival de Nhoque – molho à escolher",50],["Massas tradicionais – molho à escolher",42],["Fetuccine no Granapadano",68],["Batata frita canoa (porção)",20],["Molhos (à escolher)",0],["Churros tradicional",15],["Churros tradicional com nutella",22],["Churros Gourmet",25],["Churros Mini (porção)",45],["Chocolate quente",12],["Churros Spanhol",45],["Brownie",10]]],["Bananitas",["Samba"],[["Geladinha",25],["Empanadas",30],["Nutella adc",5],["Split",10]]],["Baritt",["Aurora","Roda Gigante"],[["Brooklyn",40],["Brooklyn + BATATA FRITA",50],["Arpoador ( Arpex pros chegados)",40],["Arpoador ( Arpex pros chegados) + BATATA FRITA",50],["Pp",37],["Pp + batata frita",47],["Barit burger",40],["Barit burger + batata frita",50],["Batata frita porção",23]]],["Basta Massas",["Aurora"],[["Rigatoni Norma",50],["Rigatoni Norma Vegano",50],["Casarecce Pomodoro",50],["Casarecce Pomodoro Vegano",50],["Casarecce Caprese",52.5],["Cavatelli com Cogumelos",54.5],["Brigadeiro de tiramisu",10],["Pão de mel",13.5]]],["Borda e Lenha",["Aurora"],[["1 Pizza 25cm",45],["2 Pizzas 25cm",80]]],["Broto Pizza",["Aurora"],[["Muça",45],["Margarida",45],["RTM",45],["Vegana",45],["Mousse Chocola-tudo",30]]],["Brownie do Ton",["Aurora"],[["Barrinha de Chocolate do Ton",12],["Brownie Avulso",16],["Cookie avulso",20],["Brownie três chocolates",20],["Mini quentinha",30],["Cookie Smores",35],["Duo Morango no Palito",35],["Fondue no pote",40],["Fondue no pote fruta",48],["Fondue na caneca brownie",50],["Fondue na caneca brownie fruta",58],["Adicionais para fondues",8],["Café expresso",10],["Chocolate quente",20],["Choconhaque",25]]],["Carango Burger",["Aurora"],[["Classic burger",35],["Combo classic",45],["Burger Melt",39],["Combo Burger Melt + Fritas",49],["RTM",39],["Combo Burger RTM + Fritas",49],["Porção Fritas",20]]],["Chez Bonbon",["Aurora"],[["Barra chocolate 80gr",45],["Barra chocolate 20gr",20],["Barra pontos turisticos",35],["Gotinhas de chocolate Belga",35],["Gotinhas de chocolate classicas",25],["Caixa bombom 2un",22],["Caixa bombom 7un",75],["Bombom un",10],["Meia lua recheada 8gr un",5],["Cookie un",16],["Brownie un",16],["Licor de chocolate dose 80ml",15],["Chocolate quente 180ml",20],["Café espresso",8]]],["Chicharrón",["Aurora"],[["Choripán Rockstar",48],["Combo Rockstar",69],["Choripán tradicional",40],["Combo Tradicional",66],["Batata frita Rockstar",39],["Batata frita tradicional",29]]],["Cogumelado",["Aurora"],[["Alemão + chips",40],["Choripan + chips",40],["Classic Burguer + Chips",45]]],["Coltivi",["Aurora"],[["Marguerita",42],["Portuguesa",42],["Marguerita Trufada",46]]],["Conytos",["Aurora","Roda Gigante"],[["Coxinha de alho Poro com requeijão (porção com 12)",29],["Coxinha de shimeji com requeijão (porção com 12)",29],["Coxinha 4 queijos (porção com 12)",29],["Bolinha de queijo (porção com 12)",29],["Quibe vegano (porção com 12)",29],["Travesseiro de Brócolis com muçarela (porção com 12)",29],["Batata frita + Molho",20],["Miny Pizza Marguerita",19],["Miny Pizza 4 Queijos",19],["Miny Pizza Alho poró com requeijão",19]]],["Ducara Sanduíches no Pão de Alho",["Roda Gigante"],[["Carne",40],["3 Queijos",40],["Queijo coalho",38],["Pão de alho simples",15],["Batata frita grande",29],["Batata frita pequena",15],["Veg Carne queijos",40],["Veg carne e bbq",28],["Adicional",7]]],["Fala Falafel",["Aurora"],[["Batata Chips",15],["Porção de Falafel (3 und)",28],["Porção de Falafel (6 und)",46],["Sanduíche de Falafel",46],["Hambúrguer de Falafel",52],["Brownie de Chocolate XL",24]]],["Fazenda Futuro",["Aurora"],[["X burguer",35],["Burguer RTM",40],["Cheddar melt",40],["Batata frita combo",10],["Batata frita porção pequena",18],["Molho extra",2]]],["Focaccia",["Aurora"],[["Toscana",35],["Florença",40],["Bolonha",43],["Veneza",40],["Adicional",5]]],["Friend Fries",["Aurora"],[["Fritas com molhos",20]]],["Friitas",["Aurora","Samba"],[["Trufada",35],["Mexicana",38],["Tres Queijos",40],["Steak",40],["Friitas Gorgonzola",38],["Cone de batata",25],["Nachos",30],["Adicional",5]]],["Gustô Burger",["Roda Gigante"],[["Classic Burger",37],["Duplo Tasty",48],["Gorgonzola",40],["Combo",10],["Porção batata",25],["Adicional",5]]],["Gustô Italian Food",["Aurora"],[["Nhoque Pesto",35],["Nhoque 4 queijos",40],["Nhoque Bolonhesa",40],["Panini Toscano",35],["Panini Bolonhese",40],["Panini Florentino",40],["Adicional",5]]],["Jaca no Pão",["Aurora"],[["Burguês costela (Burguês)",45],["Burguês costela combo (Burguês combo)",55],["Surra de queijo (Surra)",42],["Surra de queijo queijo (Surra combo)",52],["Vegan (Veg)",40],["Vegan combo (Veg combo)",50],["Abacaxi ao mel (Abacaxi)",45],["Abacaxi ao mel (Abacaxi combo)",55],["Smash (Smash)",39],["Smash (Smash combo)",49],["Fritas especial",55],["Fritas simples",40],["Estrogojaca de frango (Estrogojaca)",36]]],["Ki Batata",["Roda Gigante"],[["Fritas Trufada",35],["Fritas Três Queijos",35],["Fritas Gorgonzola",35],["Fritas RTM",38],["Fritas Americana",40],["Cone de fritas",20],["Dog Crispy",40],["Dog Cheddar",40],["Combo",10]]],["La Pasta Agitare",["Roda Gigante"],[["Pernil vegano",44],["Bacon Al cheddar",38],["Italiana",40],["Carne seca de Jaca",42]]],["Las Empanadas",["Aurora","Samba"],[["Queijo com cebola",18.9],["Napolitana",18.9],["Espinafre",18.9],["Caponata de Berinjela",18.9],["Doce de Leite",18.9],["Chocolate",18.9],["Combo 2 empanadas",32],["Açaí",22.9],["Açaí",32.9]]],["Levain Carioca",["Aurora"],[["Croissant de Emmental e Cogumelos",39],["Ciabatta Caprese",36],["Pipoca de Croissant Doce",18],["Grissini",19],["Cinnamon Roll",18],["Kit Mini Croissant",34],["Adicional de nutella",8],["Girella de Gruyère com Pesto",18],["Bolo da Rochi",21],["Café Coado",8],["Café Coado com leite",13]]],["Lievita Pizza",["Samba"],[["Pizza muçarela",34],["Pizza marguerita especial",38],["Pizza RTM",38],["Pizza 4 queijos",38],["Risoto funghi",42],["Risoto espinafre com gorgonzola",42]]],["Monstruck Burguer",["Aurora","Samba"],[["Monstro",35],["Monstro + batata",45],["Classico",40],["Classico + batata",50],["Orgia",40],["Orgia + batata",50],["Fresco",45],["Fresco + batata",55],["Gorgonzila",42],["Gorgonzila + batata",52],["Duplo cheddar vegan bacon",60],["Dupli cheddar vegan bacon + batata",70],["Fritas",10]]],["Nosso Nhoque",["Samba"],[["Nhoque 4 queijo",40],["Nhoque funghi tartufo",42],["Nhoque ao sugo",40],["Nhoque pesto",35]]],["Nuu Pão de Queijo",["Aurora"],[["Pão de Queijo 90g",12],["PDQ Queijo meia cura com molho pesto de manjericão",18],["PDQ Caponata de Berinjela",18],["PDQ Cogumelos salteados na manteiga com ervas e molho becgamel",20],["PDQ Doce de Leite",17],["PDQ Nutella",17],["PDQ Queijo de cabra com mel ou pesto",20],["Palitos de Tapioca c/molho Barbecue de Goiabada",22],["Café expresso 100 ML",12],["Combo dois sanduiches recheados",36],["Combo Pão de queijo de 90g + café",22]]],["O Fallafel",["Aurora","Roda Gigante"],[["Kebab de falafel",39],["Porção de falafel",39],["Batata frita",16]]],["Os Bambas",["Roda Gigante"],[["Marguerita – 30cm",50],["Pesto Cogu – 30cm",53],["Cogumelo Picante – 30cm",53],["Fatia Marguerita",17],["Fatia Pesto Cogu",20],["Fatia Cogumelo Picante",20]]],["Pão de Alho do Kiki",["Aurora","Samba"],[["Batata adc",10],["Batata G",22],["Batata ling grão",35],["Batata ched cost",42],["PA Ling futuro",33],["PA Costela veg",38],["PA Brócolis Coalho",37],["PA Carne Futuro",40],["Tabua Misto",70],["Almoço",45]]],["Pizza in Box e Wrap and Go",["Aurora"],[["Pizza de muçarela",30],["Pizza Marguerita",32],["Pizza primavera",34],["Wrap de frango crocante e salada caesar",43],["Wrap de peixe vegetariano ao molho oriental",45],["Adicional de fritas no wrap",10],["Porção de batata e molho",25],["Porção de empanado de frango vegetariano com molho",46],["Porção de isca de peixe vegetariana com molho",48],["Brownie recheado",17],["Alfajor",18],["Cookie",22],["Cookie recheado",24]]],["Ragi Empório Árabe",["Aurora"],[["Falafel",38],["Kafta",38],["Porção",45]]],["Rock Burguer",["Samba"],[["Rock n zola",42],["Rock burguer",40],["Hardy rock",42],["Duplo cheddar melt",60],["Rock spice cheese",48],["Rock cheddar melt",36],["Rock mac",35],["Adicional de fritas",10],["Fritas com cheddar melt",25],["Brownie recheado",17],["Cookie tradicional",22]]],["Rock Veg",["Roda Gigante"],[["Sanduíche RTM 1 carne",35,"Pão, steak de carne vegana, alface, tomate, cebola roxa, pepino, cheddar em fatia e mostarda e mel"],["Sanduíche RTM 2 margherita",32,"Pão, queijo coalho, tomate, alface e manjericão"],["Sanduíche RTM 4 queijos",34],["Porção de batata comum",30],["Combo batata add",10]]],["Rod-Beth Crepes",["Aurora","Roda Gigante"],[["4 queijos",35],["Alho Poro",35],["Margherita",33],["Chocolate com Confete",35],["Doce de Leite com Banana",35],["Nutela com Kinder Bueno",40]]],["Sisi Pizza",["Aurora"],[["Pizza Marguerita",42],["Pizza Marguerita Trufada",46],["Pizza Quatro Queijos",42]]],["Só Coxinha",["Samba"],[["Porção 12 coxinhas",29],["Porção 18 coxinhas",39],["Porção 15 coxinhas e batata frita",46],["Porção de batata frita com molho",25],["Porção de empanado de frango vegetariano com molho",46],["Porção de peixe vegetariano com molho",48],["Brownie recheado",17],["Alfajor",18],["Cookie tradicional",22],["Cookie recheado",24]]],["Tapí Tapioca",["Aurora"],[["Tapí Raiz",32],["Tapí Pizza",32],["Tapí Hermana",32],["Tapí Amor",29],["Tapí Leche",29],["Açaí da Tapí",29],["Batido de açaí",29],["Batido Cupuaçu",29],["Batido Tropical",29],["Combo 1 tapí salgada + 1 Batido",58],["Adicional",6]]],["To Frito",["Samba","Roda Gigante"],[["Churros Tradicional",15],["Churros Gourmet",25],["Churros Tradicional de Nutella",22],["Especial de Nutella",30],["Porção de Mini Churros",45],["Churros Espanhol",45],["Pastel pizza",28],["Pastel de Champignon",32],["Pastel RTM",40],["Chocolate quente",12]]],["TT Burguer",["Aurora","Samba"],[["T.T. Futuro",42],["Combo T.T. Futuro",56],["T.T. Futuro Trufado",48],["Combo T.T. Futuro Trufado",62],["Batata Frita",20],["Crispy Queijo Gouda (6 unidades)",30]]],["Vulcano",["Aurora","Samba"],[["Hot dog vulcano",32],["Hot dog cheddar",32],["Batata frita combo",10],["Batata frita pequena",18],["Batata frita grande",28],["Batata frita cheddar e crispy cebola grande",30],["Molho extra",2]]],["Yaki Barit",["Samba"],[["Yakisoba com bolinho de feijoada",40],["Yakisoba com chikin franfo",40],["Yakisoba de legumes",37],["Sanduiche de kafta",33],["Sanduiche de burguer de caju comqueijo",33]]],["Zé Colmeia",["Ambulante"],[["Halls",9],["Mentos tubo",10],["Mentos up",10],["Fruittella",10],["Tic-tac",10],["Trident",10],["Balas Sortidas",0.5],["Bubbaloo",1],["Bananada",1],["Pingo de leite",1],["Pastilha garoto",5],["Pé de moça",5],["Pirulito",3],["Amendoim",5],["Paçoca",3],["Paçoca diet",4],["Jujuba",5],["Baton",5],["Bombom",5],["Barra de cereal",8],["Trento",10],["Chokito",10],["Prestígio",10],["Twix",15],["Kit-kat",15],["Snikers",15],["Mem's",15],["Fini",16],["Flopi",20],["Passatempo",8],["Torcida",9],["Fofura",9],["Fandangos",10],["Globo",10],["Piraque",12],["Batata",12],["Filtro Slin",30],["Tabaco Orgânico",40],["Hi tabaco/ amsterdan",50],["Charuto Titans",35],["Piteira",12],["Isqueiro Bic",15],["Seda Smoking",20],["Seda Zomo / Bbolado",15],["Dunhill",45],["Marlboro",45],["Lucky Strike",45],["Camel",40],["Rotman",30]]]];
+const MENU_B=[["Copo",null,[["Copo / taça retornável",15],["Cordinha pro copo",10]]],["Bebidas",null,[["Água",10],["Refrigerante",15],["Suco",15],["Schweppes",15,"Tônica, Tônica Zero ou Citrus"],["Água de coco LVNV",20],["Red Bull",20,"Energy Drink, Zero, Tropical, Melancia ou Carnaval Edition Sugarfree"]]],["Cervejas",null,[["Heineken ou Heineken 0.0",20],["Heineken Ultimate",22],["Blue Moon",25],["Lagunitas Day Time",25]]],["Schweppes Mixed · drinks prontos","R$ 27 cada",[["Maracujá Vodka Fusion"],["Vodka Citrus"],["Gin Tônica"],["Gin Tônica Pink"],["Spritz"]]],["Vinhos e espumante",null,[["Vinho · taça 150 ml",35],["Vinho · garrafa",170],["Wine bag Castas",20],["Espumante Alud Brut · garrafa",170]]],["Doses",null,[["Vodka Smirnoff",30],["Gin Gordon's",35],["Amarula",30],["Whisky Johnnie Walker Blonde",35],["Whisky Johnnie Walker Red Label",35],["Whisky Johnnie Walker Black Label",45]]],["Drinks Smirnoff","R$ 35 cada",[["Smirnoff & Citrus",null,"Vodka e Schweppes Citrus"],["Smirnoff & Red Bull",null,"Vodka e Red Bull Original"],["Smirnoff Caju Fresh",null,"Vodka, suco de caju, suco de limão e xarope de açúcar"]]],["Drinks Gordon's","R$ 40 cada",[["Gordon's & Tônica",null,"Gin e água tônica"],["Gordon's & Red Bull",null,"Gin e Red Bull Original"]]],["Drinks Johnnie Walker",null,[["Red & Guaraná",40,"Johnnie Walker Red Label, Guaraná Antarctica e rodela de laranja"],["Johnnie Citrus",40,"Johnnie Walker Blonde, Schweppes Citrus e rodela de laranja"],["Blonde & Red Bull Tropical",40,"Johnnie Walker Blonde, Red Bull Tropical e rodela de laranja"],["Black & Água de Coco",50,"Johnnie Walker Black Label, água de coco e fatia de coco"],["Black & Coke",50,"Johnnie Walker Black Label e Coca-Cola"],["Black & Red Bull",50,"Johnnie Walker Black Label e Red Bull Original"],["Black Penicillin",50,"Johnnie Walker Black Label, suco de limão, xarope de mel e 2 fatias de gengibre"]]],["Drinks Amarula","R$ 35 cada",[["Amarula Iced Coffee",null,"Amarula Cream e café · exclusivo no bar da Amarula"],["Amarula Pink Lake",null,"Amarula Raspberry, xarope de framboesa, splash de limão, tônica e hortelã"],["Amarula Vegan Vibes",null,"Amarula Vegan, suco de abacaxi, leite de coco e hortelã"],["Amarula shot ou on the rocks",null,"Amarula Cream, Raspberry ou Vegan, com gelo"]]],["Aperol Spritz",null,[["Aperol Spritz",40,"Aperol, espumante e água com gás"]]]];
+const brl=p=>p==null?'':'R$ '+String(p).replace('.',',').replace(/,(\d)$/,',$10');
+function foodItems(it){return '<ul class="mn-its">'+it.map(x=>`<li class="mn-it"><span class="mn-it-n">${esc(x[0])}${x[2]?`<small>${esc(x[2])}</small>`:''}</span><span class="mn-it-p">${brl(x[1])}</span></li>`).join('')+'</ul>';}
+function foodList(){
+  const q=norm((S.fq||'').trim());
+  if(S.ft==='b'){
+    return MENU_B.map(s=>`<section class="mn-sec"><h3>${esc(s[0])}${s[1]?` <span>${esc(s[1])}</span>`:''}</h3>${foodItems(s[2])}</section>`).join('')+'<p class="note">Outros drinks especiais nos bares exclusivos das marcas. Pega leve na bebida. Venda e consumo proibidos para menores de 18 anos.</p>';
+  }
+  const L=MENU_F.filter(o=>(S.fa==='all'||o[1].includes(S.fa))&&(!q||norm(o[0]).includes(q)||o[2].some(x=>norm(x[0]).includes(q))));
+  if(!L.length)return '<p class="note">Nada encontrado.</p>';
+  return L.map(o=>`<details class="mn-op"${q?' open':''}><summary><span class="mn-n">${esc(o[0])}</span><span class="mn-m">${esc(o[1].join(' · '))} · ${o[2].length} ${o[2].length===1?'item':'itens'}</span><svg class="mn-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>${foodItems(o[2])}</details>`).join('');
+}
+function rFood(){
+  if(!S.ft)S.ft='c'; if(!S.fa)S.fa='all'; if(S.fq==null)S.fq='';
+  const ar=[['all','Todas'],['Aurora','Aurora'],['Samba','Samba'],['Roda Gigante','Roda Gigante'],['Ambulante','Ambulante']];
+  main.innerHTML=`<h2 class="ptitle">Alimentação</h2><div class="row" role="group" aria-label="Tipo"><button class="chip-btn" data-ft="c" aria-pressed="${S.ft==='c'}">Comidas</button><button class="chip-btn" data-ft="b" aria-pressed="${S.ft==='b'}">Bebidas</button></div>`+
+  (S.ft==='c'?`<input class="search" id="fq" type="search" placeholder="Buscar barraca ou prato" value="${esc(S.fq)}" aria-label="Buscar"><div class="chips" role="group" aria-label="Área">${ar.map(a=>`<button class="chip-btn" data-fa="${a[0]}" aria-pressed="${S.fa===a[0]}">${a[1]}</button>`).join('')}</div>`:'')+
+  `<div id="foodlist">${foodList()}</div><p class="note">Praça de alimentação 100% vegetariana. Cardápios e preços enviados pelos operadores para 2026, podem mudar no dia.</p>`+credit();
+}
 function dayChips(){return '<div class="row days" role="group" aria-label="Dia">'+DAYS.map((d,i)=>`<button class="chip-btn${dayOver(i)?' over':''}" data-day="${i}" aria-pressed="${S.day===i}"${dayOver(i)?' disabled aria-label="'+d.short+' '+d.n+' (já passou)"':''}><b>${d.short} ${d.n}</b>${dayRain(i)}</button>`).join('')+'</div>'+(DAYS.every((x,d)=>dayOver(d))?'<div class="empty"><b>O fim de semana do festival já passou</b>Obrigado por usar o Rock the App!</div>':'');}
 function card(sh,opts={}){
   const st=stageById[sh.stage],cf=conflictsOf(sh),on=S.sel.has(sh.id);
@@ -1305,7 +1395,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.138';
+const APP_VER='1.0.139';
 function aboutSheet(){
   $('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Como funciona</h2>
   <ul class="how">
@@ -1393,7 +1483,7 @@ setInterval(tick,15000);
 const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>';
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
 function isDark(){return document.documentElement.dataset.theme==='dark';}
-function paintTheme(){const b=$('#theme-btn');if(b){b.innerHTML=isDark()?SUN:MOON;b.setAttribute('aria-label',isDark()?'Mudar para o modo claro':'Mudar para o modo escuro');}const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141214':'#FEFAD9';const cs=document.getElementById('cs');if(cs)cs.content=isDark()?'dark':'light dark';}
+function paintTheme(){document.querySelectorAll('#theme-btn,#theme-home').forEach(b=>{b.innerHTML=isDark()?SUN:MOON;b.setAttribute('aria-label',isDark()?'Mudar para o modo claro':'Mudar para o modo escuro');});const m=document.querySelector('meta[name=theme-color]');if(m)m.content=isDark()?'#141214':'#FEFAD9';const cs=document.getElementById('cs');if(cs)cs.content=isDark()?'dark':'light dark';}
 function toggleTheme(){const d=!isDark();document.documentElement.dataset.theme=d?'dark':'light';try{localStorage.setItem('rta_theme',d?'dark':'light')}catch(e){}paintTheme();}
 
 
@@ -1424,10 +1514,13 @@ document.addEventListener('click',e=>{
   if(e.target.closest('.favbtn'))return toggleFavFilter();
   if(e.target.closest('.plabel')&&!e.target.closest('.irl'))return;
   if(e.target.closest('#mapbox')&&!e.target.closest('.pin,.plabel')){if(S.pin){S.pin=null;paintPin();}else{S.showPins=!S.showPins;$('#mapbox').classList.toggle('nopins',!S.showPins);const h=$('#maphint');if(h)h.textContent=(S.showPins?'Toque num número para ver o nome.':'Toque no mapa para mostrar os números.')+' Dois dedos dão zoom.';}return;}
-  const t=e.target.closest('button,a,.irl'); if(!t)return;
+  const t=e.target.closest('button,a,.irl,img.sticker'); if(!t)return;
+  if(t.dataset.ft){S.ft=t.dataset.ft;return render();}
+  if(t.dataset.fa){S.fa=t.dataset.fa;return render();}
+  if(t.dataset.home){closeSheet();const h=t.dataset.home;if(h==='fav'){S.cat='fav';S.pin=null;return S.tab==='map'?render():setTab('map');}if(h==='share')return shareAppSheet();if(h==='about')return aboutSheet();}
   if(t.dataset.tab){closeSheet();if(t.dataset.tab==='map'&&S.tab!=='map')S.pin=null;return setTab(t.dataset.tab);}
   if(t.id==='install-btn')return doInstall();
-  if(t.id==='theme-btn')return toggleTheme();
+  if(t.id==='theme-btn'||t.id==='theme-home')return toggleTheme();
   if(t.id==='about-btn')return aboutSheet();
   if(t.hasAttribute('data-close')||t.id==='scrim')return closeSheet();
   if(t.dataset.rotday!==undefined){const el=document.getElementById('rotday-'+t.dataset.rotday);if(el){main.scrollTop+=el.getBoundingClientRect().top-main.getBoundingClientRect().top-8;}return;}
@@ -1460,7 +1553,7 @@ document.addEventListener('click',e=>{
   if(t.id==='clear'){const n=S.sel.size+S.maybe.size;$('#sheet').innerHTML=`<button class="xbtn" data-close aria-label="Cancelar">×</button><h2>Limpar o roteiro?</h2><p>Essa ação não pode ser desfeita.</p><div class="acts2 row2"><button class="btnp" id="clear-ok">${IC.trash}Limpar tudo</button><button class="btns" data-close>Cancelar</button></div>`;openSheet();return;}
   if(t.id==='clear-ok'){S.sel.clear();S.maybe.clear();save();closeSheet();return render();}
 });
-document.addEventListener('input',e=>{if(e.target.id==='fsq'){const l=$('#fslegend');if(l)l.innerHTML=legendHtml(e.target.value);return;}if(e.target.id==='mq'){S.mq=e.target.value;const l=$('#legend');if(l)l.innerHTML=legendHtml();return;}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;rProg();const n=$('#q');n.focus();n.setSelectionRange(pos,pos);}});
+document.addEventListener('input',e=>{if(e.target.id==='fq'){S.fq=e.target.value;const l=$('#foodlist');if(l)l.innerHTML=foodList();return;}if(e.target.id==='fsq'){const l=$('#fslegend');if(l)l.innerHTML=legendHtml(e.target.value);return;}if(e.target.id==='mq'){S.mq=e.target.value;const l=$('#legend');if(l)l.innerHTML=legendHtml();return;}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;rProg();const n=$('#q');n.focus();n.setSelectionRange(pos,pos);}});
 
 /* ===================== COMPARTILHAR / IMAGEM / IMPORTAR ===================== */
 const APP_URL='https://rock-the-app.pages.dev';
