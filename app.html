@@ -1344,7 +1344,7 @@ function openPin(n,center){
 const K='#1A1420',CR='#FEFAD9',RO='#EB4B94',CO='#FE5A5E',YE='#FFD653',GR='#92FE71',VI='#884AFE',VD='#6034BD';
 const eye=(x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${CR}" stroke="${K}" stroke-width="2.5"/><circle cx="${x+1}" cy="${y+1}" r="${r/2.6}" fill="${K}"/>`;
 const drop=(x,y)=>`<path d="M${x} ${y}c-3 5-5 8-5 11a5 5 0 0 0 10 0c0-3-2-6-5-11z" fill="${CR}" stroke="${K}" stroke-width="2"/>`;
-const CV={storm:3,rain:5,mix:4,sun:3,cold:3,fog:4,hot:3}; /* variações por cenário: chars/<cenário>[-2|-3].webp */
+const CV={storm:3,rain:4,mix:4,sun:3,cold:3,fog:4,hot:3}; /* variações por cenário: chars/<cenário>[-2|-3].webp */
 const ROT_MS=2*3600*1000; /* a cada 2h o personagem do dia alterna */
 function varIdx(keys,i){let k=0;for(let j=0;j<i;j++)if(keys[j]===keys[i])k++;return k+Math.floor(Date.now()/ROT_MS);} /* dias com a mesma previsão nunca repetem o personagem */
 const CHAR_ALT={"storm": "Personagem com guarda-chuva virado sob trovoada", "mix": "Personagem em dia nublado com sol entre nuvens", "sun": "Personagem sob o sol forte", "cold": "Personagem agasalhado no frio", "fog": "Personagem na neblina da serra", "hot": "Personagem no calor", "rain": "Personagem na chuva"};
@@ -1459,7 +1459,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.153';
+const APP_VER='1.0.154';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
