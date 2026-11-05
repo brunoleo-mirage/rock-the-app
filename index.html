@@ -1459,7 +1459,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.154';
+const APP_VER='1.0.155';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
