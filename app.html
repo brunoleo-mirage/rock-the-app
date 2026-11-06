@@ -1196,7 +1196,8 @@ function card(sh,opts={}){
 const FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSd0j0GTqsGBnjCWQN1FHlYE5OHMZJE3G3uJwRk1INbK7bDGag/viewform';
 const rateKey=d=>'rta_rate_'+d;
 const RATE_DEMO=/[?&]aval=1/.test(location.search); /* ?aval=1 simula o fim do dia 1 para testar o cartão e o piscar */
-const rateOff=d=>{if(RATE_DEMO)return false;try{return localStorage.getItem(rateKey(d))==='1';}catch(e){return false;}};
+let rateDemoHid=false;
+const rateOff=d=>{if(RATE_DEMO)return rateDemoHid;try{return localStorage.getItem(rateKey(d))==='1';}catch(e){return false;}};
 const rateDay=()=>[0,1,2].filter(i=>(RATE_DEMO?i===0:dayOver(i))&&!rateOff(i)).pop();
 function rateCard(){const d=rateDay();if(d===undefined)return '';return `<div class="rate" role="note"><div><b>Rolou o ${DAYS[d].k==='sex'?'primeiro':DAYS[d].k==='sab'?'segundo':'último'} dia! Como foi?</b><span>Dá uma nota pro Rock the App e conta o que curtiu.<br>Leva 1 minuto e é anônimo.</span><button type="button" class="go" data-rateopen="${d}">Avaliar o app</button></div><button type="button" data-rate-x="${d}" aria-label="Fechar">×</button></div>`;}
 const hintOff=()=>{try{return localStorage.getItem('rta_hint2')==='1';}catch(e){return false;}};
@@ -1496,7 +1497,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.169';
+const APP_VER='1.0.170';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
@@ -1679,8 +1680,8 @@ document.addEventListener('click',e=>{
   if(t.dataset.z){S.zoom=Math.min(S.mapFs?6:4,Math.max(1,S.zoom+(+t.dataset.z)*0.5));const w=$('#mapwrap');const sl=w.scrollLeft/w.scrollWidth,st=w.scrollTop/w.scrollHeight;$('#mapbox').style.width=S.zoom*100+'%';w.scrollLeft=sl*w.scrollWidth;w.scrollTop=st*w.scrollHeight;relayout();return;}
   if(t.id==='wxr'){return loadWx();}
   if(shareClick(t))return;
-  if(t.dataset.rateopen!==undefined){const d=t.dataset.rateopen;if(d!=='')try{localStorage.setItem(rateKey(d),'1');}catch(e){}return rateSheet();}
-  if(t.hasAttribute('data-rate-x')){try{localStorage.setItem(rateKey(t.getAttribute('data-rate-x')),'1');}catch(e){}return render();}
+  if(t.dataset.rateopen!==undefined){const d=t.dataset.rateopen;if(d!=='')rateDemoHid=true;if(d!=='')try{localStorage.setItem(rateKey(d),'1');}catch(e){}return rateSheet();}
+  if(t.hasAttribute('data-rate-x')){rateDemoHid=true;try{localStorage.setItem(rateKey(t.getAttribute('data-rate-x')),'1');}catch(e){}return render();}
   if(t.hasAttribute('data-hint-x')){try{localStorage.setItem('rta_hint2','1');}catch(e){}return render();}
   if(t.id==='remind')return toggleRemind();
   if(t.id==='rem-off'){try{localStorage.setItem('rta_remind','0');}catch(e){}pushOff();closeSheet();return render();}
