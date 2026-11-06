@@ -74,6 +74,7 @@ nav .badge{position:absolute;top:4px;left:calc(50% + 6px);background:var(--rose)
 .days .chip-btn[aria-pressed="true"]{background:var(--sky)}
 .days .chip-btn[aria-pressed="true"] small{color:var(--ink)}
 .search{width:100%;border:2px solid var(--ink);border-radius:14px;padding:10px 14px;background:var(--paper);font:inherit;margin:0 0 8px;min-height:44px}
+.search:focus-visible{outline-offset:-3px}
 .hour{font-family:var(--f-display);font-weight:600;font-size:14px;color:var(--ink2);margin:14px 0 6px;display:flex;align-items:center;gap:8px}
 .hour::after{content:"";flex:1;border-top:2px dashed var(--line)}
 .card{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;background:var(--paper);border:2px solid var(--ink);border-radius:16px;padding:10px 10px 10px 0;margin-bottom:8px;border-left:10px solid var(--c,var(--rose));padding-left:10px;position:relative}
@@ -1475,7 +1476,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.163';
+const APP_VER='1.0.164';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
