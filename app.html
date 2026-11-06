@@ -1051,7 +1051,7 @@ const PINS=[
 ].map(p=>({n:p[0],x:p[1],y:p[2],name:p[3],cat:p[4],note:p[5]||''}));
 const CATS=[['all','Tudo'],['palco','Palcos'],['exp','Comida e arte'],['beb','Bebedouros'],['ban','Banheiros'],['sau','Saúde'],['pcd','Acessibilidade'],['srv','Serviços'],['sai','Saídas']];
 const MAPW=924, MAPH=425;
-const PIN_STAGE={6:'aurora',15:'casa',17:'coreto',19:'speakeasy',24:'floresta',25:'estrela',29:'samba',30:'kids',34:'magic',40:'secreto',42:'fervo',46:'reggae',47:'skate'};
+const PIN_STAGE={6:'aurora',15:'casa',17:'coreto',19:'speakeasy',24:'floresta',25:'estrela',29:'samba',30:'kids',34:'magic',40:'secreto',42:'fervo',46:'reggae',47:'skate',23:'atracoes',45:'atracoes'};
 
 /* ===================== MODELO ===================== */
 const LT=new Set(['--st4','--st6','--st7','--st9','--st12','--st13']);
@@ -1092,7 +1092,7 @@ const planIds=()=>[...S.sel,...S.maybe];
 const overlap=(a,b)=>a.s<b.e&&b.s<a.e;
 function conflictsOf(sh){ if(sh.bg)return[]; return [...S.sel].map(i=>byId[i]).filter(o=>o&&o.id!==sh.id&&o.d===sh.d&&!o.bg&&overlap(sh,o)); }
 function fmtIn(m){m=Math.max(0,Math.round(m));const d=Math.floor(m/1440),h=Math.floor(m%1440/60),mm=m%60;return d?`${d}d ${h}h`:h?`${h}h${String(mm).padStart(2,'0')}`:`${mm} min`;}
-const liveWord=sh=>(sh.oficina||sh.stage==='kids')?'Rolando agora':'Tocando agora';
+const liveWord=sh=>(sh.oficina||sh.stage==='kids'||sh.stage==='atracoes')?'Rolando agora':'Tocando agora';
 const isLive=sh=>NOW.date===DAYS[sh.d].date&&NOW.mins>=sh.s&&NOW.mins<sh.e;
 
 /* ===================== RENDER ===================== */
@@ -1183,12 +1183,12 @@ const hintOff=()=>{try{return localStorage.getItem('rta_hint2')==='1';}catch(e){
 function rProg(){
   const _pc=main.querySelector('.chips[aria-label="Palco"]'), _sl=_pc?_pc.scrollLeft:0; /* mantém a posição da fila de palcos ao tocar num deles */
   const q=norm(S.q.trim());
-  let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0||S.stages.includes(x.stage))&&(!S.hl||isHl(x))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
+  let list=SHOWS.filter(x=>x.d===S.day&&!showOver(x)&&(S.stages.length===0?x.stage!=='atracoes':S.stages.includes(x.stage))&&(!S.hl||isHl(x))&&(!q||norm(x.name+' '+stageById[x.stage].n).includes(q)));
   list.sort((a,b)=>a.s-b.s||stageById[a.stage].i-stageById[b.stage].i);
   let html=dayChips();
   if(!S.sel.size&&!S.maybe.size&&!hintOff())html+='<div class="hint2" role="note"><span>Se programe para o 2º fim de semana</span><button type="button" data-hint-x aria-label="Fechar aviso">×</button></div>';
   html+=`<input class="search" id="q" type="search" placeholder="Buscar artista ou palco" value="${esc(S.q)}" aria-label="Buscar">`;
-  const ordered=S.stages.map(id=>stageById[id]).concat(STAGES.filter(s=>!S.stages.includes(s.id)));
+  const ordered=S.stages.map(id=>stageById[id]).concat(STAGES.filter(s=>!S.stages.includes(s.id)&&s.id!=='atracoes'));
   html+='<div class="chips" role="group" aria-label="Palco">'+[{id:'all',n:'Todos os palcos',c:'--rose',on:S.stages.length===0&&!S.hl},{id:'hl',n:'Destaques',c:'--butter',on:S.hl}].concat(ordered.map(s=>({id:s.id,n:s.n,c:s.c,on:S.stages.includes(s.id)}))).map(s=>`<button class="chip-btn${s.id!=='all'&&s.id!=='hl'&&!SHOWS.some(x=>x.d===S.day&&x.stage===s.id&&!showOver(x))?' nodata':''}${LT.has(s.c)?' lt':''}" data-stage="${s.id}" style="--c:var(${s.c})" aria-pressed="${s.on}">${esc(s.n)}</button>`).join('')+'</div>';
   html+=`<p class="note" style="margin:0 0 4px">${DAYS[S.day].full} · ${list.length} ${list.length===1?'atração':'atrações'}${S.sel.size?' · '+[...S.sel].filter(i=>byId[i].d===S.day).length+' marcada(s)':''}</p>`;
   if(!list.length) html+=SHOWS.filter(x=>x.d===S.day).every(showOver)?'<div class="empty"><b>As atrações deste dia já acabaram</b>Escolha outro dia acima.</div>':'<div class="empty"><b>Nada por aqui</b>Troque o palco ou limpe a busca.</div>';
@@ -1476,7 +1476,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.164';
+const APP_VER='1.0.165';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
