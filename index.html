@@ -30,10 +30,10 @@
 <style>
 /* Layout: cabeçalho amarelo manteiga, conteúdo em lista de cartões, navegação fixa embaixo. Paleta suave derivada do KV do festival. */
 :root{
-  --nms1:#FEFAD9;--nms2:#FEFAD9;--nms3:#FEFAD9;--nms4:#1A1420;--nms5:#FEFAD9;--nms6:#1A1420;--nms7:#1A1420;--nms8:#FEFAD9;--nms9:#1A1420;--nms10:#FEFAD9;--nms11:#FEFAD9;--nms12:#1A1420;--nms13:#1A1420;--nms14:#FEFAD9;--nms15:#FEFAD9;
+  --nms1:#FEFAD9;--nms2:#FEFAD9;--nms3:#FEFAD9;--nms4:#1A1420;--nms5:#FEFAD9;--nms6:#1A1420;--nms7:#1A1420;--nms8:#FEFAD9;--nms9:#1A1420;--nms10:#FEFAD9;--nms11:#FEFAD9;--nms12:#1A1420;--nms13:#1A1420;--nms14:#FEFAD9;--nms15:#FEFAD9;--nms16:#FEFAD9;
   --bg:#FEFAD9; --paper:#FFFDF8; --butter:#FFD653; --rose:#EBA9CC; --sky:#884AFE; --sage:#A9D3A0;
   --lav:#884AFE; --peach:#F3C7A6; --ink:#3A3340; --ink2:#6E6578; --line:#E6DAC2;
-  --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#2B1466;--nm2:#2B1466;--nm3:#2B1466;--nm4:#FEFAD9;--nm5:#2B1466;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#2B1466;--nm9:#FEFAD9;--nm10:#2B1466;--nm11:#2B1466;--nm12:#FEFAD9;--nm13:#FEFAD9;--nm14:#2B1466;--nm15:#2B1466;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;
+  --warn:#F2B8A2; --warn-ink:#7A3B2A; --hdr:#FFD653; --on:#FFF6D9; --dk:#3A3340; --nm1:#2B1466;--nm2:#2B1466;--nm3:#2B1466;--nm4:#FEFAD9;--nm5:#2B1466;--nm6:#FEFAD9;--nm7:#FEFAD9;--nm8:#2B1466;--nm9:#FEFAD9;--nm10:#2B1466;--nm11:#2B1466;--nm12:#FEFAD9;--nm13:#FEFAD9;--nm14:#2B1466;--nm15:#2B1466;--nm16:#2B1466;--st1:#EB4B94;--st2:#FFD653;--st3:#92FE71;--st4:#884AFE;--st5:#FE5A5E;--st6:#301A5E;--st7:#497F38;--st8:#C3A4FE;--st9:#7F2D2F;--st10:#B2963A;--st11:#FEACAE;--st12:#82348D;--st13:#B23F42;--st14:#66B24F;--st15:#9071D1;--st16:#E8833A;
   --f-display:'Amatic SC','Comic Sans MS',cursive; --f-body:'Amatic SC','Comic Sans MS',cursive;
   color-scheme: light;
 }
@@ -794,7 +794,8 @@ const STAGES=[
  {id:'speakeasy',n:'Speakeasy',s:'Heineken conv. Louder',pins:[19],c:'--st12'},
  {id:'skate',n:'Skatepark',s:'Lagunitas',pins:[47],c:'--st13'},
  {id:'quadras',n:'Quadras',s:'',pins:[],c:'--st14'},
- {id:'kids',n:'Área Kids',s:'',pins:[30],c:'--st15'}
+ {id:'kids',n:'Área Kids',s:'',pins:[30],c:'--st15'},
+ {id:'atracoes',n:'Atrações',s:'',pins:[45,23],c:'--st16'}
 ];
 /* stage|nome|início|fim|flags  (o=oficina, b=atração contínua, e=sem horário de fim) */
 const RAW=[`
@@ -842,6 +843,8 @@ speakeasy|Radio Louder convida Rio Doce (Caio Rosa)|19:00|21:00
 speakeasy|Breno LDR|21:00|23:00
 speakeasy|D.A.N.V|23:00|01:00
 speakeasy|Linguini|01:00|03:00
+atracoes|Roda Gigante|18:00|01:00|b
+atracoes|Tirolesa|18:00|01:00|b
 `,`
 floresta|Claudya|13:30|14:30
 floresta|Fran|15:50|16:50
@@ -931,6 +934,9 @@ kids|Palhaça Amora e Bolhas de Sabão|14:00|14:40
 kids|Palhaça Amora e Bolhas de Sabão|15:40|16:20
 skate|DJ Jama Beats|13:00|17:00|b
 skate|Oficina Best Trick|15:00|17:00|o
+atracoes|Roda Gigante|13:00|16:00|b
+atracoes|Roda Gigante|17:00|01:00|b
+atracoes|Tirolesa|14:00|00:00|b
 `,`
 floresta|Dora Morelenbaum|13:30|14:30
 floresta|Paulinho da Viola|15:30|16:20
@@ -1020,6 +1026,9 @@ kids|Palhaça Amora e Bolhas de Sabão|16:30|17:10
 skate|DJ Jama Beats|13:00|17:00|b
 skate|Oficina Trick for Cash|15:00|17:00|o
 reggae|Gideön|23:30|00:30
+atracoes|Roda Gigante|13:00|16:00|b
+atracoes|Roda Gigante|17:00|01:00|b
+atracoes|Tirolesa|14:00|00:00|b
 `];
 /* pins do mapa: n, x, y (no mapa emendado de 924x425), nome, categoria */
 const PINS=[
@@ -1187,7 +1196,7 @@ function rProg(){
   main.innerHTML=html;
   const cr=main.querySelector('.chips[aria-label="Palco"]');if(cr)cr.scrollLeft=_sl;
 }
-const STAGE_LONG={floresta:'Palco Floresta',estrela:'Palco Estrela',aurora:'Palco Aurora',movdome:'Mov.Dome',fervo:'Pista Fervo',secreto:'Secreto',magic:'Magic Drags',casa:'Casa do Rock',coreto:'Coreto',samba:'Roda de Samba',reggae:'Reggae Yard',speakeasy:'Speakeasy',skate:'Skatepark',quadras:'Quadras',kids:'Área Kids'};
+const STAGE_LONG={floresta:'Palco Floresta',estrela:'Palco Estrela',aurora:'Palco Aurora',movdome:'Mov.Dome',fervo:'Pista Fervo',secreto:'Secreto',magic:'Magic Drags',casa:'Casa do Rock',coreto:'Coreto',samba:'Roda de Samba',reggae:'Reggae Yard',speakeasy:'Speakeasy',skate:'Skatepark',quadras:'Quadras',kids:'Área Kids',atracoes:'Atrações'};
 const stageLong=id=>STAGE_LONG[id]||('Palco '+stageById[id].n);
 function dayText(d){
   const items=planIds().map(i=>byId[i]).filter(x=>x.d===d).sort((a,b)=>a.s-b.s);
@@ -1464,7 +1473,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.158';
+const APP_VER='1.0.160';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
