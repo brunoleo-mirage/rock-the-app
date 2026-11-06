@@ -1464,7 +1464,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.156';
+const APP_VER='1.0.157';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
@@ -1504,7 +1504,7 @@ function aboutSheet(k){
     const h=HELP[k];
     sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><button class="hlp-back" data-help="home">‹ Ajuda</button><h2 class="hlp-t"><span class="hlp-i${k==='mirage'?' nobg':''}">${ic(h[1])}</span>${h[0]}</h2><div class="hlp-body">${h[2]()}</div>`;
   }else{
-    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Ajuda</h2><input class="search hlp-q" id="hq" type="search" placeholder="Buscar na ajuda (ex.: locker)" aria-label="Buscar na ajuda" autocomplete="off" autocapitalize="off" enterkeyhint="search"><p class="hlp-lead">${S.tab==='home'?'Toque num tema para ver como funciona.':'Toque num tema. Para voltar à tela inicial, toque no logo, no topo.'}</p><div class="hlp-res" id="hres" style="display:none"></div><div class="hlp-grid" id="hgrid">${Object.keys(HELP).map(x=>`<button class="hlp-b" data-help="${x}"><span class="hlp-i${x==='mirage'?' nobg':''}">${ic(HELP[x][1])}</span>${HELP[x][0]}</button>`).join('')}</div><p class="ver">Versão ${APP_VER}</p>`;
+    sh.innerHTML=`<button class="xbtn" data-close aria-label="Fechar">×</button><h2>Ajuda</h2><input class="search hlp-q" id="hq" type="search" placeholder="Buscar na ajuda (ex.: locker)" aria-label="Buscar na ajuda" autocomplete="off" autocapitalize="off" enterkeyhint="search"><p class="hlp-lead">${S.tab==='home'?'Toque num tema para ver como funciona.':'Toque num tema. Para voltar à tela inicial, toque no logo, no topo.'}</p><div class="hlp-res" id="hres" style="display:none"></div><div class="hlp-grid" id="hgrid">${Object.keys(HELP).map(x=>`<button class="hlp-b" data-help="${x}"><span class="hlp-i${x==='mirage'?' nobg':''}">${ic(HELP[x][1])}</span>${HELP[x][0]}</button>`).join('')}</div><p class="ver">Versão ${APP_VER}</p>${(()=>{try{return localStorage.getItem('rta_noan')==='1'?'<p class="ver">Modo teste: seus acessos não são contados</p>':''}catch(e){return ''}})()}`;
   }
   const hq=sh.querySelector('#hq');
   if(hq)hq.addEventListener('input',()=>{

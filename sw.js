@@ -1,4 +1,4 @@
-const V='rta-v156';
+const V='rta-v157';
 const CORE=['./','index.html','map.jpg','sticker.webp','mirage-logo.webp','mirage-icon.webp','manifest.webmanifest','favicon.png','icons/icon-192.png','icons/icon-512.png','icons/badge-96.png','fonts/AmaticSC-Regular.woff','fonts/AmaticSC-Bold.woff','chars/fest-duo.webp','chars/fest-rock.webp','chars/fest-dance.webp','chars/fest-guitar.webp','logo-rtm.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=='rta-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
