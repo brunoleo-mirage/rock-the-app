@@ -882,7 +882,7 @@ movdome|Tata Ogan DJ + Grazzi VJ|17:35|19:10
 movdome|Mov DJ's + Mov VJ's|20:00|21:00
 movdome|Gaspar Muniz DJ + Grazzi VJ|21:00|22:40
 movdome|Nepal DJ + Luvinha VJ|23:40|00:30
-fervo|Oficina de Ioga|13:00|14:00|o
+fervo|Morning Ioga|13:00|14:00|o
 fervo|Oficina de Passinho|14:30|15:30|o
 fervo|WLDZ|15:30|17:00
 fervo|Juntos Com Certeza|17:00|18:30
@@ -942,7 +942,7 @@ speakeasy|DJ Livea|21:00|23:00
 speakeasy|High Tuco|23:00|01:00
 speakeasy|Joazz|01:00|03:00
 skate|Oficina Skate Feminino e LGBTQIA+|13:00|15:00|o
-quadras|Oficina Gaymado|14:00|15:00|o
+quadras|Gaymada|14:00|15:00|o
 quadras|Oficina Bambolê de LED|21:30||oe|Sem horário de término no cartaz; considerei 1h.
 kids|Pintura Facial|13:00|17:00|b
 kids|Palhaça Amora e Bolhas de Sabão|14:00|14:40
@@ -1497,7 +1497,7 @@ function conflictSheet(sh,cf){
   <div class="acts2 row2"><button class="btnp" data-swap="${sh.id}">${IC.swap}Trocar pelo novo</button><button class="btns" data-both="${sh.id}">${IC.warn}Marcar mesmo assim</button></div>`;
   openSheet();
 }
-const APP_VER='1.0.170';
+const APP_VER='1.0.171';
 const MB=(l,o)=>{o=o||{};return `<span class="mb ${o.c||''}" aria-hidden="true">${o.i||''}${l||''}</span>`;};
 const HELP={
  prog:['Programação','prog',()=>`<ul><li><b>Por dia.</b> ${MB('SEX 06/11',{c:'day'})} Lista os shows de cada dia, por horário. Toque no dia para trocar.</li><li><b>Busca e palcos.</b> Busque por artista ou palco, ou filtre por um palco. Em ${MB('★ Destaques',{c:'yel'})}, veja só as atrações principais.</li><li><b>Marcar um show.</b> ${MB('Quero ir')} Coloca o show no seu roteiro. Se bater com outro do mesmo dia, o app avisa e você escolhe: trocar pelo novo, marcar mesmo assim ou cancelar.</li><li><b>Ainda em dúvida.</b> ${MB('Talvez',{c:'dash'})} Guarda como possibilidade, sem checar choque.</li><li><b>Shows encerrados.</b> Os que já acabaram saem da lista.</li></ul>`],
